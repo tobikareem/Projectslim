@@ -1,0 +1,13 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/src/.vs
+/.vs
+/src/Core/Slim.Core/bin/Debug/net6.0
+/src/Core/Slim.Core/obj
+/src/Data/Slim.Data/bin/Debug/net6.0
+/src/Data/Slim.Data/obj
+/src/Shared/Slim.Shared/obj
+/src/Web/Slim.Pages/bin/Debug/net6.0
+/src/Web/Slim.Pages/obj
