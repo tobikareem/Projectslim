@@ -11,3 +11,5 @@
 /src/Shared/Slim.Shared/obj
 /src/Web/Slim.Pages/bin/Debug/net6.0
 /src/Web/Slim.Pages/obj
+/src/.vscode/launch.json
+/src/.vscode/tasks.json
