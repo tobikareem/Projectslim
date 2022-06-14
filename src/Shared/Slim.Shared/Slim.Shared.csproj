@@ -6,4 +6,14 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Interfaces\Serv\" />
+    <Folder Include="Interfaces\Repo\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\Slim.Core\Slim.Core.csproj" />
+    <ProjectReference Include="..\..\Data\Slim.Data\Slim.Data.csproj" />
+  </ItemGroup>
+
 </Project>
