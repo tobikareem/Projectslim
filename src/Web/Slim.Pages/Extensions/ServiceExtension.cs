@@ -6,6 +6,7 @@ using Slim.Shared.Interfaces.Repo;
 using Slim.Shared.Interfaces.Serv;
 using Slim.Shared.Repositories;
 using Slim.Shared.Services;
+using Newtonsoft.Json.Serialization;
 
 namespace Slim.Pages.Extensions
 {
@@ -23,6 +24,8 @@ namespace Slim.Pages.Extensions
                 .AddEntityFrameworkStores<SlimDbContext>();
 
             builder.Services.AddRazorPages();
+
+            services.AddAntiforgery(o => o.HeaderName = "XSRF-TOKEN");
 
 
             #region Add Service Injection

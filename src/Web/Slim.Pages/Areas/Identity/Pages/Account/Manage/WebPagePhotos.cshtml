@@ -169,10 +169,10 @@
 
                 // process the form
                 $.ajax({
-                    type: 'POST', // define the type of HTTP verb we want to use (POST for our form)
-                    url: '@Url.Action("SaveWording")', // the url where we want to POST
-                    data: formData, // our data object
-                    contentType: 'application/x-www-form-urlencoded; charset=UTF-8', // what kind of content do we expect back from the server
+                    type: 'get', // define the type of HTTP verb we want to use (POST for our form)
+                    url: '/Identity/Account/Manage/WebPagePhotos?handler=Wording', // the url where we want to POST
+                    data: JSON.stringify('p'), // our data object
+                    // contentType: 'application/x-www-form-urlencoded; charset=UTF-8', // what kind of content do we expect back from the server
                     dataType: 'json', // what type of data do we expect back from the server
                     encode: true,
                     success: function(data) {
@@ -182,6 +182,8 @@
                         } else {
                             alert('Error');
                         }
+                    }, error: function(data) {
+                        alert('Error');
                     }
 
 
