@@ -51,11 +51,16 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
         public PageImage PageImage { get; set; } = default!;
 
         [HttpPost]
-        public async Task<IActionResult> SaveWording(List<PageSection> sections)
+        public async Task<IActionResult> OnPostSaveWording(string sections)
         {
-            return Page();
+            return new JsonResult("This is me");
         }
-        
+
+        [HttpGet]
+        public async Task<IActionResult> OnGetWording(string sections)
+        {
+            return new JsonResult("This is me");
+        }
 
         public  IActionResult OnPostAllSections()
         {
