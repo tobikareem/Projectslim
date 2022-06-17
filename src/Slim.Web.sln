@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32526.322
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Slim.Pages", "Web\Slim.Pages\Slim.Pages.csproj", "{D296F051-08E7-4502-AD7F-EFE09312B530}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Slim.Pages", "Web\Slim.Pages\Slim.Pages.csproj", "{D296F051-08E7-4502-AD7F-EFE09312B530}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Slim.Shared", "Shared\Slim.Shared\Slim.Shared.csproj", "{724A474E-6FD1-4D64-BBDB-F7922B4051E9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Slim.Shared", "Shared\Slim.Shared\Slim.Shared.csproj", "{724A474E-6FD1-4D64-BBDB-F7922B4051E9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Slim.Data", "Data\Slim.Data\Slim.Data.csproj", "{96BB0364-6F40-416F-956E-AD286AADBBCC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Slim.Data", "Data\Slim.Data\Slim.Data.csproj", "{96BB0364-6F40-416F-956E-AD286AADBBCC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Slim.Core", "Core\Slim.Core\Slim.Core.csproj", "{B182E3B8-496C-44F4-B834-C591A99A8241}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Slim.Core", "Core\Slim.Core\Slim.Core.csproj", "{B182E3B8-496C-44F4-B834-C591A99A8241}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
