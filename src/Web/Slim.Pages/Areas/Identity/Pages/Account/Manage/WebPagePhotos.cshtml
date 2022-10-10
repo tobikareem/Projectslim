@@ -1,0 +1,195 @@
+﻿@page
+@using Slim.Pages.Areas.Identity.Pages.Account.Manage
+@model WebPagePhotosModel
+
+@{
+    ViewData["Title"] = "WebPagePhotos";
+    ViewData["ActivePage"] = ManageNavPages.WebPagePhotos;
+}
+
+<h1>WebPagePhotos</h1>
+<hr />
+<div class="row mt-3">
+    <div class="col-md-12">
+
+
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <form method="post" asp-page-handler="AllSections">
+            <div class="form-group">
+                <label asp-for="InModel.RazorPageId" class="control-label"></label>
+                <select asp-for="InModel.RazorPageId" asp-items="Model.RazorPageSelectList"></select>
+                <span asp-validation-for="InModel.RazorPageId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+
+        </form>
+
+        <!-- Tabs-->
+        <ul class="nav nav-tabs nav-justified" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link px-0 active" href="#pageWording" data-bs-toggle="tab" role="tab">
+                    <div class="d-none d-lg-block"><i class="bi bi-pen opacity-60 me-2"></i>Page Wordings</div>
+                    <div class="d-lg-none text-center">
+                        <i class="ci-user opacity-60 d-block fs-xl mb-2"></i><span class="fs-ms">Page Wordings</span>
+                    </div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link px-0" href="#notifications" data-bs-toggle="tab" role="tab">
+                    <div class="d-none d-lg-block"><i class="ci-bell opacity-60 me-2"></i>Change Photos</div>
+                    <div class="d-lg-none text-center">
+                        <i class="bi bi-image-alt opacity-60 d-block fs-xl mb-2"></i><span class="fs-ms">
+                            Change
+                            Photos
+                        </span>
+                    </div>
+                </a>
+            </li>
+        </ul>
+
+        <!-- Tab content-->
+
+        <div class="tab-content">
+
+            <!-- Profile-->
+            <div class="tab-pane fade show active" id="pageWording" role="tabpanel">
+                <div class="row gx-4 gy-3">
+                    <form>
+                        @foreach (var sec in Model.PageSections.Where(section => !section.HasImage))
+                        {
+                            <div class="col-sm-12">
+                                <label class="form-label" asp-for="InModel.PageSectionName">@sec.PageSectionName</label>
+                                <input class="form-control" asp-for="InModel.Description" value="@sec.Description">
+                            </div>
+                        }
+
+                        <hr class="mt-2 mb-4">
+                        <div class="col-12 d-sm-flex justify-content-between align-items-center">
+                            <button class="btn btn-primary mt-3 mt-sm-0" type="button" id="SaveWording"> Save changes </button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+
+            <!-- Notifications-->
+            <div class="tab-pane fade" id="notifications" role="tabpanel">
+                <div class="bg-secondary rounded-3 p-4 mb-4">
+                    <div class="d-flex align-items-center">
+                        <img class="rounded" src="img/marketplace/account/avatar.png" width="90" alt="Createx Studio">
+                        <div class="ps-3">
+                            <button class="btn btn-light btn-shadow btn-sm mb-2" type="button">
+                                <i class="ci-loading me-2"></i>Change <span class='d-none d-sm-inline'>avatar</span>
+                            </button>
+                            <div class="p mb-0 fs-ms text-muted">Upload JPG, GIF or PNG image. 300 x 300 required.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-secondary rounded-3 p-4">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="nf-disable-all"
+                               data-master-checkbox-for="#notifocation-settings">
+                        <label class="form-check-label fw-medium" for="nf-disable-all">
+                            Enable/disable all
+                            notifications
+                        </label>
+                    </div>
+                </div>
+                <div id="notifocation-settings">
+                    <div class="border-bottom p-4">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="nf-product-sold" checked>
+                            <label class="form-check-label" for="nf-product-sold">Product sold notifications</label>
+                        </div>
+                        <div class="form-text">Send an email when someone purchased one of my products</div>
+                    </div>
+                    <div class="border-bottom p-4">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="nf-product-updated" checked>
+                            <label class="form-check-label" for="nf-product-updated">
+                                Product update
+                                notifications
+                            </label>
+                        </div>
+                        <div class="form-text">Send an email when a product I've purchased is updated</div>
+                    </div>
+                    <div class="border-bottom p-4">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="nf-product-comment" checked>
+                            <label class="form-check-label" for="nf-product-comment">
+                                Product comment
+                                notifications
+                            </label>
+                        </div>
+                        <div class="form-text">Send an email when someone comments on one of my products</div>
+                    </div>
+                    <div class="border-bottom p-4">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="nf-product-review" checked>
+                            <label class="form-check-label" for="nf-product-review">Product review notification</label>
+                        </div>
+                        <div class="form-text">Send an email when someone leaves a review with their rating</div>
+                    </div>
+                    <div class="border-bottom p-4">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="nf-daily-summary">
+                            <label class="form-check-label" for="nf-daily-summary">Daily summary emails</label>
+                        </div>
+                        <div class="form-text">Send me a daily summary of all products sold, commented or reviewed</div>
+                    </div>
+                </div>
+                <div class="text-sm-end mt-4">
+                    <button class="btn btn-primary" type="button">Save changes</button>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function() {
+            debugger;
+            $('#SaveWording').click(function() {
+                // get the form data
+                // there are many ways to get this data using jQuery (you can use the class or id also)
+                var formData = $('form').serialize();
+
+
+
+                // process the form
+                $.ajax({
+                    type: 'get', // define the type of HTTP verb we want to use (POST for our form)
+                    url: '/Identity/Account/Manage/WebPagePhotos?handler=Wording', // the url where we want to POST
+                    data: JSON.stringify('p'), // our data object
+                    // contentType: 'application/x-www-form-urlencoded; charset=UTF-8', // what kind of content do we expect back from the server
+                    dataType: 'json', // what type of data do we expect back from the server
+                    encode: true,
+                    success: function(data) {
+                        // using the JSON data from the server
+                        if (data.success) {
+                            alert('Success');
+                        } else {
+                            alert('Error');
+                        }
+                    }, error: function(data) {
+                        alert('Error');
+                    }
+
+
+                });
+
+            });
+        });
+    </script>
+}

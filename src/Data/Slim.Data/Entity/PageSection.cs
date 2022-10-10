@@ -1,6 +1,8 @@
-﻿namespace Slim.Data.Entity
+﻿using Slim.Data.Model;
+
+namespace Slim.Data.Entity
 {
-    public sealed partial class PageSection
+    public partial class PageSection : GeneralEntity
     {
         public PageSection()
         {
@@ -12,14 +14,10 @@
         public int RazorPageId { get; set; }
         public string PageSectionName { get; set; } = null!;
         public string? Description { get; set; }
-        public bool? Enabled { get; set; }
-        public int CreatedBy { get; set; }
-        public DateTime CreatedDate { get; set; }
-        public int? ModifiedBy { get; set; }
-        public DateTime? ModifiedDate { get; set; }
+        public bool HasImage { get; set; }
 
-        public RazorPage RazorPage { get; set; } = null!;
-        public ICollection<PageSectionImage> PageSectionImages { get; set; }
-        public ICollection<PageSectionResource> PageSectionResources { get; set; }
+        public virtual RazorPage RazorPage { get; set; } = null!;
+        public virtual ICollection<PageSectionImage> PageSectionImages { get; set; }
+        public virtual ICollection<PageSectionResource> PageSectionResources { get; set; }
     }
 }

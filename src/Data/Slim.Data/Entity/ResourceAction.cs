@@ -2,7 +2,7 @@
 
 namespace Slim.Data.Entity
 {
-    public sealed partial class ResourceAction : GeneralEntity
+    public partial class ResourceAction :GeneralEntity
     {
         public ResourceAction()
         {
@@ -14,7 +14,7 @@ namespace Slim.Data.Entity
         public string ResourceAction1 { get; set; } = null!;
         public string? Description { get; set; }
 
-        public ICollection<PageSectionResource> PageSectionResources { get; set; }
-        public ICollection<RazorPageResourceActionMap> RazorPageResourceActionMaps { get; set; }
+        public virtual ICollection<PageSectionResource> PageSectionResources { get; set; }
+        public virtual ICollection<RazorPageResourceActionMap> RazorPageResourceActionMaps { get; set; }
     }
 }

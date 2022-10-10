@@ -13,3 +13,6 @@
 /src/Web/Slim.Pages/obj
 /src/.vscode/launch.json
 /src/.vscode/tasks.json
+*.dll
+*.pdb
+*/src/Shared/Slim.Shared/obj
