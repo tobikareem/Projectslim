@@ -16,3 +16,6 @@
 *.dll
 *.pdb
 */src/Shared/Slim.Shared/obj
+.DS_Store
+src/Shared/Slim.Shared/bin/Debug/net6.0/Slim.Shared.deps.json
+src/Shared/Slim.Shared/bin/Debug/net6.0/Slim.Shared.pdb
