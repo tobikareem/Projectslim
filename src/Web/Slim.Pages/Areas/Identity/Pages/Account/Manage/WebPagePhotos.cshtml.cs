@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Slim.Core.Model;
-using Slim.Data.Context;
 using Slim.Data.Entity;
 using Slim.Shared.Interfaces.Repo;
 using Slim.Shared.Interfaces.Serv;
@@ -12,57 +11,68 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
 {
     public class WebPagePhotosModel : PageModel
     {
-        private readonly SlimDbContext _context;
         private readonly IBaseStore<RazorPage> _razorPagesBaseStore;
+        private readonly IPageSection<PageSection> _pageSectionsBaseStore;
         private readonly ICacheService _cacheService;
         private readonly ILogger<WebPagePhotosModel> _logger;
-
-        private readonly IBaseStore<PageSection> _pageSectionsBaseStore;
-
-        public List<PageSection> PageSections;
-        public List<InputModel> InputModels;
-
         public List<SelectListItem> RazorPageSelectList { get; set; }
-        public WebPagePhotosModel(SlimDbContext context, IBaseStore<RazorPage> razorPagesBaseStore, ICacheService cacheService, ILogger<WebPagePhotosModel> logger, IBaseStore<PageSection> pageSectionsBaseStore)
+        public Image PageImage { get; set; } = default!;
+
+        public List<InputModel> InputModels { get; set; } = new();
+
+        public WebPagePhotosModel(IBaseStore<RazorPage> razorPagesBaseStore, IPageSection<PageSection> pageSectionsBaseStore, ICacheService cacheService, ILogger<WebPagePhotosModel> logger )
         {
-            _context = context;
             _razorPagesBaseStore = razorPagesBaseStore;
             _cacheService = cacheService;
             _logger = logger;
             _pageSectionsBaseStore = pageSectionsBaseStore;
-            
             RazorPageSelectList = new List<SelectListItem>();
-            PageSections = new List<PageSection>();
-            InputModels = new List<InputModel>();
-
 
             var razorPages = _cacheService.GetOrCreate(CacheKey.GetRazorPages, _razorPagesBaseStore.GetAll);
             RazorPageSelectList = razorPages.Select(page => new SelectListItem { Text = page.PageName, Value = page.Id.ToString() }).ToList();
         }
+
+        [BindProperty(SupportsGet = true)] public InputModel InModel { get; set; } = new();
+        [BindProperty] public List<InputModel> WordingModel { get; set; } = new();
+
 
         public IActionResult OnGet()
         {
             return Page();
         }
 
-        [BindProperty] public InputModel InModel { get; set; } = new();
-
-
-        public PageImage PageImage { get; set; } = default!;
-
-        [HttpPost]
-        public async Task<IActionResult> OnPostSaveWording(string sections)
+        public IActionResult OnPostSaveWording()
         {
-            return new JsonResult("This is me");
-        }
+            var pageSections = _cacheService.GetOrCreate(CacheKey.GetPageSections, _pageSectionsBaseStore.GetAll).ToList();
+            
+            var wording = pageSections.Where(x => !x.HasImage && x.RazorPageId == int.Parse(WordingModel.First().RazorPageId)).ToList();
+            var hasChanges = false;
 
-        [HttpGet]
-        public async Task<IActionResult> OnGetWording(string sections)
-        {
-            return new JsonResult("This is me");
-        }
+            for (var i = 0; i < WordingModel.Count; i++)
+            {
+                if (wording[i].Description == WordingModel[i].Description)
+                {
+                    continue;
+                }
+                wording[i].Description = WordingModel[i].Description;
+                wording[i].ModifiedDate = DateTime.UtcNow;
 
-        public  IActionResult OnPostAllSections()
+                // TODO: Set the Modified By 
+                hasChanges = true;
+            }
+
+            if (hasChanges)
+            {
+                _pageSectionsBaseStore.UpdatePageSections(pageSections);
+            }
+            var razorPages = _cacheService.GetOrCreate(CacheKey.GetRazorPages, _razorPagesBaseStore.GetAll);
+            var currentPage = razorPages.First(x => x.Id == int.Parse(WordingModel.First().RazorPageId)).Url;
+            
+            return RedirectToPage($"{currentPage}");
+        }
+        
+        
+        public void OnPostAllSections()
         {
             try
             {
@@ -70,36 +80,34 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
                 if (string.IsNullOrWhiteSpace(InModel.RazorPageId))
                 {
                     ModelState.TryAddModelError(nameof(InModel.RazorPageId), "Please select a Page to make edits");
-                    return Page();
+                   // return Page();
                 }
+
                 var allSections = _cacheService.GetOrCreate(CacheKey.GetPageSections, _pageSectionsBaseStore.GetAll);
-
-                var pageId = Convert.ToInt32(InModel.RazorPageId);
-                PageSections = allSections.Where(x => x.RazorPageId == pageId).ToList();
-
-                foreach (var inputModel in PageSections.Select(section => new InputModel
-                         {
-                             PageSectionName = section.PageSectionName,
-                             Description = section.Description,
-                             PageSectionId = section.Id,
-                             HasImage = section.HasImage
-                        
-                         }))
+                
+                InputModels = allSections.Where(x => x.RazorPageId == int.Parse(InModel.RazorPageId)).Select(s => new InputModel
                 {
-                    InputModels.Add(inputModel);
-                }
+                    PageSectionName = s.PageSectionName,
+                    Description = s.Description,
+                    PageSectionId = s.Id,
+                    HasImage = s.HasImage,
+                    RazorPageId = InModel.RazorPageId
+                }).ToList();
 
-                return Page();
+                WordingModel = InputModels.Where(x => !x.HasImage).ToList();
+
+               // return Page();
             }
             catch (Exception e)
             {
                 _logger.LogError("... Exception occurred while Posting . {message}", e.Message);
-                return Page();
+               // return Page();
             }
         }
 
         public class InputModel
         {
+
             [Required, Display(Name = "Please, Select the Page you want to edit.")]
             public string RazorPageId { get; set; } = default!;
 
@@ -109,7 +117,7 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
 
             public int PageSectionId { get; set; }
             public bool HasImage { get; set; }
-            
+
         }
     }
 }

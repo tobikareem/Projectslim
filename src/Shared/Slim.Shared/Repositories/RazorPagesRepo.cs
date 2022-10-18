@@ -63,5 +63,26 @@ namespace Slim.Shared.Repositories
                 throw;
             }
         }
+
+        public void DeleteEntity(RazorPage entity, CacheKey cacheKey = CacheKey.None, bool hasCache = false)
+        {
+            try
+            {
+                _context.RazorPages.Remove(entity);
+                _context.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("Unable to delete Razor Page: {message}", e.Message);
+                throw;
+            }
+            finally
+            {
+                if (hasCache)
+                {
+                    _cacheService.Remove(cacheKey);
+                }
+            }
+        }
     }
 }

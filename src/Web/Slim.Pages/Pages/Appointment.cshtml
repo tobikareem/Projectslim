@@ -1,0 +1,169 @@
+﻿@page
+@model Slim.Pages.Pages.AppointmentModel
+@{
+}
+
+<div class="page-title-overlap bg-dark pt-4">
+    <div class="container d-lg-flex justify-content-between py-2 py-lg-3">
+        <div class="order-lg-2 mb-3 mb-lg-0 pt-lg-2">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb breadcrumb-light flex-lg-nowrap justify-content-center justify-content-lg-start">
+                    <li class="breadcrumb-item">
+                        <a class="text-nowrap" asp-page="/Index"><i class="bi bi-house"></i>Home</a>
+                    </li>
+                    <li class="breadcrumb-item text-nowrap">
+                        <a asp-page="/Hair"><i class="bi bi-house"></i>Hair</a>
+                    </li>
+                    <li class="breadcrumb-item text-nowrap">
+                        <a asp-page="/Lashes"><i class="bi bi-house"></i>Lashes</a>
+                    </li>
+                    <li class="breadcrumb-item text-nowrap">
+                        <a asp-page="/Lip"><i class="bi bi-house"></i>Lip Gloss</a>
+                    </li>
+                    <li class="breadcrumb-item text-nowrap active" aria-current="page">Appointment</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="order-lg-1 pe-lg-4 text-center text-lg-start">
+            <h1 class="h3 text-light mb-0">Book an Appointment below</h1>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid pb-5 mb-2 mb-md-4 mt-5">
+    <div class="row gy-3">
+        <section class="col-lg-8">
+            <!-- Google Calendar Appointment Scheduling begin -->
+            <iframe src="https://calendar.google.com/calendar/appointments/schedules/AcZssZ2Zi8I6RDP8dPDK4-J2h2GJiP-LbHQJ3Evyq1F8EoD8Tv1TdJ481oIAu7nRMjonb4qR9pKtgiG0?gv=true" style="border: 0" width="100" height="800" frameborder="0" name="googleFrame"></iframe>
+            <!-- end Google Calendar Appointment Scheduling -->
+        </section>
+
+        <aside class="col-lg-4">
+            <div class="card border-0 box-shadow">
+                <div class="card-body">
+                    <h2 class="h5 mb-4">Contact Us</h2>
+                    <ul class="list-unstyled fs-sm pb-2">
+                        <li class="d-flex align-items-center">
+                            <i class="bi bi-geo-alt text-muted mt-n1 me-2"></i>1234 Main St.<br />Anytown, CA 12345 US
+                        </li>
+                        <li class="d-flex align-items-center">
+                            <i class="bi bi-telephone text-muted mt-n1 me-2"></i>(555) 123-4567
+                        </li>
+                        <li class="d-flex align-items-center">
+                            <textarea class="form-control" id="appointment-message" rows="4" placeholder="Tell us more about your request"></textarea>
+                        </li>
+                        <li class="d-flex align-items-center">
+                            <button class="btn btn-primary" type="submit"><i class="bi bi-envelope text-muted mt-n1 me-2"></i> Send Money </button>
+                        </li>
+                    </ul>
+                    <hr class="my-4" />
+                    <h2 class="h5 mb-4">Opening Hours</h2>
+                    <ul class="list-unstyled fs-sm pb-2">
+                        <li class="d-flex align-items-center">
+                            <i class="bi bi-clock text-muted mt-n1 me-2"></i>Monday - Friday<br />9:00 AM - 5:00 PM
+                        </li>
+                        <li class="d-flex align-items-center">
+                            <i class="bi bi-clock text-muted mt-n1 me-2"></i>Saturday<br />10:00 AM - 2:00 PM
+                        </li>
+                        <li class="d-flex align-items-end">
+                            <i class="bi bi-clock text-muted mt-n1 me-2"></i>Sunday<br />Closed
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+        </aside>
+    </div>
+
+</div>
+
+@*<div class="container pb-5 mb-2 mb-md-4">
+    <div class="row">
+        <section class="col-lg-8">
+
+            <div class="card border-0 box-shadow">
+                <div class="card-body">
+                    <h2 class="h4 mb-4">Book an Appointment</h2>
+                    <form class="needs-validation" novalidate>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="appointment-name">Full name</label>
+                                    <input class="form-control" type="text" id="appointment-name" placeholder="John Doe" required>
+                                    <div class="invalid-feedback">Please enter your name.</div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="appointment-email">Email address</label>
+                                    <input class="form-control" type="email" id="appointment-email" placeholder="check it out" required>
+                                    <div class="invalid-feedback">Please provide a valid email address.</div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="appointment-phone">Phone number</label>
+                                    <input class="form-control" type="tel" id="appointment-phone" placeholder="123-456-7890" required>
+                                    <div class="invalid-feedback">Please provide a valid phone number.</div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="mb-3">
+                                    <label class="form-label" asp-for="Input.AppointmentDate">Date</label>
+                                    <input class="form-control" asp-for="Input.AppointmentDate" required>
+                                    <div class="invalid-feedback">Please provide a valid date.</div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="mb-3">
+                                    <label class="form-label" asp-for="Input.AppointmentTime">Time</label>
+                                    <input class="form-control" asp-for="Input.AppointmentTime" required>
+                                    <div class="invalid-feedback">Please provide a valid time.</div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="appointment-service">Service</label>
+                                    <select class="form-select" id="appointment-service" required>
+                                        <option value="">Select service</option>
+                                        <option value="Hair">Hair</option>
+                                        <option value="Lashes">Lashes</option>
+                                        <option value="Lip Gloss">Lip Gloss</option>
+                                    </select>
+                                    <div class="invalid-feedback">Please select a service.</div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label class="form-label" for="appointment-message">Message</label>
+                                    <textarea class="form-control" id="appointment-message" rows="4" placeholder="Tell us more about your request"></textarea>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="d-grid">
+                                    <button class="btn btn-primary" type="submit">Book Appointment</button>
+                                    <button class="bookAppointmentBtn btn btn-primary">Book an appointment</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+
+
+        </section>
+
+        <aside class="col-lg-4">
+        </aside>
+    </div>
+</div>
+*@
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+    </script>
+}

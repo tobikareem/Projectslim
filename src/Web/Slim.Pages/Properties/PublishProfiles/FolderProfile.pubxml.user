@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+https://go.microsoft.com/fwlink/?LinkID=208121.
+-->
+<Project>
+  <PropertyGroup>
+    <TimeStampOfAssociatedLegacyPublishXmlFile />
+    <_PublishTargetUrl>C:\Users\Tobi Kareem\OneDrive\Desktop\Personal\SlimTryPub</_PublishTargetUrl>
+    <History>True|2022-10-14T04:57:45.4323327Z;</History>
+    <LastFailureDetails />
+  </PropertyGroup>
+  <ItemGroup>
+    <DestinationConnectionStrings Include="AllowedHosts">
+      <Value>Server=%28localdb%29\MSSQLLocalDB%3bDatabase=SlimWebDB%3bTrusted_Connection=True%3bMultipleActiveResultSets=true</Value>
+    </DestinationConnectionStrings>
+  </ItemGroup>
+  <ItemGroup>
+    <EFMigrations Include="Slim.Data.Context.SlimDbContext">
+      <Value>%2a</Value>
+    </EFMigrations>
+  </ItemGroup>
+</Project>

@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Slim.Data.Entity;
 
 namespace Slim.Data.Context
@@ -19,96 +16,107 @@ namespace Slim.Data.Context
         {
         }
 
-        public virtual DbSet<PageImage> PageImages { get; set; } = null!;
+        public virtual DbSet<Image> Images { get; set; } = null!;
         public virtual DbSet<PageSection> PageSections { get; set; } = null!;
-        public virtual DbSet<PageSectionImage> PageSectionImages { get; set; } = null!;
+        public virtual DbSet<ProductImage> ProductImages{ get; set; } = null!;
         public virtual DbSet<PageSectionResource> PageSectionResources { get; set; } = null!;
         public virtual DbSet<RazorPage> RazorPages { get; set; } = null!;
         public virtual DbSet<RazorPageResourceActionMap> RazorPageResourceActionMaps { get; set; } = null!;
         public virtual DbSet<ResourceAction> ResourceActions { get; set; } = null!;
+        public virtual DbSet<Product> Products { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            optionsBuilder.EnableSensitiveDataLogging(true);
+            
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer();
+                optionsBuilder.UseSqlServer("Server=(localdb)\\MSSQLLocalDB;Database=SlimWebDB;Trusted_Connection=True;MultipleActiveResultSets=true");
             }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<PageImage>(entity =>
+            modelBuilder.Entity<Image>(entity =>
             {
-                entity.ToTable("PageImage", "slm");
+                entity.ToTable("Image", "slm");
 
+                entity.Property(e => e.ImageId).IsRequired().HasDefaultValue(Guid.NewGuid());
+                entity.Property(e => e.UploadedImage).IsRequired();
+                entity.Property(e => e.IsPrimaryImage).IsRequired().HasDefaultValue(false);
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
-
-                entity.Property(e => e.Description)
-                    .HasMaxLength(500)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Enabled)
-                    .IsRequired()
-                    .HasDefaultValueSql("((1))");
-
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+                entity.Property(e => e.CreatedBy);
+                entity.Property(e => e.ModifiedBy);
+                entity.Property(e => e.Enabled).IsRequired().HasDefaultValueSql("((1))");
+                
+            });
 
-                entity.Property(e => e.PageImageName)
-                    .HasMaxLength(100)
-                    .IsUnicode(false);
+            modelBuilder.Entity<Product>(entity =>
+            {
+                entity.ToTable("Product", "slm");
+
+                entity.Property(e => e.RazorPageId);
+                entity.Property(e => e.ProductName).IsRequired();
+                entity.Property(e => e.ProductDescription).IsRequired();
+                entity.Property(e => e.StandardPrice);
+                entity.Property(e => e.SalePrice);
+                entity.Property(e => e.ProductTags);
+                entity.Property(e => e.IsOnSale).IsRequired().HasDefaultValue(false);
+                entity.Property(e => e.IsNewProduct).IsRequired().HasDefaultValue(true);
+                entity.Property(e => e.IsTrending).IsRequired().HasDefaultValue(false);
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+                entity.Property(e => e.CreatedBy);
+                entity.Property(e => e.ModifiedBy);
+                entity.Property(e => e.Enabled).IsRequired().HasDefaultValueSql("((1))");
+
+                entity.HasOne(d => d.RazorPage)
+                    .WithMany(p => p.Products)
+                    .HasForeignKey(d => d.RazorPageId)
+                    .HasConstraintName("FK_Product_RazorPage");
+
+                entity.HasMany(d => d.Images)
+                    .WithOne(p => p.Product);
+            });
+
+            modelBuilder.Entity<ProductImage>(entity =>
+            {
+                entity.ToTable("ProductImage", "slm");
+
+                entity.HasOne(d => d.Image)
+                    .WithMany(p => p.ProductImages)
+                    .HasForeignKey(d => d.ImageId)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK_ProductImage_ImageImg");
+
+                entity.HasOne(d => d.Product)
+                    .WithMany(p => p.ProductImages)
+                    .HasForeignKey(d => d.ProductId)
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .HasConstraintName("FK_ProductImage_ProductProd");
             });
 
             modelBuilder.Entity<PageSection>(entity =>
             {
                 entity.ToTable("PageSection", "slm");
 
+                entity.Property(e => e.RazorPageId);
+                entity.Property(e => e.PageSectionName).HasMaxLength(100).IsUnicode(false);
+                entity.Property(e => e.Description).HasMaxLength(500).IsUnicode(false);
+                entity.Property(e => e.HasImage).IsRequired().HasDefaultValueSql("((0))");
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
-
-                entity.Property(e => e.Description)
-                    .HasMaxLength(500)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.HasImage).IsRequired().HasDefaultValueSql("((1))");
-
-                entity.Property(e => e.Enabled)
-                    .IsRequired()
-                    .HasDefaultValueSql("((1))");
-
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
-
-                entity.Property(e => e.PageSectionName)
-                    .HasMaxLength(100)
-                    .IsUnicode(false);
+                entity.Property(e => e.CreatedBy);
+                entity.Property(e => e.ModifiedBy);
+                entity.Property(e => e.Enabled).IsRequired().HasDefaultValueSql("((1))");
 
                 entity.HasOne(d => d.RazorPage)
                     .WithMany(p => p.PageSections)
                     .HasForeignKey(d => d.RazorPageId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_PageSection_PageId");
-            });
-
-            modelBuilder.Entity<PageSectionImage>(entity =>
-            {
-                entity.ToTable("PageSectionImage", "slm");
-
-                entity.HasOne(d => d.PageImage)
-                    .WithMany(p => p.PageSectionImages)
-                    .HasForeignKey(d => d.PageImageId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_PageSectionImage_PageImageId");
-
-                entity.HasOne(d => d.RazorPage)
-                    .WithMany(p => p.PageSectionImages)
-                    .HasForeignKey(d => d.RazorPageId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_PageSectionImage_PageId");
-
-                entity.HasOne(d => d.RazorPageSection)
-                    .WithMany(p => p.PageSectionImages)
-                    .HasForeignKey(d => d.RazorPageSectionId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_PageSectionImage_SectionId");
             });
 
             modelBuilder.Entity<PageSectionResource>(entity =>

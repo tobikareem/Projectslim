@@ -1,0 +1,346 @@
+﻿/** Eye Lashes **/
+body, html {
+    height: 100%;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+
+.cateSub {
+    border: none;
+    background: white;
+}
+
+.cateSub-nav {
+    width: 100%;
+    -webkit-transition: top .3s ease-in-out;
+    -webkit-transition-delay: 0s;
+    -moz-transition: top .3s ease-in-out;
+    -o-transition: top .3s ease-in-out;
+    transition: top .3s ease-in-out false;
+    z-index: calc(995 - 1px);
+}
+
+.h-220 {
+    height: 220px;
+}
+
+.cate-banner {
+    background-color: #FFFAFA;
+}
+
+
+.bg-img {
+    /* The image used */
+    min-height: 380px;
+    /* Center and scale the image nicely */
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    position: relative;
+}
+
+.mt-9-lashes {
+    margin-top: 9rem !important;
+}
+
+/***  Hair ****/
+.hair-header {
+    display: table-row;
+    width: 100%;
+}
+
+.hair-header-wrapper {
+    display: table;
+    table-layout: fixed;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    transition: height 400ms cubic-bezier(0.785, 0.135, 0.15, 0.86), opacity 0.5s ease-out 0.2s !important;
+}
+
+.hair-header[data-imgready="true"] .hair-header-wrapper > *, .no-cssanimations .hair-header .hair-header-wrapper > * {
+    opacity: 1;
+}
+
+.hair-header-wrapper .row-container > .row-background {
+    opacity: 0;
+    transition: opacity 0.5s;
+    transition-delay: 0.2s;
+}
+
+.row-background {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    overflow: hidden;
+    border-radius: inherit;
+    background-clip: padding-box;
+}
+
+.hair-bg {
+    /* The image used */
+    /* Full height */
+    height: 50%;
+    /* Center and scale the image nicely */
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+section.top-section {
+    background-color: #ebe9e1;
+}
+
+.hair-section {
+    max-width: 42rem;
+    z-index: 10;
+}
+
+.p-10-3 {
+    padding-top: 10rem !important;
+    padding-bottom: 3rem !important;
+}
+
+.hair-hr {
+    width: 75%;
+    height: 20px !important;
+    color: #796d56;
+}
+
+.hair-service {
+    padding: 30px 40px;
+    background-color: black;
+    color: white;
+}
+
+.linkBtn {
+    border: 1px solid gray;
+    color: #796d56;
+}
+
+    .linkBtn:hover {
+        background-color: #796d56;
+        color: white;
+    }
+
+.review-container {
+    overflow: auto;
+    max-height: 1200px;
+    border: 1px solid #796d56;
+    font-family: Arial;
+    margin: 0 auto;
+    max-height: 800px;
+    padding: 20px;
+}
+
+.star-check {
+    color: orange;
+}
+
+.side {
+    float: left;
+    width: 15%;
+    margin-top: 10px;
+}
+
+.middle {
+    margin-top: 10px;
+    float: left;
+    width: 70%;
+}
+
+.rating-row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.bar-container {
+    width: 100%;
+    background-color: #f1f1f1;
+    text-align: center;
+    color: white;
+}
+
+.bar-5 {
+    width: 60%;
+    height: 18px;
+    background-color: #04AA6D;
+}
+
+.bar-4 {
+    width: 30%;
+    height: 18px;
+    background-color: #2196F3;
+}
+
+.bar-3 {
+    width: 10%;
+    height: 18px;
+    background-color: #00bcd4;
+}
+
+.bar-2 {
+    width: 4%;
+    height: 18px;
+    background-color: #ff9800;
+}
+
+.bar-1 {
+    width: 15%;
+    height: 18px;
+    background-color: #f44336;
+}
+
+@media (max-width: 400px) {
+    .side, .middle {
+        width: 100%;
+    }
+
+    .text-end {
+        display: none;
+    }
+
+    .write-header {
+        padding: 5px !important;
+    }
+}
+
+.write-header {
+    background-color: #ebe9e1;
+    padding: 30px 40px;
+    color: white;
+    text-align: center;
+}
+
+    .write-header:after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+
+textarea {
+    margin: 0;
+    border: none;
+    border-radius: 0;
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    max-height: 150px;
+}
+
+.addReviewBtn {
+    padding: 10px;
+    width: 25%;
+    background: #d9d9d9;
+    color: black;
+    float: right;
+    text-align: center;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+    border-radius: 0;
+}
+
+    .addReviewBtn:hover {
+        background-color: #bbb;
+    }
+
+div.mobile-reviews {
+    display: block;
+    margin-top: 2rem;
+}
+
+div.mobile-reviews > div.contain-review {
+    border: 2px solid #ccc;
+    background-color: #eee;
+    border-radius: 5px;
+    padding: 15px;
+    margin: 16px 0;
+}
+
+div.mobile-reviews > div.contain-review:after {
+    content: '';
+    clear: both;
+    display: table;
+}
+div.mobile-reviews > div.contain-review > img.companyLogo {
+    float: left;
+    margin-right: 20px;
+    border-radius: 50%;
+    height: 60px;
+    width: 60px;
+    display: block;
+}
+
+div.mobile-reviews > div.contain-review > p > span {
+    font-size: 10px;
+    margin-right: 15px;
+}
+
+.customer-images {
+    text-align: center;
+    padding: 32px;
+}
+
+.cust-img-row {
+    display: -ms-flexbox; /* IE10 */
+    display: flex;
+    -ms-flex-wrap: wrap; /* IE10 */
+    flex-wrap: wrap;
+    padding: 0 4px;
+}
+
+.cust-img-col {
+    -ms-flex: 25%; /* IE10 */
+    flex: 25%;
+    max-width: 25%;
+    padding: 0 4px;
+}
+
+.cust-img-col img {
+        margin-top: 8px;
+        vertical-align: middle;
+        width: 100%;
+    }
+
+/* Responsive layout - makes a two column-layout instead of four columns */
+@media screen and (max-width: 800px) {
+    .cust-img-col {
+        -ms-flex: 50%;
+        flex: 50%;
+        max-width: 50%;
+    }
+}
+
+/* Responsive layout - makes the two columns stack on top of each other instead of next to each other */
+@media screen and (max-width: 600px) {
+    .cust-img-col {
+        -ms-flex: 100%;
+        flex: 100%;
+        max-width: 100%;
+    }
+}
+
+/*** Appointments ***/
+.bookAppointmentBtn {
+    min-height: 36px;
+    padding: 8px 16px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    font-family: "Roboto";
+    font-weight: 700;
+    line-height: 20px;
+    letter-spacing: .25px;
+    color: white;
+    border-width: 0;
+    cursor: pointer;
+    white-space: break-spaces;
+    word-break: break-word;
+}
