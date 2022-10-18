@@ -2,51 +2,29 @@
 @model IndexModel
 @{
     ViewData["Title"] = "Home page";
+
+    var bannerHeading1 = @Model.PageSections.FirstOrDefault(x => x.PageSectionName == "Banner Heading1")?.Description ?? "Hurry up! Limited time offer.";
+    var bannerHeading2 = @Model.PageSections.FirstOrDefault(x => x.PageSectionName == "Banner Heading2")?.Description ?? "New Arrivals, Bundles and Sets";
+    var bannerHeading3 = @Model.PageSections.FirstOrDefault(x => x.PageSectionName == "Banner Heading3")?.Description ?? "Magnetic Lashes, Whites, Anytime &amp; much more...";
 }
 
 <!-- Hero slider-->
 <section class="tns-carousel tns-controls-lg">
     <div class="tns-carousel-inner" data-carousel-options="{&quot;mode&quot;: &quot;gallery&quot;, &quot;responsive&quot;: {&quot;0&quot;:{&quot;nav&quot;:true, &quot;controls&quot;: false},&quot;992&quot;:{&quot;nav&quot;:false, &quot;controls&quot;: true}}}">
-        <!-- Item-->
-        @*<div class="px-lg-5" style="background-color: #3aafd2;">
-        <div class="d-lg-flex justify-content-between align-items-center ps-lg-4"><img class="d-block order-lg-2 me-lg-n5 flex-shrink-0" src="img/home/hero-slider/lashes1.jpg" alt="Summer Collection">
-        <div class="position-relative mx-auto me-lg-n5 py-5 px-4 mb-lg-5 order-lg-1" style="max-width: 42rem; z-index: 10;">
-        <div class="pb-lg-5 mb-lg-5 text-center text-lg-start text-lg-nowrap">
-        <h3 class="h2 text-light fw-light pb-1 from-start">Has just arrived!</h3>
-        <h2 class="text-light display-5 from-start delay-1">Huge Summer Collection</h2>
-        <p class="fs-lg text-light pb-3 from-start delay-2">Swimwear, Tops, Shorts, Sunglasses &amp; much more...</p>
-        <div class="d-table scale-up delay-4 mx-auto mx-lg-0"><a class="btn btn-primary" href="shop-grid-ls.html">Shop Now<i class="bi bi-arrow-right-circle-fill ms-2 me-n1"></i></a></div>
-        </div>
-        </div>
-        </div>
-        </div>*@
-        <!-- Item-->
+
         <div class="px-lg-5" style="background-color: #f5b1b0;">
             <div class="d-lg-flex justify-content-between align-items-center ps-lg-4">
                 <img class="d-block order-lg-2 me-lg-n5 flex-shrink-0" src="img/home/hero-slider/02.jpg" alt="Women Sportswear">
                 <div class="position-relative mx-auto me-lg-n5 py-5 px-4 mb-lg-5 order-lg-1" style="max-width: 42rem; z-index: 10;">
                     <div class="pb-lg-5 mb-lg-5 text-center text-lg-start text-lg-nowrap">
-                        <h3 class="h2 text-light fw-light pb-1 from-bottom">Hurry up! Limited time offer.</h3>
-                        <h2 class="text-light display-5 from-bottom delay-1">New Arrivals, Bundles and Sets</h2>
-                        <p class="fs-lg text-light pb-3 from-bottom delay-2">Magnetic Lashes, Whites, Anytime &amp; much more...</p>
-                        <div class="d-table scale-up delay-4 mx-auto mx-lg-0"><a class="btn btn-primary" asp-page="/Shop">Shop Now<i class="bi bi-arrow-right-circle-fill ms-2 me-n1"></i></a></div>
+                        <h3 class="h2 text-light fw-light pb-1 from-bottom">@bannerHeading1</h3>
+                        <h2 class="text-light display-5 from-bottom delay-1">@bannerHeading2</h2>
+                        <p class="fs-lg text-light pb-3 from-bottom delay-2">@bannerHeading3</p>
+                        <div class="d-table scale-up delay-4 mx-auto mx-lg-0"><a class="btn btn-primary" asp-page="/Appointment">Book Online<i class="bi bi-arrow-right-circle-fill ms-2 me-n1"></i></a></div>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- Item-->
-        @* <div class="px-lg-5" style="background-color: #eba170;">
-        <div class="d-lg-flex justify-content-between align-items-center ps-lg-4"><img class="d-block order-lg-2 me-lg-n5 flex-shrink-0" src="img/home/hero-slider/03.jpg" alt="Men Accessories">
-        <div class="position-relative mx-auto me-lg-n5 py-5 px-4 mb-lg-5 order-lg-1" style="max-width: 42rem; z-index: 10;">
-        <div class="pb-lg-5 mb-lg-5 text-center text-lg-start text-lg-nowrap">
-        <h3 class="h2 text-light fw-light pb-1 from-top">Complete your look with</h3>
-        <h2 class="text-light display-5 from-top delay-1">New Men's Accessories</h2>
-        <p class="fs-lg text-light pb-3 from-top delay-2">Hats &amp; Caps, Sunglasses, Bags &amp; much more...</p>
-        <div class="d-table scale-up delay-4 mx-auto mx-lg-0"><a class="btn btn-primary" href="shop-grid-ls.html">Shop Now<i class="bi bi-arrow-right-circle-fill ms-2 me-n1"></i></a></div>
-        </div>
-        </div>
-        </div>
-        </div>*@
     </div>
 </section>
 
@@ -58,19 +36,19 @@
                 <div class="card-body px-3 pt-grid-gutter pb-0">
                     <div class="row g-0 ps-1">
                         <div class="col-sm-4 px-2 mb-grid-gutter">
-                            <a class="d-block text-center text-decoration-none me-1" href="shop-grid-ls.html">
+                            <a class="d-block text-center text-decoration-none me-1" asp-page="/Lashes">
                                 <img class="d-block rounded mb-3 homePopularImg" src="img/home/hero-slider/lashes1.jpg" alt="Men">
                                 <h3 class="fs-base pt-1 mb-0">Eye Lashes</h3>
                             </a>
                         </div>
                         <div class="col-sm-4 px-2 mb-grid-gutter">
-                            <a class="d-block text-center text-decoration-none me-1" href="shop-grid-ls.html">
+                            <a class="d-block text-center text-decoration-none me-1" asp-page="/Lip">
                                 <img class="d-block rounded mb-3 homePopularImg" src="img/shop/catalog/l2.jpg" alt="Women">
                                 <h3 class="fs-base pt-1 mb-0">Lip Gloss</h3>
                             </a>
                         </div>
                         <div class="col-sm-4 px-2 mb-grid-gutter">
-                            <a class="d-block text-center text-decoration-none me-1" href="shop-grid-ls.html">
+                            <a class="d-block text-center text-decoration-none me-1" asp-page="/Hair">
                                 <img class="d-block rounded mb-3 homePopularImg" src="img/home/hero-slider/lashes3.jpg" alt="Kids">
                                 <h3 class="fs-base pt-1 mb-0">Hair</h3>
                             </a>
@@ -397,7 +375,7 @@
             <div class="d-sm-flex justify-content-between align-items-center bg-secondary overflow-hidden rounded-3">
                 <div class="py-4 my-2 my-md-0 py-md-5 px-4 ms-md-3 text-center text-sm-start">
                     <h4 class="fs-lg fw-light mb-2">Want to make an appointment?</h4>
-                    <h3 class="mb-4">Hurry up to reserve your spot</h3><a class="btn btn-primary btn-shadow btn-sm" href="#">Click Here</a>
+                    <h3 class="mb-4">Hurry up to reserve your spot</h3><a class="btn btn-primary btn-shadow btn-sm" asp-page="/Appointment">Click Here</a>
                 </div>
                 @*<img class="d-block ms-auto" src="img/shop/catalog/banner.jpg" alt="Shop Converse">*@
             </div>
@@ -423,7 +401,7 @@
             <div class="d-flex flex-column h-100 overflow-hidden rounded-3" style="background-color: #e2e9ef;">
                 <div class="d-flex justify-content-between px-grid-gutter py-grid-gutter">
                     <div>
-                        <h3 class="mb-1">Hair day</h3><a class="fs-md" href="shop-grid-ls.html">Shop hairs<i class="bi bi-arrow-right-circle-fill fs-xs align-middle ms-1"></i></a>
+                        <h3 class="mb-1">Hair day</h3><a class="fs-md" asp-page="/Hair">Shop hairs<i class="bi bi-arrow-right-circle-fill fs-xs align-middle ms-1"></i></a>
                     </div>
                     <div class="tns-carousel-controls" id="hoodie-day">
                         <button type="button"><i class="bi bi-arrow-left-circle-fill"></i></button>

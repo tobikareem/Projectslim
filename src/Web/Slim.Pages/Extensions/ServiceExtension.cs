@@ -19,27 +19,18 @@ namespace Slim.Pages.Extensions
             builder.Services.AddDbContext<SlimDbContext>(options =>
                 options.UseSqlServer(connectionString));
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-
             builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<SlimDbContext>();
-
             builder.Services.AddRazorPages();
-
             services.AddAntiforgery(o => o.HeaderName = "XSRF-TOKEN");
 
-
             #region Add Service Injection
-
             builder.Services.AddSingleton<ICacheService, CacheService>();
-
-            
             builder.Services.AddScoped<IBaseStore<RazorPage>, RazorPagesRepo>();
-            builder.Services.AddScoped<IBaseStore<PageSection>, PageSectionRepo>();
-
-
+            builder.Services.AddScoped<IPageSection<PageSection>, PageSectionRepo>();
+            builder.Services.AddScoped<IImage<Image>, ImageUploadRepo>();
+            builder.Services.AddScoped<IBaseStore<Product>, ProductRepository>();
             #endregion
-
-
 
             return services;
         }

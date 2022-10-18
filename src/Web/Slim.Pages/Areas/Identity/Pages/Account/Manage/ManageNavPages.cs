@@ -66,11 +66,13 @@ namespace  Slim.Pages.Areas.Identity.Pages.Account.Manage
         /// </summary>
         public static string WebPagePhotos => "WebPagePhotos";
 
+        public static string AddNewProduct => "AddNewProduct";
+
 
         /// <summary>
         /// This is to add new Products
         /// </summary>
-        public static string NewProduct => "NewProduct";        
+        public static string AllProducts => "AllProducts";        
 
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -92,11 +94,18 @@ namespace  Slim.Pages.Areas.Identity.Pages.Account.Manage
         public static string WebPagePhotosNavClass(ViewContext viewContext) => PageNavClass(viewContext, WebPagePhotos);
 
         /// <summary>
+        /// Add a new product
+        /// </summary>
+        /// <param name="viewContext"></param>
+        /// <returns></returns>
+        public static string AddNewProductClass(ViewContext viewContext) => PageNavClass(viewContext, AddNewProduct);
+        
+        /// <summary>
         /// This page is to add active to the New Product class
         /// </summary>
         /// <param name="viewContext"></param>
         /// <returns></returns>
-        public static string NewProductNavClass(ViewContext viewContext) => PageNavClass(viewContext, NewProduct);
+        public static string AllProductsNavClass(ViewContext viewContext) => PageNavClass(viewContext, AllProducts);
 
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used

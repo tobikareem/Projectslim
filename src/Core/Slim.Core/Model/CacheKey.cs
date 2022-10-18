@@ -6,6 +6,7 @@ namespace Slim.Core.Model
     {
         None,
         GetRazorPages,
-        GetPageSections
+        GetPageSections,
+        UploadImage
     }
 }

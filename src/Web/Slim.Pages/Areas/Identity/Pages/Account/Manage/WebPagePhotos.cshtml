@@ -1,5 +1,6 @@
 ﻿@page
 @using Slim.Pages.Areas.Identity.Pages.Account.Manage
+@using Microsoft.CodeAnalysis
 @model WebPagePhotosModel
 
 @{
@@ -11,18 +12,17 @@
 <hr />
 <div class="row mt-3">
     <div class="col-md-12">
-
-
+        
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
         <form method="post" asp-page-handler="AllSections">
-            <div class="form-group">
-                <label asp-for="InModel.RazorPageId" class="control-label"></label>
-                <select asp-for="InModel.RazorPageId" asp-items="Model.RazorPageSelectList"></select>
+            <div class="form-control">
+                <label asp-for="InModel.RazorPageId" class="col-form-label-lg"></label>
+                <select asp-for="InModel.RazorPageId" asp-items="Model.RazorPageSelectList" class="form-select me-2"></select>
                 <span asp-validation-for="InModel.RazorPageId" class="text-danger"></span>
             </div>
 
-            <div class="form-group">
+            <div class="mt-2">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
 
@@ -54,22 +54,37 @@
         <!-- Tab content-->
 
         <div class="tab-content">
-
             <!-- Profile-->
             <div class="tab-pane fade show active" id="pageWording" role="tabpanel">
                 <div class="row gx-4 gy-3">
-                    <form>
-                        @foreach (var sec in Model.PageSections.Where(section => !section.HasImage))
-                        {
-                            <div class="col-sm-12">
-                                <label class="form-label" asp-for="InModel.PageSectionName">@sec.PageSectionName</label>
-                                <input class="form-control" asp-for="InModel.Description" value="@sec.Description">
-                            </div>
+                    <form method="post" asp-page-handler="SaveWording">
+                        @{
+                            @for (var i = 0; i < Model.WordingModel.Count; i++)
+                            {
+                                <div class="col-sm-12">
+                                    @{
+                                        var i1 = i;
+                                        Model.WordingModel[i1].RazorPageId = Model.WordingModel[i1].RazorPageId;
+                                    }
+                                    @if (Model.WordingModel[i1].PageSectionName == "Exceptional Service")
+                                    {
+                                        <label class="form-label" asp-for="@Model.WordingModel[i1].PageSectionName">@Model.WordingModel[i1].PageSectionName</label>
+                                        <textarea rows="15" asp-for="@Model.WordingModel[i1].Description" class="form-control">@Model.WordingModel[i1].Description</textarea>
+                                    }
+                                    else
+                                    {
+                                        <label class="form-label" asp-for="@Model.WordingModel[i1].PageSectionName">@Model.WordingModel[i1].PageSectionName</label>
+                                        <input class="form-control" asp-for="@Model.WordingModel[i1].Description" value="@Model.WordingModel[i1].Description">
+                                    }
+                                    <input type="hidden" asp-for="@Model.WordingModel[i1].RazorPageId">
+                                    <input type="hidden" asp-for="@Model.WordingModel[i1].PageSectionId">
+                                </div>
+                            }
                         }
 
                         <hr class="mt-2 mb-4">
                         <div class="col-12 d-sm-flex justify-content-between align-items-center">
-                            <button class="btn btn-primary mt-3 mt-sm-0" type="button" id="SaveWording"> Save changes </button>
+                            <input class="btn btn-primary mt-3 mt-sm-0" type="submit" id="SaveWording" value="Save Changes"/>
                         </div>
                     </form>
                 </div>
@@ -160,29 +175,37 @@
     <script>
         $(document).ready(function() {
             debugger;
-            $('#SaveWording').click(function() {
+            $('#SaveWordingfer').click(function() {
                 // get the form data
                 // there are many ways to get this data using jQuery (you can use the class or id also)
                 var formData = $('form').serialize();
 
-
+                var person = { "FirstName": "Andrew", "LastName": "Lock", "Age": 31 };
+                debugger;
 
                 // process the form
                 $.ajax({
-                    type: 'get', // define the type of HTTP verb we want to use (POST for our form)
-                    url: '/Identity/Account/Manage/WebPagePhotos?handler=Wording', // the url where we want to POST
-                    data: JSON.stringify('p'), // our data object
-                    // contentType: 'application/x-www-form-urlencoded; charset=UTF-8', // what kind of content do we expect back from the server
-                    dataType: 'json', // what type of data do we expect back from the server
-                    encode: true,
-                    success: function(data) {
-                        // using the JSON data from the server
-                        if (data.success) {
-                            alert('Success');
-                        } else {
-                            alert('Error');
-                        }
-                    }, error: function(data) {
+                    type: 'POST', // define the type of HTTP verb we want to use (POST for our form)
+                    url: '@Url.Page(null, "SaveWording")',//'/Identity/Account/Manage/WebPagePhotos?handler=SaveWording', // the url where we want to POST
+
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader("XSRF-TOKEN",
+                            $('input:hidden[name="__RequestVerificationToken"]').val());
+                    },
+                    data: { model: formData }, // our data object
+                    contentType: "application/json; charset=utf-8",
+                    traditional: true,
+                    async: true,
+                    success:
+                        function(data) {
+                            // using the JSON data from the server
+                            if (data.success) {
+                                alert('Success');
+                            } else {
+                                alert('Error');
+                            }
+                        },
+                    error: function(data) {
                         alert('Error');
                     }
 

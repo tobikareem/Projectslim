@@ -1,0 +1,112 @@
+﻿@page
+@model AddNewProductModel
+@{
+    ViewData["Title"] = "AddNewProduct";
+    ViewData["ActivePage"] = ManageNavPages.AddNewProduct;
+}
+
+<div class="row">
+
+    <div asp-validation-summary="ModelOnly" asp-validation-class="text-danger"></div>
+    <!-- Section Add new Product -->
+    <section class="col-lg-12 pt-lg-4 pb-4 mb-3">
+        <div class="pt-2 px-4 ps-lg-0 pe-xl-5">
+            <!-- Title-->
+            <form method="post" asp-page-handler="AddNewProduct" enctype="multipart/form-data">
+                <div class="d-sm-flex flex-wrap justify-content-between align-items-center pb-2">
+                    <h2 class="h3 py-2 me-2 text-center text-sm-start">@Model.TextCaption</h2>
+
+                    <div class="py-2">
+                        <label asp-for="InModel.RazorPageId" class="col-form-label-lg"></label>
+                        <select asp-for="InModel.RazorPageId" asp-items="Model.RazorPageSelectList"
+                                class="form-select me-2"></select>
+                        <span asp-validation-for="InModel.RazorPageId" class="text-danger"></span>
+                    </div>
+                </div>
+                
+                <input asp-for="InModel.Id" type="hidden"/>
+
+                <div class="mb-3 pb-2">
+                    <label class="form-label" asp-for="InModel.ProductName"></label>
+                    <input class="form-control" type="text" asp-for="InModel.ProductName">
+                    <div class="form-text">Maximum 100 characters. No HTML or emoji allowed.</div>
+                    <span asp-validation-for="InModel.ProductName" class="text-danger"></span>
+                </div>
+                <div class="file-drop-area mb-3">
+                    <div class="file-drop-icon bi bi-cloud-arrow-up"></div><span class="file-drop-message">Drag and drop here to upload product screenshot</span>
+                    <input class="file-drop-input" type="file" asp-for="InModel.ProductImage"
+                        accept="image/png, image/jpeg, image/jpg, image/*">
+                    <button class="file-drop-btn btn btn-primary btn-sm mb-2" type="button">Or select file</button>
+                    <div class="form-text">1000 x 800px ideal size for hi-res displays</div>
+                </div>
+                <span asp-validation-for="InModel.ProductImage" class="text-danger"></span>
+                <div class="mb-3 py-2">
+                    <label class="form-label" asp-for="InModel.ProductDescription"></label>
+                    <textarea class="form-control" rows="6" id="unp-product-description"
+                        asp-for="InModel.ProductDescription"></textarea>
+                    <div class="bg-secondary p-3 fs-ms rounded-bottom"><span
+                            class="d-inline-block fw-medium me-2 my-1">Markdown supported:</span><em
+                            class="d-inline-block border-end pe-2 me-2 my-1">*Italic*</em><strong
+                            class="d-inline-block border-end pe-2 me-2 my-1">**Bold**</strong><span
+                            class="d-inline-block border-end pe-2 me-2 my-1">- List item</span><span
+                            class="d-inline-block border-end pe-2 me-2 my-1">##Heading##</span><span
+                            class="d-inline-block">--- Horizontal rule</span></div>
+                    <span asp-validation-for="InModel.ProductDescription" class="text-danger"></span>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 mb-3">
+                        <label class="form-label" asp-for="InModel.StandardPrice"></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-currency-dollar"></i></span>
+                            <input class="form-control" id="unp-standard-price" asp-for="InModel.StandardPrice">
+                        </div>
+                        <div class="form-text">Average marketplace price for this category is $15.</div>
+                        <span asp-validation-for="InModel.StandardPrice" class="text-danger"></span>
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label class="form-label" asp-for="InModel.SalePrice"></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-currency-dollar"></i></span>
+                            <input class="form-control" asp-for="InModel.SalePrice">
+                        </div>
+                        <div class="form-text">Typically 10x of the Standard license price.</div>
+                        <span asp-validation-for="InModel.SalePrice" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col mb-3">
+                        <label class="form-label" asp-for="InModel.IsOnSale"></label>
+                        <input class="form-check-input" asp-for="InModel.IsOnSale" />
+                    </div>
+
+                    <div class="col mb-3">
+                        <label class="form-label" asp-for="InModel.IsNewProduct"></label>
+                        <input class="form-check-input" asp-for="InModel.IsNewProduct" />
+                    </div>
+
+                    <div class="col mb-3">
+                        <label class="form-label" asp-for="InModel.IsTrending"></label>
+                        <input class="form-check-input" asp-for="InModel.IsTrending" />
+                    </div>
+                </div>
+
+
+                <div class="mb-3 py-2">
+                    <label class="form-label" asp-for="InModel.ProductTags"></label>
+                    <textarea class="form-control" rows="4" asp-for="InModel.ProductTags"></textarea>
+                    <div class="form-text">Up to 10 keywords that describe your item. Tags should all be in
+                        lowercase
+                        and separated by commas.</div>
+                </div>
+                <div class="mb-3 pb-2">
+                    <label class="form-label" asp-for="InModel.ProductImages"></label>
+                    <input class="form-control" type="file" asp-for="InModel.ProductImages" accept="image/png, image/jpeg, image/jpg, image/*" multiple />
+                    <div class="form-text">Maximum file size is 1GB</div>
+                </div>
+                <button class="btn btn-primary d-block w-100" type="submit"><i
+                        class="bi bi-cloud-arrow-up fs-lg me-2"></i>@Model.BtnCaption</button>
+            </form>
+        </div>
+    </section>
+</div>
