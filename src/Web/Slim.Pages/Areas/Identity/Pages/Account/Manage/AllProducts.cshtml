@@ -1,13 +1,11 @@
 ﻿@page
-@using System.Diagnostics
-@using Slim.Pages.Extensions
 @model Slim.Pages.Areas.Identity.Pages.Account.Manage.AllProductsModel
 @{
     ViewData["Title"] = "AllProducts";
     ViewData["ActivePage"] = ManageNavPages.AllProducts;
 }
 
-<div class="row">
+<div class="row" id="allPrd">
 
     <!-- Section Add new Product -->
     <section class="col-lg-12 pt-lg-4 pb-4 mb-3">
@@ -19,12 +17,18 @@
                         <div class="py-2">
                             <label asp-for="InModel.RazorPageId" class="col-form-label-lg"></label>
                             <select asp-for="InModel.RazorPageId" asp-items="Model.RazorPageSelectList"
-                                    class="form-select me-2"></select>
+                                    class="form-select me-2" id="change-product"></select>
                             <span asp-validation-for="InModel.RazorPageId" class="text-danger"></span>
-                        </div>
 
+                            @*<form method="post" asp-page-handler="ProductById" asp-route-id="@Model.InModel.RazorPageId">
+                                <button type="submit" class="btn btn-primary btn-sm d-block d-sm-inline-block mt-3 mt-sm-0">
+                                    <i class="ci-add-circle me-2"></i>Get
+                                </button>
+                            </form>*@
+                        </div>
                     </div>
 
+<div id="productByIdDiv">
                     @{
                         for (var i = 0; i < Model.Products.Count; i++)
                         {
@@ -52,6 +56,7 @@
                             </div>
                         }
                     }
+</div>
 
 
                 </div>
@@ -59,3 +64,43 @@
         </div>
     </section>
 </div>
+
+@section Scripts {
+    <script>
+        // create the onchange event for the drop down list
+        $('#change-product').change(function () {
+
+            // get the selected value
+            var selectedValue = $(this).val();
+            var pageId = Number(selectedValue);
+            $.ajax({
+                type: 'GET', // define the type of HTTP verb we want to use (POST for our form)
+                url: '@Url.Page(null, "ProductById")',//'/Identity/Account/Manage/WebPagePhotos?handler=SaveWording', // the url where we want to POST
+
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("XSRF-TOKEN",
+                        $('input:hidden[name="__RequestVerificationToken"]').val());
+                },
+                data: { id: pageId }, // our data object
+                contentType: "application/json; charset=utf-8",
+                traditional: true,
+                async: false,
+                success: function (data) {
+
+                    // find the div with id 'productByIdDiv' in the data
+                    var div = $(data).find('#productByIdDiv');
+
+                    // replace the div with id 'productByIdDiv' in the current page with the div from the data
+                    $('#productByIdDiv').replaceWith(div);
+                    $('#change-product').val(selectedValue);
+                },
+                error: function (data) {
+                    console.log("couldn't Successfully");
+                }
+
+            });
+
+
+        });
+    </script>
+}

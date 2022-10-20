@@ -6,7 +6,6 @@ using Slim.Shared.Interfaces.Repo;
 using Slim.Shared.Interfaces.Serv;
 using Slim.Shared.Repositories;
 using Slim.Shared.Services;
-using Newtonsoft.Json.Serialization;
 
 namespace Slim.Pages.Extensions
 {

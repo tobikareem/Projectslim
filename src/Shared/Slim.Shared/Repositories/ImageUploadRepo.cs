@@ -124,5 +124,26 @@ namespace Slim.Shared.Repositories
                 throw;
             }
         }
+
+        public void DeleteImages(List<Image> images, CacheKey cacheKey = CacheKey.None, bool hasCache = false)
+        {
+            try
+            {
+                _context.Images.RemoveRange(images);
+                _context.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error deleting Image entities");
+                throw;
+            }
+            finally
+            {
+                if (hasCache)
+                {
+                    _cacheService.Remove(cacheKey);
+                }
+            }
+        }
     }
 }
