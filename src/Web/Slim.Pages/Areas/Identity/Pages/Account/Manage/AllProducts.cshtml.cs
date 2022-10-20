@@ -26,19 +26,35 @@ public class AllProductsModel : PageModel
         _productBaseStore = productBaseStore;
         RazorPageSelectList = new List<SelectListItem>();
         PrimaryImages = new List<string>();
-        var razorPages = _cacheService.GetOrCreate(CacheKey.GetRazorPages, _razorPagesBaseStore.GetAll);
+        
+        var razorPages = _cacheService.GetOrCreate(CacheKey.GetRazorPages, _razorPagesBaseStore.GetAll).Where(x => PagesForDropDown.Contains(x.PageName));
         RazorPageSelectList = razorPages.Select(page => new SelectListItem { Text = page.PageName, Value = page.Id.ToString() }).ToList();
     }
     [BindProperty(SupportsGet = true)] public InputModel InModel { get; set; } = new();
     [BindProperty] public List<Product> Products { get; set; } = new();
 
+    private List<string> PagesForDropDown
+    {
+        get
+        {
+            var pages =  new List<string>
+            {
+                "Hair",
+                "Lip Gloss",
+                "Lashes"
+            };
+
+            return pages;
+        }
+    }
 
     public IActionResult OnGet()
     {
-        if (RazorPageSelectList.Any())
+        if (RazorPageSelectList.Any() && int.TryParse(RazorPageSelectList.First().Value, out var pageId))
         {
-            int.TryParse(RazorPageSelectList.First().Value, out var pageId);
             Products = GetAllProductsByProductId(pageId);
+
+            _logger.LogInformation($"Getting Product information for {pageId}");
         }
         else
         {
@@ -73,8 +89,6 @@ public class AllProductsModel : PageModel
 
     public IActionResult OnPostEachProduct(int id)
     {
-
-
         return Page();
     }
 

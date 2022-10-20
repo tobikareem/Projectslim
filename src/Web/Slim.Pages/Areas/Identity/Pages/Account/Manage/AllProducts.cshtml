@@ -1,4 +1,5 @@
 ﻿@page
+@using System.Globalization
 @model Slim.Pages.Areas.Identity.Pages.Account.Manage.AllProductsModel
 @{
     ViewData["Title"] = "AllProducts";
@@ -44,13 +45,21 @@
                                     <h3 class="h6 product-title mb-2">
                                         <a asp-page="/ProductDetail" asp-route-id="@Model.Products[i1].Id">@Model.Products[i1].ProductName</a>
                                     </h3>
-                                    <div class="d-inline-block text-accent">$18.<small>00</small></div>
+                                    @{
+                                        var salesPrice = Model.Products[i].SalePrice;
+                                        // get the numbers after decimal point of salesPrice variable
+                                        var salesPriceRoundUp = Convert.ToString(salesPrice, CultureInfo.CurrentCulture).Split('.')[1];
+                                        var wholePrice = Convert.ToInt32(Math.Truncate(salesPrice));
+
+
+                                    }
+                                    <div class="d-inline-block text-accent">$@wholePrice<small>.@salesPriceRoundUp</small></div>
                                     <div class="d-inline-block text-muted fs-ms border-start ms-2 ps-2">Sales: <span class="fw-medium">26</span></div>
                                     <div class="d-inline-block text-muted fs-ms border-start ms-2 ps-2">Earnings: <span class="fw-medium">$327.<small>60</small></span></div>
                                     <div class="d-flex justify-content-center justify-content-sm-start pt-3">
-                                        <a class="btn bg-faded-accent btn-icon me-2" type="submit" data-bs-toggle="tooltip" title="Download" asp-page="./AddNewProduct" asp-route-id="@Model.Products[i1].Id" asp-page-handler="EditProduct"><i class="bi bi-download text-accent"></i></a>
-                                        <a class="btn bg-faded-info btn-icon me-2" type="submit" data-bs-toggle="tooltip" title="Edit" asp-page="./AddNewProduct" asp-route-id="@Model.Products[i1].Id" asp-page-handler="EditProduct"><i class="bi bi-pencil text-info"></i></a>
-                                        <button class="btn bg-faded-danger btn-icon" type="submit" data-bs-toggle="tooltip" title="Delete" asp-page="./AddNewProduct" asp-route-id="@Model.Products[i1].Id" asp-page-handler="DeleteProduct"><i class="bi bi-trash3 text-danger"></i></button>
+                                        <a class="btn bg-faded-accent btn-icon me-2" data-bs-toggle="tooltip" title="Download" asp-page="./AddNewProduct" asp-route-id="@Model.Products[i1].Id" asp-page-handler="EditProduct"><i class="bi bi-download text-accent"></i></a>
+                                        <a class="btn bg-faded-info btn-icon me-2"  data-bs-toggle="tooltip" title="Edit" asp-page="./AddNewProduct" asp-route-id="@Model.Products[i1].Id" asp-page-handler="EditProduct"><i class="bi bi-pencil text-info"></i></a>
+                                        <a class="btn bg-faded-danger btn-icon"  data-bs-toggle="tooltip" title="Delete" asp-page="./AddNewProduct" asp-route-id="@Model.Products[i1].Id" asp-page-handler="DeleteProduct"><i class="bi bi-trash3 text-danger"></i></a>
                                     </div>
                                 </div>
                             </div>
