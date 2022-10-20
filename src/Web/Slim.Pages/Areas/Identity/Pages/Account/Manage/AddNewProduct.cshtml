@@ -14,12 +14,12 @@
             <!-- Title-->
             <form method="post" asp-page-handler="AddNewProduct" enctype="multipart/form-data">
                 <div class="d-sm-flex flex-wrap justify-content-between align-items-center pb-2">
-                    <h2 class="h3 py-2 me-2 text-center text-sm-start">@Model.TextCaption</h2>
+                    <h2 class="h3 py-2 me-2 text-center text-sm-start">@Model.TextCaptions.TitleCaption</h2>
 
                     <div class="py-2">
                         <label asp-for="InModel.RazorPageId" class="col-form-label-lg"></label>
                         <select asp-for="InModel.RazorPageId" asp-items="Model.RazorPageSelectList"
-                                class="form-select me-2"></select>
+                                class="form-select me-2" id="unp-product-category"></select>
                         <span asp-validation-for="InModel.RazorPageId" class="text-danger"></span>
                     </div>
                 </div>
@@ -40,6 +40,8 @@
                     <div class="form-text">1000 x 800px ideal size for hi-res displays</div>
                 </div>
                 <span asp-validation-for="InModel.ProductImage" class="text-danger"></span>
+                <span><p class="text-danger">@Model.TextCaptions.ProfileImageEditText</p> </span>
+                
                 <div class="mb-3 py-2">
                     <label class="form-label" asp-for="InModel.ProductDescription"></label>
                     <textarea class="form-control" rows="6" id="unp-product-description"
@@ -104,8 +106,9 @@
                     <input class="form-control" type="file" asp-for="InModel.ProductImages" accept="image/png, image/jpeg, image/jpg, image/*" multiple />
                     <div class="form-text">Maximum file size is 1GB</div>
                 </div>
+                <span><p class="text-danger">@Model.TextCaptions.ProfileImagesEditText</p> </span>
                 <button class="btn btn-primary d-block w-100" type="submit"><i
-                        class="bi bi-cloud-arrow-up fs-lg me-2"></i>@Model.BtnCaption</button>
+                        class="bi bi-cloud-arrow-up fs-lg me-2"></i>@Model.TextCaptions.BtnCaption</button>
             </form>
         </div>
     </section>

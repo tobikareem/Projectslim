@@ -6,7 +6,6 @@ using Slim.Data.Entity;
 using Slim.Shared.Interfaces.Repo;
 using Slim.Shared.Interfaces.Serv;
 using System.ComponentModel.DataAnnotations;
-using Microsoft.CodeAnalysis.Operations;
 using Slim.Pages.Extensions;
 
 namespace Slim.Pages.Areas.Identity.Pages.Account.Manage;
@@ -27,17 +26,48 @@ public class AllProductsModel : PageModel
         _productBaseStore = productBaseStore;
         RazorPageSelectList = new List<SelectListItem>();
         PrimaryImages = new List<string>();
-        var razorPages = _cacheService.GetOrCreate(CacheKey.GetRazorPages, _razorPagesBaseStore.GetAll);
+        
+        var razorPages = _cacheService.GetOrCreate(CacheKey.GetRazorPages, _razorPagesBaseStore.GetAll).Where(x => PagesForDropDown.Contains(x.PageName));
         RazorPageSelectList = razorPages.Select(page => new SelectListItem { Text = page.PageName, Value = page.Id.ToString() }).ToList();
     }
     [BindProperty(SupportsGet = true)] public InputModel InModel { get; set; } = new();
     [BindProperty] public List<Product> Products { get; set; } = new();
 
+    private List<string> PagesForDropDown
+    {
+        get
+        {
+            var pages =  new List<string>
+            {
+                "Hair",
+                "Lip Gloss",
+                "Lashes"
+            };
 
-    public void OnGet()
+            return pages;
+        }
+    }
+
+    public IActionResult OnGet()
+    {
+        if (RazorPageSelectList.Any() && int.TryParse(RazorPageSelectList.First().Value, out var pageId))
+        {
+            Products = GetAllProductsByProductId(pageId);
+
+            _logger.LogInformation($"Getting Product information for {pageId}");
+        }
+        else
+        {
+            Products = GetAllProductsByProductId(-1);
+        }
+
+        return Page();
+    }
+
+    public List<Product> GetAllProductsByProductId(int productId)
     {
         Products = _productBaseStore.GetAll().ToList();
-        
+
         Products.ForEach(product =>
         {
             var imgPrimary = string.Empty;
@@ -45,12 +75,20 @@ public class AllProductsModel : PageModel
             if (primaryImage == null) return;
             PrimaryImages.Add(imgPrimary.GetImageSrc(primaryImage.UploadedImage));
         });
+
+        Products = productId == -1 ? Products : Products.Where(product => product.RazorPageId == productId).ToList();
+
+        return Products;
+    }
+
+    public IActionResult OnGetProductById(int id)
+    {
+        Products = GetAllProductsByProductId(id);
+        return Page();
     }
 
     public IActionResult OnPostEachProduct(int id)
     {
-
-
         return Page();
     }
 

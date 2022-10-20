@@ -22,4 +22,6 @@ public interface IImage<T> : IBaseStore<Image>
     void UpdateImages(List<Image> images, CacheKey cacheKey = CacheKey.None, bool hasCache = false);
 
     void AddImages(List<Image> images, CacheKey cacheKey = CacheKey.None, bool hasCache = false);
+
+    void DeleteImages(List<Image> images, CacheKey cacheKey = CacheKey.None, bool hasCache = false);
 }

@@ -8,6 +8,8 @@ using Slim.Shared.Interfaces.Serv;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.Net.Http.Headers;
 using System.ComponentModel.DataAnnotations.Schema;
+using NuGet.Packaging;
+// ReSharper disable ConditionIsAlwaysTrueOrFalse
 
 namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
 {
@@ -15,15 +17,12 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
     {
         private readonly IBaseStore<RazorPage> _razorPagesBaseStore;
         private readonly ICacheService _cacheService;
-
         private readonly IImage<Image> _imageBaseStore;
         private readonly IBaseStore<Product> _productBaseStore;
         private readonly ILogger<AddNewProductModel> _logger;
 
-        public string TextCaption { get; set; } = "Add New Product";
-        public string BtnCaption { get; set; } = "Upload Product";
-        public bool IsEditing { get; set; } = false;
 
+        public TestCaptions TextCaptions { get; set; }
         public List<SelectListItem> RazorPageSelectList { get; set; }
 
         public AddNewProductModel(IBaseStore<RazorPage> razorPagesBaseStore, ICacheService cacheService, IImage<Image> imageBaseStore, ILogger<AddNewProductModel> logger, IBaseStore<Product> productBaseStore)
@@ -34,25 +33,36 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
             _imageBaseStore = imageBaseStore;
             _productBaseStore = productBaseStore;
             RazorPageSelectList = new List<SelectListItem>();
+
+            TextCaptions = new TestCaptions();
             var razorPages = _cacheService.GetOrCreate(CacheKey.GetRazorPages, _razorPagesBaseStore.GetAll);
             RazorPageSelectList = razorPages.Select(page => new SelectListItem { Text = page.PageName, Value = page.Id.ToString() }).ToList();
         }
 
         [BindProperty(SupportsGet = true)] public InputModel InModel { get; set; } = new();
-
+        
         public void OnGet()
         {
-            TextCaption = "Add New Product";
-            IsEditing   = false;
+            TextCaptions = new TestCaptions
+            {
+                TitleCaption = "Add New Product",
+                IsEditing = false
+            };
         }
 
 
         public IActionResult OnGetEditProduct(int id)
         {
             var product = _productBaseStore.GetEntity(id);
-            TextCaption = $"Edit: {product.ProductName}";
-            BtnCaption  = "Update Product";
-            IsEditing   = true;
+
+            TextCaptions = new TestCaptions
+            {
+                IsEditing = true,
+                TitleCaption = $"Edit: {product.ProductName}",
+                BtnCaption = "Update Product",
+                ProfileImageEditText = "Uploading a new image will replace the current image" ,
+                ProfileImagesEditText = "Uploading one or more images will remove all current Images"
+            };
 
             InModel = new InputModel
             {
@@ -68,17 +78,6 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
                 Id = product.Id
             };
 
-            //var pImg = product.Images.First(c => c.IsPrimaryImage);
-            
-            //var file = new FormFile(new MemoryStream(pImg.UploadedImage), 0, InModel.ProductImage.Length, pImg.ImageId.ToString(), "image.jpg" )
-            //{
-            //    Headers = new HeaderDictionary(),
-            //    ContentType = "image/jpg",
-            //    ContentDisposition = "form-data"
-            //};
-
-            //InModel.ProductImage = file;
-
             return Page();
         }
 
@@ -91,41 +90,28 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
 
         public IActionResult OnPostAddNewProduct()
         {
-
             var isEdit = InModel.Id > 0;
+
+            var product = isEdit ? UpdateExistingProduct() : CreateNewProduct();
 
             if (isEdit)
             {
-                var prd = _productBaseStore.GetEntity(InModel.Id);
-
-                prd.ProductName = InModel.ProductName;
-                prd.ProductDescription = InModel.ProductDescription;
-                prd.SalePrice = InModel.SalePrice;
-                prd.StandardPrice = InModel.StandardPrice;
-                prd.ProductTags = InModel.ProductTags;
-                prd.IsOnSale = InModel.IsOnSale;
-                prd.IsNewProduct = InModel.IsNewProduct;
-                prd.IsTrending = InModel.IsTrending;
-                prd.RazorPageId = int.Parse(InModel.RazorPageId);
-
-                
-
-                _productBaseStore.UpdateEntity(prd);
+                _productBaseStore.UpdateEntity(product);
+                return RedirectToPage("./AllProducts");
             }
-
-            var product = ValidateProductionUpload();
-
+            
             if (!ModelState.IsValid)
             {
                 return Page();
             }
 
             _productBaseStore.AddEntity(product);
+
             return RedirectToPage("./AllProducts");
         }
 
 
-        private Product ValidateProductionUpload()
+        private Product CreateNewProduct()
         {
             var product = new Product
             {
@@ -144,25 +130,75 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
                 ProductTags = InModel.ProductTags
 
             };
-
             return product;
         }
 
-        private List<Image> ValidateFileUploads()
+        private Product UpdateExistingProduct()
         {
-            var images = new List<Image>();
+            var prd = _productBaseStore.GetEntity(InModel.Id);
+
+            prd.ProductName = InModel.ProductName;
+            prd.ProductDescription = InModel.ProductDescription;
+            prd.SalePrice = InModel.SalePrice;
+            prd.StandardPrice = InModel.StandardPrice;
+            prd.ProductTags = InModel.ProductTags;
+            prd.IsOnSale = InModel.IsOnSale;
+            prd.IsNewProduct = InModel.IsNewProduct;
+            prd.IsTrending = InModel.IsTrending;
+            prd.RazorPageId = int.Parse(InModel.RazorPageId);
+
+            if (InModel.ProductImage != null)
+            {
+                // delete existing image
+                var existingImage = prd.Images.FirstOrDefault(c => c.IsPrimaryImage);
+
+                if (existingImage != null)
+                {
+                    _imageBaseStore.DeleteEntity(existingImage);
+                }
+
+                var img = UploadProductImage();
+                prd.Images.Add(img);
+            }
+
+
+            if (InModel.ProductImages != null)
+            {
+                // delete existing images
+                var existingImages = prd.Images.Where(c => !c.IsPrimaryImage).ToList();
+
+                if (existingImages.Any())
+                {
+                    _imageBaseStore.DeleteImages(existingImages, CacheKey.UploadImage, true);
+                }
+
+                var images = UploadProductImages();
+                prd.Images.AddRange(images);
+            }
+
+            if (InModel.ProductImage != null || InModel.ProductImages != null) return prd;
+
+            // To skip validation
+            InModel.ProductImage = new FormFile(null!, 0, 0, null!, null!);
+            InModel.ProductImages = new List<IFormFile>();
+
+            return prd;
+        }
+
+        private Image UploadProductImage()
+        {
+            var image = new Image();
             try
             {
-
                 if (InModel.ProductImage == null)
                 {
                     ModelState.AddModelError("File Upload", "Please upload at least one image");
-                    return images;
+                    return image;
                 }
 
-                var image = new Image();
                 using var ms = new MemoryStream();
                 InModel.ProductImage.CopyTo(ms);
+
 
                 // upload the file if less than 2 MB
                 if (ms.Length < 2097152)
@@ -179,21 +215,34 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
                         image.Enabled = true;
                         image.CreatedDate = DateTime.UtcNow;
                         image.CreatedBy = "Test User";
-
-                        images.Add(image);
                     }
                     else
                     {
                         ModelState.AddModelError("File Upload", "Please upload a valid image file (jpg, png, jpeg)");
                     }
-                    
+
                 }
                 else
                 {
                     var fileName = ContentDispositionHeaderValue.Parse(InModel.ProductImage.ContentDisposition).FileName.Trim();
                     ModelState.AddModelError("ProductImage", $"The file {fileName} is too large. Must be less than 2 MB");
                 }
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error uploading file for product");
+                throw;
+            }
 
+            return image;
+        }
+
+        private List<Image> UploadProductImages()
+        {
+            var images = new List<Image>();
+
+            try
+            {
                 if (InModel.ProductImages == null || !InModel.ProductImages.Any())
                 {
                     return images;
@@ -212,7 +261,7 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
                         {
                             using var ms1 = new MemoryStream();
                             file.CopyTo(ms1);
-                            image = new Image
+                            var image = new Image
                             {
                                 ImageId = Guid.NewGuid(),
                                 UploadedImage = ms1.ToArray(),
@@ -234,6 +283,27 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
                         ModelState.AddModelError("ProductImage", $"The file {fileName} is too large.");
                     }
                 }
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error uploading Multiple files for product");
+                throw;
+            }
+
+            return images;
+        }
+
+        private List<Image> ValidateFileUploads()
+        {
+            var images = new List<Image>();
+            try
+            {
+
+                var image = UploadProductImage();
+                images.Add(image);
+
+                var additionalImages = UploadProductImages();
+                images.AddRange(additionalImages);
 
             }
             catch (Exception e)
@@ -275,7 +345,7 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
             [Display(Name = "Product tags")]
             public string? ProductTags { get; set; }
 
-            [Required, Display(Name = "Product Image")]
+            [Display(Name = "Product Image")]
             public IFormFile ProductImage { get; set; } = default!;
 
             [Display(Name = "Product files for sale")]
@@ -290,6 +360,43 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
             [Display(Name = "Trending")]
             public bool IsTrending { get; set; }
 
+        }
+
+        public class TestCaptions
+        {
+            private string _profileImageEditText = string.Empty;
+            private string _profileImagesEditText = string.Empty;
+
+            public TestCaptions()
+            {
+                TitleCaption = "Add New Product";
+                BtnCaption = "Upload Product";
+            }
+            public string TitleCaption { get; set; }
+
+            public string BtnCaption { get; set; }
+
+            public bool IsEditing { get; set; }
+
+            public string ProfileImageEditText
+            {
+                get => _profileImageEditText;
+                set
+                {
+                    _profileImageEditText = value;
+                    _profileImageEditText = IsEditing ?  "Uploading a new image will replace the current image" :  string.Empty;
+                }
+            }
+
+            public string ProfileImagesEditText
+            {
+                get => _profileImagesEditText;
+                set
+                {
+                    _profileImagesEditText = value;
+                    _profileImagesEditText = IsEditing ? "Uploading one or more images will remove all current Images" : string.Empty;
+                }
+            }
         }
     }
 }
