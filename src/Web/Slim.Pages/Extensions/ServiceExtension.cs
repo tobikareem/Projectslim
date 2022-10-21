@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.Configuration;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Slim.Core.Model;
 using Slim.Data.Context;
 using Slim.Data.Entity;
 using Slim.Shared.Interfaces.Repo;
@@ -15,8 +17,8 @@ namespace Slim.Pages.Extensions
         {
 
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'SlimDbContextConnection' not found.");
-            builder.Services.AddDbContext<SlimDbContext>(options =>
-                options.UseSqlServer(connectionString));
+            builder.Services.AddDbContext<SlimDbContext>(options =>options.UseSqlServer(connectionString));
+            
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
             builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<SlimDbContext>();
@@ -31,6 +33,14 @@ namespace Slim.Pages.Extensions
             builder.Services.AddScoped<IBaseStore<Product>, ProductRepository>();
             #endregion
 
+
+            return services;
+        }
+
+        public static IServiceCollection AddCustomConfiguration(this IServiceCollection services, WebApplicationBuilder builder)
+        {
+            var config = builder.Configuration;
+            services.Configure<ConnectionStrings>(config.GetSection(AppConfiguration.ConnectionStringsOptions));
             return services;
         }
     }

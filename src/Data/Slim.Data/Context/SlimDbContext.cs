@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Slim.Core.Model;
 using Slim.Data.Entity;
 
 namespace Slim.Data.Context
@@ -14,6 +16,7 @@ namespace Slim.Data.Context
         public SlimDbContext(DbContextOptions<SlimDbContext> options)
             : base(options)
         {
+            
         }
 
         public virtual DbSet<Image> Images { get; set; } = null!;
@@ -24,6 +27,8 @@ namespace Slim.Data.Context
         public virtual DbSet<RazorPageResourceActionMap> RazorPageResourceActionMaps { get; set; } = null!;
         public virtual DbSet<ResourceAction> ResourceActions { get; set; } = null!;
         public virtual DbSet<Product> Products { get; set; } = null!;
+
+        public virtual DbSet<Category> Categories { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -66,6 +71,7 @@ namespace Slim.Data.Context
                 entity.Property(e => e.IsOnSale).IsRequired().HasDefaultValue(false);
                 entity.Property(e => e.IsNewProduct).IsRequired().HasDefaultValue(true);
                 entity.Property(e => e.IsTrending).IsRequired().HasDefaultValue(false);
+                entity.Property(e => e.ProductQuantity);
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
                 entity.Property(e => e.CreatedBy);
@@ -79,6 +85,28 @@ namespace Slim.Data.Context
 
                 entity.HasMany(d => d.Images)
                     .WithOne(p => p.Product);
+
+                entity.HasOne(d => d.Category)
+                    .WithMany(p => p.Products)
+                    .HasForeignKey(d => d.CategoryId)
+                    .HasConstraintName("FK_Product_Category");
+            });
+
+            modelBuilder.Entity<Category>(entity =>
+            {
+                entity.ToTable("Category", "slm");
+
+                entity.Property(e => e.CategoryName).IsRequired();
+                entity.Property(e => e.CategoryDescription).IsRequired();
+                entity.Property(e => e.CategoryTags);
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+                entity.Property(e => e.CreatedBy);
+                entity.Property(e => e.ModifiedBy);
+                entity.Property(e => e.Enabled).IsRequired().HasDefaultValueSql("((1))");
+
+                entity.HasMany(d => d.Products)
+                    .WithOne(p => p.Category);
             });
 
             modelBuilder.Entity<ProductImage>(entity =>
