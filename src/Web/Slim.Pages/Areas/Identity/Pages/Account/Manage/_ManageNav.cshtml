@@ -20,7 +20,7 @@
     </div>
 
     <ul class="list-unstyled mb-0 nav nav-pills flex-column">*@
-    <li class="border-bottom mb-0 nav-item"><a class="nav-link-style d-flex align-items-center px-4 py-3" href="dashboard-sales.html"><i class="bi bi-receipt opacity-60 me-2"></i>Create Category</a></li>
+    <li class="border-bottom mb-0 nav-item"><a class="nav-link-style d-flex align-items-center px-4 py-3 @ManageNavPages.CreateCategoryNavClass(ViewContext)" id="createCategory" asp-page="./Category"><i class="bi bi-receipt opacity-60 me-2"></i> Category</a></li>
     <li class="border-bottom mb-0 nav-item"><a class="nav-link-style d-flex align-items-center px-4 py-3 @ManageNavPages.AddNewProductClass(ViewContext)" id="addNewProduct" asp-page="./AddNewProduct"><i class="bi bi-basket opacity-60 me-2"></i>Add Products</a></li>
     <li class="border-bottom mb-0 nav-item"><a class="nav-link-style d-flex align-items-center px-4 py-3 @ManageNavPages.AllProductsNavClass(ViewContext)" id="newProduct" asp-page="./AllProducts"><i class="bi bi-plus-square opacity-60 me-2"></i>All Products</a></li>
     <li class="border-bottom mb-0 nav-item"><a class="nav-link-style d-flex align-items-center px-4 py-3 @ManageNavPages.WebPagePhotosNavClass(ViewContext)" id="webPhotos" asp-page="./WebPagePhotos"><i class="bi bi-image-fill opacity-60 me-2"></i>Edit Web Page</a></li>
