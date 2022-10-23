@@ -11,6 +11,8 @@ namespace Slim.Data.Entity
         {
             Images = new HashSet<Image>();
             ProductImages = new HashSet<ProductImage>();
+            Comments = new HashSet<Comment>();
+            Reviews = new HashSet<Review>();
         }
 
         public int Id { get; set; }
@@ -28,6 +30,8 @@ namespace Slim.Data.Entity
 
         public ICollection<Image> Images { get; set; }
         public ICollection<ProductImage> ProductImages { get; set; }
+        public ICollection<Comment> Comments { get; set; }
+        public ICollection<Review> Reviews { get; set; }
         public virtual RazorPage RazorPage { get; set; }
         public virtual Category Category { get; set; }
 

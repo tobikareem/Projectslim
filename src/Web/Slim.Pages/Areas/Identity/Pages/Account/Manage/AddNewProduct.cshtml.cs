@@ -20,23 +20,32 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
         private readonly IImage<Image> _imageBaseStore;
         private readonly IBaseStore<Product> _productBaseStore;
         private readonly ILogger<AddNewProductModel> _logger;
+        private readonly IBaseStore<Category> _categoryBaseStore;
 
 
         public TestCaptions TextCaptions { get; set; }
         public List<SelectListItem> RazorPageSelectList { get; set; }
+        public List<SelectListItem> CategorySelectList { get; set; }
 
-        public AddNewProductModel(IBaseStore<RazorPage> razorPagesBaseStore, ICacheService cacheService, IImage<Image> imageBaseStore, ILogger<AddNewProductModel> logger, IBaseStore<Product> productBaseStore)
+        private readonly IEnumerable<Category> _categories;
+        private readonly IEnumerable<RazorPage> _razorPages;
+
+        public AddNewProductModel(IBaseStore<RazorPage> razorPagesBaseStore, ICacheService cacheService, IImage<Image> imageBaseStore, ILogger<AddNewProductModel> logger, IBaseStore<Product> productBaseStore, IBaseStore<Category> categoryBaseStore)
         {
             _razorPagesBaseStore = razorPagesBaseStore;
             _cacheService = cacheService;
             _logger = logger;
             _imageBaseStore = imageBaseStore;
             _productBaseStore = productBaseStore;
+            _categoryBaseStore = categoryBaseStore;
             RazorPageSelectList = new List<SelectListItem>();
 
             TextCaptions = new TestCaptions();
-            var razorPages = _cacheService.GetOrCreate(CacheKey.GetRazorPages, _razorPagesBaseStore.GetAll);
-            RazorPageSelectList = razorPages.Select(page => new SelectListItem { Text = page.PageName, Value = page.Id.ToString() }).ToList();
+            _razorPages = _cacheService.GetOrCreate(CacheKey.GetRazorPages, _razorPagesBaseStore.GetAll).Where(x => SlmConstant.PagesForDropDown.Contains(x.PageName));
+            _categories = _cacheService.GetOrCreate(CacheKey.ProductCategories, _categoryBaseStore.GetAll);
+
+            RazorPageSelectList = _razorPages.Select(page => new SelectListItem { Text = page.PageName, Value = page.Id.ToString() }).ToList();
+            CategorySelectList = _categories.Select(category => new SelectListItem { Text = category.CategoryName, Value = category.Id.ToString() }).ToList();
         }
 
         [BindProperty(SupportsGet = true)] public InputModel InModel { get; set; } = new();
@@ -48,6 +57,9 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
                 TitleCaption = "Add New Product",
                 IsEditing = false
             };
+
+            InModel.Category = _categories.FirstOrDefault(x => x.CategoryName == "General")?.Id ?? 1;
+            
         }
 
 
@@ -75,6 +87,8 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
                 IsOnSale = product.IsOnSale,
                 IsNewProduct = product.IsNewProduct,
                 IsTrending = product.IsTrending,
+                ProductQuantity = product.ProductQuantity,
+                Category = product.Category.Id,
                 Id = product.Id
             };
 
@@ -96,7 +110,7 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
 
             if (isEdit)
             {
-                _productBaseStore.UpdateEntity(product);
+                _productBaseStore.UpdateEntity(product, CacheKey.GetProducts, true);
                 return RedirectToPage("./AllProducts");
             }
             
@@ -105,7 +119,7 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
                 return Page();
             }
 
-            _productBaseStore.AddEntity(product);
+            _productBaseStore.AddEntity(product, CacheKey.GetProducts, true);
 
             return RedirectToPage("./AllProducts");
         }
@@ -127,8 +141,9 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
                 IsNewProduct = InModel.IsNewProduct,
                 IsOnSale = InModel.IsOnSale,
                 IsTrending = InModel.IsTrending,
-                ProductTags = InModel.ProductTags
-
+                ProductTags = InModel.ProductTags,
+                ProductQuantity = InModel.ProductQuantity,
+                CategoryId = InModel.Category
             };
             return product;
         }
@@ -146,6 +161,8 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
             prd.IsNewProduct = InModel.IsNewProduct;
             prd.IsTrending = InModel.IsTrending;
             prd.RazorPageId = int.Parse(InModel.RazorPageId);
+            prd.ProductQuantity = InModel.ProductQuantity;
+            prd.CategoryId = InModel.Category;
 
             if (InModel.ProductImage != null)
             {
@@ -317,11 +334,17 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
 
         public class InputModel
         {
-
+            private const int DefaultCategoryId = 1;
             public int Id { get; set; }
 
             [Required, Display(Name = "Product Page")]
             public string RazorPageId { get; set; } = default!;
+
+            [Required, Display(Name = "Category")]
+            public int Category { get; set; } = DefaultCategoryId;
+
+            [Required, Display(Name = "Product Quantity"), Range(1, 1000)]
+            public int ProductQuantity { get; set; }
 
             /// <summary>
             /// Must only use letters.

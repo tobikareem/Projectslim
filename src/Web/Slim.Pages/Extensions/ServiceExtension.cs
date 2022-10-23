@@ -1,5 +1,4 @@
-﻿using System.Configuration;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Slim.Core.Model;
 using Slim.Data.Context;
@@ -31,6 +30,9 @@ namespace Slim.Pages.Extensions
             builder.Services.AddScoped<IPageSection<PageSection>, PageSectionRepo>();
             builder.Services.AddScoped<IImage<Image>, ImageUploadRepo>();
             builder.Services.AddScoped<IBaseStore<Product>, ProductRepository>();
+            builder.Services.AddScoped<IBaseStore<Category>, CategoryRepository>();
+            builder.Services.AddScoped<IBaseStore<Review>, ReviewRepository>();
+            builder.Services.AddScoped<IBaseStore<Comment>, CommentRepository>();
             #endregion
 
 

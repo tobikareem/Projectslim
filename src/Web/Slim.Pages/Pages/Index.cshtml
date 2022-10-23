@@ -1,4 +1,6 @@
 ﻿@page
+@using System.Globalization
+@using Slim.Pages.Extensions
 @model IndexModel
 @{
     ViewData["Title"] = "Home page";
@@ -65,181 +67,58 @@
     <h2 class="h3 text-center">Trending Lashes</h2>
     <div class="row pt-4 mx-n2">
         <!-- Product-->
-        <div class="col-lg-3 col-md-4 col-sm-6 px-2 mb-4">
-            <div class="card product-card">
-                <button class="btn-wishlist btn-sm" type="button" data-bs-toggle="tooltip" data-bs-placement="left" title="Add to wishlist"><i class="bi bi-heart"></i></button><a class="card-img-top d-block overflow-hidden" asp-page="/Lashes"><img src="img/shop/catalog/e1.jpg" alt="Product"></a>
-                <div class="card-body py-2">
-                    <a class="product-meta d-block fs-xs pb-1" asp-page="/Lashes">Whipsy and Fluffy</a>
-                    <h3 class="product-title fs-sm"><a asp-page="/Lashes">Pearl Eye Lashes</a></h3>
-                    <div class="d-flex justify-content-between">
-                        <div class="product-price"><span class="text-accent">$154.<small>00</small></span></div>
-                        <div class="star-rating">
-                            <i class="bi bi-star-fill active"></i><i class="bi bi-star-fill active"></i><i class="bi bi-star-fill active"></i><i class="bi bi-star-half active"></i><i class="bi bi-star"></i>
+        
+        @{
+            for (var i = 0; i < Model.Lashes.Count; i++)
+            {
+                var item = Model.Lashes[i];
+
+                var primary = string.Empty;
+                var imgPrimary = item.Images.FirstOrDefault(x => x.IsPrimaryImage);
+
+                var standardPrice = item.StandardPrice;
+                var standardPriceRoundUp = Convert.ToString(standardPrice, CultureInfo.CurrentCulture).Split('.')[1];
+                var standardPriceWholePrice = Convert.ToInt32(Math.Truncate(standardPrice));
+
+                var salesPrice = item.SalePrice;
+                var salesPriceRoundUp = Convert.ToString(salesPrice, CultureInfo.CurrentCulture).Split('.')[1];
+                var salesPriceWholePrice = Convert.ToInt32(Math.Truncate(salesPrice));
+
+                    <div class="col-lg-3 col-md-4 col-sm-6 px-2 mb-4">
+                        <div class="card product-card">
+                            <button class="btn-wishlist btn-sm" type="button" data-bs-toggle="tooltip" data-bs-placement="left" title="Add to wishlist"><i class="bi bi-heart"></i></button>
+
+                        <a class="card-img-top d-block overflow-hidden" asp-page="/ProductDetail" asp-route-id="@item.Id">
+                                <img src="@primary.GetImageSrc(imgPrimary?.UploadedImage)" alt="Product">
+                            </a>
+                            
+                            <div class="card-body py-2">
+                            <a class="product-meta d-block fs-xs pb-1" asp-page="/ProductDetail" asp-route-id="@item.Id">@item.Category.CategoryName</a>
+                            <h3 class="product-title fs-sm"><a asp-page="/ProductDetail" asp-route-id="@item.Id">@item.ProductName</a></h3>
+                                <div class="d-flex justify-content-between">
+                                    @if (salesPrice > 0)
+                                {
+                                    <div class="product-price"><span class="text-accent"><s>$@standardPriceWholePrice.<small>@standardPriceRoundUp</small></s></span> <span class="text-accent">$@salesPriceWholePrice<span class="fs-sm">.@salesPriceRoundUp</span></span></div>
+                                }
+                                else
+                                {
+                                        <div class="product-price"><span class="text-accent">$@standardPriceWholePrice.<small>@standardPriceRoundUp</small></span></div>
+                                }
+                                    <div class="star-rating">
+                                        <i class="bi bi-star-fill active"></i><i class="bi bi-star-fill active"></i><i class="bi bi-star-fill active"></i><i class="bi bi-star-half active"></i><i class="bi bi-star"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body card-body-hidden">
+                                <button class="btn btn-primary btn-sm d-block w-100 mb-2" type="button"><i class="bi bi-cart-check-fill fs-sm me-1"></i>Add to Cart</button>
+                                <div class="text-center"><a class="nav-link-style fs-ms" href="#quick-view" data-bs-toggle="modal"><i class="bi bi-eye-fill align-middle me-1"></i>Quick view</a></div>
+                            </div>
                         </div>
+                        <hr class="d-sm-none">
                     </div>
-                </div>
-                <div class="card-body card-body-hidden">
-                    <button class="btn btn-primary btn-sm d-block w-100 mb-2" type="button"><i class="bi bi-cart-check-fill fs-sm me-1"></i>Add to Cart</button>
-                    <div class="text-center"><a class="nav-link-style fs-ms" href="#quick-view" data-bs-toggle="modal"><i class="bi bi-eye-fill align-middle me-1"></i>Quick view</a></div>
-                </div>
-            </div>
-            <hr class="d-sm-none">
-        </div>
-        <!-- Product-->
-        <div class="col-lg-3 col-md-4 col-sm-6 px-2 mb-4">
-            <div class="card product-card">
-                <span class="badge badge-danger badge-shadow">Sale</span>
-                <button class="btn-wishlist btn-sm" type="button" data-bs-toggle="tooltip" data-bs-placement="left" title="Add to wishlist"><i class="bi bi-heart"></i></button><a class="card-img-top d-block overflow-hidden" asp-page="/Lashes"><img src="img/shop/catalog/e2.jpg" alt="Product"></a>
-                <div class="card-body py-2">
-                    <a class="product-meta d-block fs-xs pb-1" asp-page="/Lashes">Natural</a>
-                    <h3 class="product-title fs-sm"><a asp-page="/Lashes">Candy Eye Lashes</a></h3>
-                    <div class="d-flex justify-content-between">
-                        <div class="product-price">
-                            <span class="text-accent">$28.<small>50</small></span>
-                            <del class="fs-sm text-muted">$38.<small>50</small></del>
-                        </div>
-                        <div class="star-rating">
-                            <i class="bi bi-star-fill active"></i><i class="bi bi-star-fill active"></i><i class="bi bi-star-fill active"></i><i class="bi bi-star"></i><i class="bi bi-star"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body card-body-hidden">
-                    <div class="d-flex mb-2">
-                        <button class="btn btn-primary btn-sm" type="button"><i class="bi bi-cart-check-fill fs-sm me-1"></i>Add to Cart</button>
-                    </div>
-                    <div class="text-center"><a class="nav-link-style fs-ms" href="#quick-view" data-bs-toggle="modal"><i class="bi bi-eye-fill align-middle me-1"></i>Quick view</a></div>
-                </div>
-            </div>
-            <hr class="d-sm-none">
-        </div>
-        <!-- Product-->
-        <div class="col-lg-3 col-md-4 col-sm-6 px-2 mb-4">
-            <div class="card product-card">
-                <button class="btn-wishlist btn-sm" type="button" data-bs-toggle="tooltip" data-bs-placement="left" title="Add to wishlist"><i class="bi bi-heart"></i></button><a class="card-img-top d-block overflow-hidden" asp-page="/Lashes"><img src="img/shop/catalog/e3.jpg" alt="Product"></a>
-                <div class="card-body py-2">
-                    <a class="product-meta d-block fs-xs pb-1" asp-page="/Lashes">Whipsy and Fluffy</a>
-                    <h3 class="product-title fs-sm"><a asp-page="/Lashes">Delux Eye Lashes</a></h3>
-                    <div class="d-flex justify-content-between">
-                        <div class="product-price"><span class="text-accent">$39.<small>50</small></span></div>
-                        <div class="star-rating">
-                            <i class="bi bi-star-fill active"></i><i class="bi bi-star-fill active"></i><i class="bi bi-star-fill active"></i><i class="bi bi-star-fill active"></i><i class="bi bi-star-fill active"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body card-body-hidden">
-                    <button class="btn btn-primary btn-sm d-block w-100 mb-2" type="button"><i class="bi bi-cart-check-fill fs-sm me-1"></i>Add to Cart</button>
-                    <div class="text-center"><a class="nav-link-style fs-ms" href="#quick-view" data-bs-toggle="modal"><i class="bi bi-eye-fill align-middle me-1"></i>Quick view</a></div>
-                </div>
-            </div>
-            <hr class="d-sm-none">
-        </div>
-        <!-- Product-->
-        <div class="col-lg-3 col-md-4 col-sm-6 px-2 mb-4">
-            <div class="card product-card">
-                <button class="btn-wishlist btn-sm" type="button" data-bs-toggle="tooltip" data-bs-placement="left" title="Add to wishlist"><i class="bi bi-heart"></i></button><a class="card-img-top d-block overflow-hidden" asp-page="/Lashes"><img src="img/shop/catalog/e4.jpg" alt="Product"></a>
-                <div class="card-body py-2">
-                    <a class="product-meta d-block fs-xs pb-1" asp-page="/Lashes">Whipsy and Fluffy</a>
-                    <h3 class="product-title fs-sm"><a asp-page="/Lashes">Coco Eye Lashes</a></h3>
-                    <div class="d-flex justify-content-between">
-                        <div class="product-price"><span class="text-accent">$18.<small>99</small></span></div>
-                        <div class="star-rating">
-                            <i class="bi bi-star-fill active"></i><i class="bi bi-star-fill active"></i><i class="bi bi-star-fill active"></i><i class="bi bi-star-fill active"></i><i class="bi bi-star"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body card-body-hidden">
-                    <button class="btn btn-primary btn-sm d-block w-100 mb-2" type="button"><i class="bi bi-cart-check-fill fs-sm me-1"></i>Add to Cart</button>
-                    <div class="text-center"><a class="nav-link-style fs-ms" asp-page="/Lashes" data-bs-toggle="modal"><i class="bi bi-eye-fill align-middle me-1"></i>Quick view</a></div>
-                </div>
-            </div>
-            <hr class="d-sm-none">
-        </div>
-        <!-- Product-->
-        <div class="col-lg-3 col-md-4 col-sm-6 px-2 mb-4">
-            <div class="card product-card">
-                <button class="btn-wishlist btn-sm" type="button" data-bs-toggle="tooltip" data-bs-placement="left" title="Add to wishlist"><i class="bi bi-heart"></i></button><a class="card-img-top d-block overflow-hidden" asp-page="/Lashes"><img src="img/shop/catalog/e5.jpg" alt="Product"></a>
-                <div class="card-body py-2">
-                    <a class="product-meta d-block fs-xs pb-1" asp-page="/Lashes">Natural</a>
-                    <h3 class="product-title fs-sm"><a asp-page="/Lashes">Bleu</a></h3>
-                    <div class="d-flex justify-content-between">
-                        <div class="product-price"><span class="text-accent">$68.<small>40</small></span></div>
-                        <div class="star-rating">
-                            <i class="bi bi-star-fill active"></i><i class="bi bi-star-fill active"></i><i class="bi bi-star-fill active"></i><i class="bi bi-star-fill active"></i><i class="bi bi-star-half active"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body card-body-hidden">
-                    
-                    <button class="btn btn-primary btn-sm d-block w-100 mb-2" type="button"><i class="bi bi-cart-check-fill fs-sm me-1"></i>Add to Cart</button>
-                    <div class="text-center"><a class="nav-link-style fs-ms" asp-page="/Lashes" data-bs-toggle="modal"><i class="bi bi-eye-fill align-middle me-1"></i>Quick view</a></div>
-                </div>
-            </div>
-            <hr class="d-sm-none">
-        </div>
-        <!-- Product-->
-        <div class="col-lg-3 col-md-4 col-sm-6 px-2 mb-4">
-            <div class="card product-card">
-                <button class="btn-wishlist btn-sm" type="button" data-bs-toggle="tooltip" data-bs-placement="left" title="Add to wishlist"><i class="bi bi-heart"></i></button><a class="card-img-top d-block overflow-hidden" asp-page="/Lashes"><img src="img/shop/catalog/e6.jpg" alt="Product"></a>
-                <div class="card-body py-2">
-                    <a class="product-meta d-block fs-xs pb-1" asp-page="/Lashes">Natural</a>
-                    <h3 class="product-title fs-sm"><a asp-page="/Lashes">$lim</a></h3>
-                    <div class="d-flex justify-content-between">
-                        <div class="product-price"><span class="text-muted fs-sm">Out of stock</span></div>
-                        <div class="star-rating">
-                            <i class="bi bi-star-fill active"></i><i class="bi bi-star-fill active"></i><i class="bi bi-star-fill active"></i><i class="bi bi-star-fill active"></i><i class="bi bi-star"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body card-body-hidden">
-                    <a class="btn btn-secondary btn-sm d-block w-100 mb-2" asp-page="/Lashes">View details</a>
-                    <div class="text-center"><a class="nav-link-style fs-ms" href="#quick-view" data-bs-toggle="modal"><i class="bi bi-eye-fill align-middle me-1"></i>Quick view</a></div>
-                </div>
-            </div>
-            <hr class="d-sm-none">
-        </div>
-        <!-- Product-->
-        <div class="col-lg-3 col-md-4 col-sm-6 px-2 mb-4">
-            <div class="card product-card">
-                <button class="btn-wishlist btn-sm" type="button" data-bs-toggle="tooltip" data-bs-placement="left" title="Add to wishlist"><i class="bi bi-heart"></i></button><a class="card-img-top d-block overflow-hidden" asp-page="/Lashes"><img src="img/shop/catalog/e3.jpg" alt="Product"></a>
-                <div class="card-body py-2">
-                    <a class="product-meta d-block fs-xs pb-1" asp-page="/Lashes">Whispy and Fluffy</a>
-                    <h3 class="product-title fs-sm"><a asp-page="/Lashes">Chaz</a></h3>
-                    <div class="d-flex justify-content-between">
-                        <div class="product-price"><span class="text-accent">$79.<small>50</small></span></div>
-                        <div class="star-rating">
-                            <i class="bi bi-star-fill active"></i><i class="bi bi-star-fill active"></i><i class="bi bi-star-half active"></i><i class="bi bi-star"></i><i class="bi bi-star"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body card-body-hidden">
-                   
-                    <button class="btn btn-primary btn-sm d-block w-100 mb-2" type="button"><i class="bi bi-cart-check-fill fs-sm me-1"></i>Add to Cart</button>
-                    <div class="text-center"><a class="nav-link-style fs-ms" asp-page="/Lashes" data-bs-toggle="modal"><i class="bi bi-eye-fill align-middle me-1"></i>Quick view</a></div>
-                </div>
-            </div>
-            <hr class="d-sm-none">
-        </div>
-        <!-- Product-->
-        <div class="col-lg-3 col-md-4 col-sm-6 px-2 mb-4">
-            <div class="card product-card">
-                <button class="btn-wishlist btn-sm" type="button" data-bs-toggle="tooltip" data-bs-placement="left" title="Add to wishlist"><i class="bi bi-heart"></i></button><a class="card-img-top d-block overflow-hidden" asp-page="/Lashes"><img src="img/shop/catalog/e5.jpg" alt="Product"></a>
-                <div class="card-body py-2">
-                    <a class="product-meta d-block fs-xs pb-1" asp-page="/Lashes">Whipsy and Fluffy</a>
-                    <h3 class="product-title fs-sm"><a asp-page="/Lashes">Queen</a></h3>
-                    <div class="d-flex justify-content-between">
-                        <div class="product-price"><span class="text-accent">$215.<small>00</small></span></div>
-                        <div class="star-rating">
-                            <i class="bi bi-star-fill active"></i><i class="bi bi-star-fill active"></i><i class="bi bi-star-fill active"></i><i class="bi bi-star-fill active"></i><i class="bi bi-star"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body card-body-hidden">
-                    <button class="btn btn-primary btn-sm d-block w-100 mb-2" type="button"><i class="bi bi-cart-check-fill fs-sm me-1"></i>Add to Cart</button>
-                    <div class="text-center"><a class="nav-link-style fs-ms" asp-page="/Lashes" data-bs-toggle="modal"><i class="bi bi-eye-fill align-middle me-1"></i>Quick view</a></div>
-                </div>
-            </div>
-            <hr class="d-sm-none">
-        </div>
+            }
+        }
+
     </div>
     <div class="text-center pt-3"><a class="btn btn-outline-accent" asp-page="/Lashes">More products<i class="bi bi-arrow-right-circle-fill ms-1"></i></a></div>
 </section>
@@ -262,7 +141,7 @@
                 <div class="py-4 my-2 px-4 text-center">
                     <div class="py-1">
                         <h5 class="mb-2">Or Reach Out</h5>
-                        <p class="fs-sm text-muted">You may fill out the form </p><a class="btn btn-primary btn-shadow btn-sm" href="#">Contact us</a>
+                        <p class="fs-sm text-muted">You may fill out the form </p><a class="btn btn-primary btn-shadow btn-sm" asp-page="/Appointments">Contact us</a>
                     </div>
                 </div>
             </div>
@@ -278,7 +157,7 @@
             <div class="d-flex flex-column h-100 overflow-hidden rounded-3" style="background-color: #e2e9ef;">
                 <div class="d-flex justify-content-between px-grid-gutter py-grid-gutter">
                     <div>
-                        <h3 class="mb-1">Hair day</h3><a class="fs-md" asp-page="/Hair">Shop hairs<i class="bi bi-arrow-right-circle-fill fs-xs align-middle ms-1"></i></a>
+                        <h3 class="mb-1">Hair day</h3><a class="fs-md" asp-page="/Hair">Book an appointment<i class="bi bi-arrow-right-circle-fill fs-xs align-middle ms-1"></i></a>
                     </div>
                     <div class="tns-carousel-controls" id="hoodie-day">
                         <button type="button"><i class="bi bi-arrow-left-circle-fill"></i></button>
@@ -495,17 +374,15 @@
 <section class="container py-lg-4 mb-4">
     <h2 class="h3 text-center pb-4">Shop Our Lip Glosses</h2>
     <div class="row">
-        <div class="col-md-3 col-sm-4 col-6"><a class="d-block bg-white shadow-sm rounded-3 py-3 py-sm-4 mb-grid-gutter" href="#"><img class="d-block mx-auto lipGlossImg" src="img/shop/catalog/l1.jpg" alt="Brand"></a></div>
-        <div class="col-md-3 col-sm-4 col-6"><a class="d-block bg-white shadow-sm rounded-3 py-3 py-sm-4 mb-grid-gutter" href="#"><img class="d-block mx-auto lipGlossImg" src="img/shop/catalog/l2.jpg" alt="Brand"></a></div>
-        <div class="col-md-3 col-sm-4 col-6"><a class="d-block bg-white shadow-sm rounded-3 py-3 py-sm-4 mb-grid-gutter" href="#"><img class="d-block mx-auto lipGlossImg" src="img/shop/catalog/l3.jpg" alt="Brand"></a></div>
-        <div class="col-md-3 col-sm-4 col-6"><a class="d-block bg-white shadow-sm rounded-3 py-3 py-sm-4 mb-grid-gutter" href="#"><img class="d-block mx-auto lipGlossImg" src="img/shop/catalog/l4.jpg" alt="Brand"></a></div>
-        <div class="col-md-3 col-sm-4 col-6"><a class="d-block bg-white shadow-sm rounded-3 py-3 py-sm-4 mb-grid-gutter" href="#"><img class="d-block mx-auto lipGlossImg" src="img/shop/catalog/l5.jpg" alt="Brand"></a></div>
-        <div class="col-md-3 col-sm-4 col-6"><a class="d-block bg-white shadow-sm rounded-3 py-3 py-sm-4 mb-grid-gutter" href="#"><img class="d-block mx-auto lipGlossImg" src="img/shop/catalog/l6.jpg" alt="Brand"></a></div>
-        <div class="col-md-3 col-sm-4 col-6"><a class="d-block bg-white shadow-sm rounded-3 py-3 py-sm-4 mb-grid-gutter" href="#"><img class="d-block mx-auto lipGlossImg" src="img/shop/catalog/l5.jpg" alt="Brand"></a></div>
-        <div class="col-md-3 col-sm-4 col-6"><a class="d-block bg-white shadow-sm rounded-3 py-3 py-sm-4 mb-grid-gutter" href="#"><img class="d-block mx-auto lipGlossImg" src="img/shop/catalog/l3.jpg" alt="Brand"></a></div>
-        <div class="col-md-3 col-sm-4 col-6"><a class="d-block bg-white shadow-sm rounded-3 py-3 py-sm-4 mb-grid-gutter" href="#"><img class="d-block mx-auto lipGlossImg" src="img/shop/catalog/l2.jpg" alt="Brand"></a></div>
-        <div class="col-md-3 col-sm-4 col-6"><a class="d-block bg-white shadow-sm rounded-3 py-3 py-sm-4 mb-grid-gutter" href="#"><img class="d-block mx-auto lipGlossImg" src="img/shop/catalog/l4.jpg" alt="Brand"></a></div>
-        <div class="col-md-3 col-sm-4 col-6"><a class="d-block bg-white shadow-sm rounded-3 py-3 py-sm-4 mb-grid-gutter" href="#"><img class="d-block mx-auto lipGlossImg" src="img/shop/catalog/l1.jpg" alt="Brand"></a></div>
-        <div class="col-md-3 col-sm-4 col-6"><a class="d-block bg-white shadow-sm rounded-3 py-3 py-sm-4 mb-grid-gutter" href="#"><img class="d-block mx-auto lipGlossImg" src="img/shop/catalog/l3.jpg" alt="Brand"></a></div>
+        @{
+            foreach (var lip in Model.LipGloss)
+            {
+                var primary = string.Empty;
+                var imgPrimary = lip.Images.FirstOrDefault(x => x.IsPrimaryImage);
+                
+                <div class="col-md-3 col-sm-4 col-6"><a class="d-block bg-white shadow-sm rounded-3 py-3 py-sm-4 mb-grid-gutter" href="#"><img class="d-block mx-auto lipGlossImg" src="@primary.GetImageSrc(imgPrimary?.UploadedImage)" alt="Brand"></a></div>
+            }
+        }
+        @*<div class="col-md-3 col-sm-4 col-6"><a class="d-block bg-white shadow-sm rounded-3 py-3 py-sm-4 mb-grid-gutter" href="#"><img class="d-block mx-auto lipGlossImg" src="img/shop/catalog/l1.jpg" alt="Brand"></a></div>*@
     </div>
 </section>

@@ -77,6 +77,28 @@
                 </div>
 
                 <div class="row">
+                    <div class="col-sm-6 mb-3">
+                        <label asp-for="InModel.ProductQuantity" class="form-label"> </label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-plus"></i></span>
+                            <input class="form-control" asp-for="InModel.ProductQuantity">
+                        </div>
+                        <div class="form-text">How many quaunties are in store?</div>
+                        <span asp-validation-for="InModel.ProductQuantity" class="text-danger"></span>
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label asp-for="InModel.Category" class="form-label"> </label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-bookmark-plus-fill"></i></span>
+                             <select asp-for="InModel.Category" asp-items="Model.CategorySelectList"
+                                class="form-select me-2" id="product-category"></select>
+                        </div>
+                        <div class="form-text">The Category product belongs to</div>
+                        <span asp-validation-for="InModel.Category" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row">
                     <div class="col mb-3">
                         <label class="form-label" asp-for="InModel.IsOnSale"></label>
                         <input class="form-check-input" asp-for="InModel.IsOnSale" />
