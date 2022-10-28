@@ -106,6 +106,7 @@ namespace Slim.Data.Context
                 entity.Property(e => e.CategoryName).IsRequired();
                 entity.Property(e => e.CategoryDescription).IsRequired();
                 entity.Property(e => e.CategoryTags);
+                entity.Property(e => e.RazorPageId);
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
                 entity.Property(e => e.CreatedBy);
@@ -114,6 +115,11 @@ namespace Slim.Data.Context
 
                 entity.HasMany(d => d.Products)
                     .WithOne(p => p.Category);
+
+                entity.HasOne(d => d.RazorPage)
+                    .WithMany(p => p.Categories)
+                    .HasForeignKey(d => d.RazorPageId)
+                    .HasConstraintName("FK_Category_RazorPage").OnDelete(DeleteBehavior.NoAction);
             });
 
             modelBuilder.Entity<Comment>(entity =>

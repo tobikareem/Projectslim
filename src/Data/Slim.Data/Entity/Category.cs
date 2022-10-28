@@ -19,7 +19,11 @@ namespace Slim.Data.Entity
 
         public string CategoryTags { get; set; } = string.Empty;
 
+        public int RazorPageId { get; set; }
+
         public ICollection<Product> Products { get; set; }
+
+        public RazorPage RazorPage { get; set; }
 
     }
 }

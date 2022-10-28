@@ -41,15 +41,17 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
             RazorPageSelectList = new List<SelectListItem>();
 
             TextCaptions = new TestCaptions();
-            _razorPages = _cacheService.GetOrCreate(CacheKey.GetRazorPages, _razorPagesBaseStore.GetAll).Where(x => SlmConstant.PagesForDropDown.Contains(x.PageName));
+            _razorPages = _cacheService.GetOrCreate(CacheKey.GetRazorPages, _razorPagesBaseStore.GetAll).Where(x => SlmConstant.PagesForDropDown.Contains(x.PageName)).ToList();
             _categories = _cacheService.GetOrCreate(CacheKey.ProductCategories, _categoryBaseStore.GetAll);
+            
+            var pageId = _razorPages.FirstOrDefault(x => string.Compare(x.PageName, "Hair", StringComparison.OrdinalIgnoreCase) == 0)?.Id ?? 1;
 
             RazorPageSelectList = _razorPages.Select(page => new SelectListItem { Text = page.PageName, Value = page.Id.ToString() }).ToList();
-            CategorySelectList = _categories.Select(category => new SelectListItem { Text = category.CategoryName, Value = category.Id.ToString() }).ToList();
+            CategorySelectList = _categories.Where(x => x.RazorPageId == pageId).Select(category => new SelectListItem { Text = category.CategoryName, Value = category.Id.ToString() }).ToList();
         }
 
         [BindProperty(SupportsGet = true)] public InputModel InModel { get; set; } = new();
-        
+
         public void OnGet()
         {
             TextCaptions = new TestCaptions
@@ -59,7 +61,7 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
             };
 
             InModel.Category = _categories.FirstOrDefault(x => x.CategoryName == "General")?.Id ?? 1;
-            
+
         }
 
 
@@ -72,7 +74,7 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
                 IsEditing = true,
                 TitleCaption = $"Edit: {product.ProductName}",
                 BtnCaption = "Update Product",
-                ProfileImageEditText = "Uploading a new image will replace the current image" ,
+                ProfileImageEditText = "Uploading a new image will replace the current image",
                 ProfileImagesEditText = "Uploading one or more images will remove all current Images"
             };
 
@@ -98,8 +100,14 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
         public IActionResult OnGetDeleteProduct(int id)
         {
             var product = _productBaseStore.GetEntity(id);
-            _productBaseStore.DeleteEntity(product);
+            _productBaseStore.DeleteEntity(product, CacheKey.GetProducts, true);
             return RedirectToPage("./AllProducts");
+        }
+
+        public JsonResult OnGetSelectionChanged(int id)
+        {
+            var categories = _cacheService.GetOrCreate(CacheKey.ProductCategories, _categoryBaseStore.GetAll).Where(x => x.RazorPageId == id);
+            return new JsonResult(categories);
         }
 
         public IActionResult OnPostAddNewProduct()
@@ -113,7 +121,7 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
                 _productBaseStore.UpdateEntity(product, CacheKey.GetProducts, true);
                 return RedirectToPage("./AllProducts");
             }
-            
+
             if (!ModelState.IsValid)
             {
                 return Page();
@@ -407,7 +415,7 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
                 set
                 {
                     _profileImageEditText = value;
-                    _profileImageEditText = IsEditing ?  "Uploading a new image will replace the current image" :  string.Empty;
+                    _profileImageEditText = IsEditing ? "Uploading a new image will replace the current image" : string.Empty;
                 }
             }
 
