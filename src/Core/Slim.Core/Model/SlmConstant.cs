@@ -17,32 +17,18 @@
             }
         }
 
-        public static List<string> LashesCategories
+        public static List<string> AdminEmailList
         {
             get
             {
-                var pages = new List<string>
+                var emails = new List<string>
                 {
-                    "Natural",
-                    "Whipsy and Fluffy"
+                    "elizabeth.lucys@hotmail.com",
+                    "captain@tobikareem.com",
+                    "odunayoadegbaju@yahoo.com"
                 };
 
-                return pages;
-            }
-        }
-
-        public static List<string> LipCategories
-        {
-            get
-            {
-                var pages = new List<string>
-                {
-                    "Crystal",
-                    "Cocao",
-                    "Forse"
-                };
-
-                return pages;
+                return emails;
             }
         }
     }

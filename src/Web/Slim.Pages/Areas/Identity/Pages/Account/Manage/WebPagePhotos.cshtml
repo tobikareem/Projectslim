@@ -173,14 +173,10 @@
 
     <script>
         $(document).ready(function() {
-            debugger;
             $('#SaveWordingfer').click(function() {
                 // get the form data
                 // there are many ways to get this data using jQuery (you can use the class or id also)
                 var formData = $('form').serialize();
-
-                var person = { "FirstName": "Andrew", "LastName": "Lock", "Age": 31 };
-                debugger;
 
                 // process the form
                 $.ajax({
