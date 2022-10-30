@@ -24,4 +24,8 @@
 	  <Folder Include="Migrations\" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\..\Core\Slim.Core\Slim.Core.csproj" />
+	</ItemGroup>
+
 </Project>

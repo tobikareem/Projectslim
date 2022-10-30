@@ -25,7 +25,7 @@ namespace Slim.Shared.Repositories
         {
             try
             {
-               //  _context.Entry(typeof(Image)).State = EntityState.Detached;
+                //  _context.Entry(typeof(Image)).State = EntityState.Detached;
                 _context.Products.Add(entity);
                 _context.SaveChanges();
 
@@ -39,6 +39,13 @@ namespace Slim.Shared.Repositories
             {
                 _logger.LogError(e, "Error in Add Product Entity");
                 throw;
+            }
+            finally
+            {
+                if (hasCache)
+                {
+                    _cacheService.Remove(CacheKey.GetProducts);
+                }
             }
         }
 
@@ -59,6 +66,13 @@ namespace Slim.Shared.Repositories
                 _logger.LogError(e, "Error in Update Product Entity");
                 throw;
             }
+            finally
+            {
+                if (hasCache)
+                {
+                    _cacheService.Remove(CacheKey.GetProducts);
+                }
+            }
         }
 
         public Product GetEntity(int id)
@@ -78,7 +92,10 @@ namespace Slim.Shared.Repositories
         {
             try
             {
-                return _context.Products.Include(x => x.Images).ToList();
+                return _context.Products.Include(x => x.Images)
+                    .Include(x => x.Category)
+                    .Include(y => y.Comments)
+                    .Include(d => d.Reviews).ToList();
             }
             catch (Exception e)
             {

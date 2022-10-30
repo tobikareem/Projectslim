@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Slim.Core.Model;
 using Slim.Data.Entity;
 
 namespace Slim.Data.Context
@@ -14,6 +16,7 @@ namespace Slim.Data.Context
         public SlimDbContext(DbContextOptions<SlimDbContext> options)
             : base(options)
         {
+            
         }
 
         public virtual DbSet<Image> Images { get; set; } = null!;
@@ -24,6 +27,9 @@ namespace Slim.Data.Context
         public virtual DbSet<RazorPageResourceActionMap> RazorPageResourceActionMaps { get; set; } = null!;
         public virtual DbSet<ResourceAction> ResourceActions { get; set; } = null!;
         public virtual DbSet<Product> Products { get; set; } = null!;
+        public virtual DbSet<Category> Categories { get; set; } = null!;
+        public virtual DbSet<Comment> Comments { get; set; }
+        public virtual DbSet<Review> Reviews { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -66,6 +72,7 @@ namespace Slim.Data.Context
                 entity.Property(e => e.IsOnSale).IsRequired().HasDefaultValue(false);
                 entity.Property(e => e.IsNewProduct).IsRequired().HasDefaultValue(true);
                 entity.Property(e => e.IsTrending).IsRequired().HasDefaultValue(false);
+                entity.Property(e => e.ProductQuantity);
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
                 entity.Property(e => e.CreatedBy);
@@ -79,6 +86,81 @@ namespace Slim.Data.Context
 
                 entity.HasMany(d => d.Images)
                     .WithOne(p => p.Product);
+
+                entity.HasOne(d => d.Category)
+                    .WithMany(p => p.Products)
+                    .HasForeignKey(d => d.CategoryId)
+                    .HasConstraintName("FK_Product_Category");
+
+                entity.HasMany(d => d.Comments)
+                    .WithOne(p => p.Product);
+
+                entity.HasMany(d => d.Reviews)
+                    .WithOne(p => p.Product);
+            });
+
+            modelBuilder.Entity<Category>(entity =>
+            {
+                entity.ToTable("Category", "slm");
+
+                entity.Property(e => e.CategoryName).IsRequired();
+                entity.Property(e => e.CategoryDescription).IsRequired();
+                entity.Property(e => e.CategoryTags);
+                entity.Property(e => e.RazorPageId);
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+                entity.Property(e => e.CreatedBy);
+                entity.Property(e => e.ModifiedBy);
+                entity.Property(e => e.Enabled).IsRequired().HasDefaultValueSql("((1))");
+
+                entity.HasMany(d => d.Products)
+                    .WithOne(p => p.Category);
+
+                entity.HasOne(d => d.RazorPage)
+                    .WithMany(p => p.Categories)
+                    .HasForeignKey(d => d.RazorPageId)
+                    .HasConstraintName("FK_Category_RazorPage").OnDelete(DeleteBehavior.NoAction);
+            });
+
+            modelBuilder.Entity<Comment>(entity =>
+            {
+                entity.ToTable("Comment", "slm");
+
+                entity.Property(e => e.UserComment).IsRequired();
+                entity.Property(e => e.FullName).IsRequired();
+                entity.Property(e => e.Email);
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+                entity.Property(e => e.CreatedBy);
+                entity.Property(e => e.ModifiedBy);
+                entity.Property(e => e.Enabled).IsRequired().HasDefaultValueSql("((1))");
+
+                entity.HasOne(d => d.Product)
+                    .WithMany(p => p.Comments)
+                    .HasForeignKey(d => d.ProductId)
+                    .HasConstraintName("FK_Comment_Product");
+            });
+
+            modelBuilder.Entity<Review>(entity =>
+            {
+                entity.ToTable("Review", "slm");
+
+                entity.Property(e => e.UserReview).IsRequired();
+                entity.Property(e => e.FullName).IsRequired();
+                entity.Property(e => e.Email);
+                entity.Property(e => e.Rating).IsRequired();
+                entity.Property(e => e.Pros);
+                entity.Property(e => e.Cons);
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+                entity.Property(e => e.CreatedBy);
+                entity.Property(e => e.ModifiedBy);
+                entity.Property(e => e.Enabled).IsRequired().HasDefaultValueSql("((1))");
+
+                entity.HasOne(d => d.Product)
+                    .WithMany(p => p.Reviews)
+                    .HasForeignKey(d => d.ProductId)
+                    .HasConstraintName("FK_Review_Product");
             });
 
             modelBuilder.Entity<ProductImage>(entity =>

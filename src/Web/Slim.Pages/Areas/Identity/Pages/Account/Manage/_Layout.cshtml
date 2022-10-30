@@ -1,4 +1,6 @@
-﻿@{
+﻿@using Microsoft.CodeAnalysis
+@using Slim.Core.Model
+@{
     if (ViewData.TryGetValue("ParentLayout", out var parentLayout))
     {
         Layout = (string)parentLayout;
@@ -13,48 +15,50 @@
 <div class="page-title-overlap bg-accent pt-4">
     <div class="container d-flex flex-wrap flex-sm-nowrap justify-content-center justify-content-sm-between align-items-center pt-2">
         <div class="d-flex align-items-center pb-3">
-            <div class="img-thumbnail rounded-circle position-relative flex-shrink-0" style="width: 6.375rem;"><img class="rounded-circle" src="~/img/dashboard/avatar.png" alt="Slim Studio"></div>
+            <div class="img-thumbnail rounded-circle position-relative flex-shrink-0" style="width: 6.375rem;"><img class="rounded-circle" src="~/img/home/hero-slider/logo.PNG" alt="Slim Studio"></div>
             <div class="ps-3">
-                <h3 class="text-light fs-lg mb-0">Slim</h3><span class="d-block text-light fs-ms opacity-60 py-1">Member since November 2022</span>
+                @{
+                    var userYear = User.Claims.FirstOrDefault(c => c.Type == ResourceRole.UserSignUpDate)?.Value?.Split("-")[0];
+                    var date = string.IsNullOrWhiteSpace(userYear) ? DateTime.Now.Year : Convert.ToInt32(userYear);
+                }
+                <h3 class="text-light fs-lg mb-0">Slim</h3><span class="d-block text-light fs-ms opacity-60 py-1">Member since @date</span>
             </div>
         </div>
-        <div class="d-flex">
-            <div class="text-sm-end me-5">
-                <div class="text-light fs-base">Total sales</div>
-                <h3 class="text-light">426</h3>
-            </div>
-            <div class="text-sm-end">
-                <div class="text-light fs-base">Seller rating</div>
-                <div class="star-rating">
-                    <i class="bi bi-star-fill active"></i><i class="bi bi-star-fill active"></i><i class="bi bi-star-fill active"></i><i class="bi bi-star-half active"></i><i class="bi bi-star"></i>
-                </div>
-                <div class="text-light opacity-60 fs-xs">Based on 98 reviews</div>
-            </div>
+        @* <div class="d-flex">
+        <div class="text-sm-end me-5">
+        <div class="text-light fs-base">Total sales</div>
+        <h3 class="text-light">426</h3>
         </div>
+        <div class="text-sm-end">
+        <div class="text-light fs-base">Seller rating</div>
+        <div class="star-rating">
+        <i class="bi bi-star-fill active"></i><i class="bi bi-star-fill active"></i><i class="bi bi-star-fill active"></i><i class="bi bi-star-half active"></i><i class="bi bi-star"></i>
+        </div>
+        <div class="text-light opacity-60 fs-xs">Based on 98 reviews</div>
+        </div>
+        </div>*@
     </div>
 </div>
 
 <div class="container mb-5 pb-3">
     <div class="bg-light shadow-lg rounded-3 overflow-hidden">
         <div class="row">
-            <div class="col-md-3">
-                <aside>
+            <aside class="col-lg-4 pe-xl-5">
+                <div class="d-block d-lg-none p-4"><a class="btn btn-outline-accent d-block" href="#account-menu" data-bs-toggle="collapse"><i class="bi bi-menu-up me-2"></i>Account menu</a></div>
+                <div class="h-100 border-end mb-2">
                     <div class="d-lg-block collapse" id="account-menu">
                         <div class="bg-secondary p-4">
                             <h3 class="fs-sm mb-0 text-muted">Account</h3>
                         </div>
 
                         <partial name="_ManageNav" />
-
                     </div>
-                </aside>
-            </div>
+                </div>
+            </aside>
 
-            <div class="col-md-9">
-                <section class="col-lg-12 pt-lg-4 pb-4 mb-3">
-                    @RenderBody()
-                </section>
-            </div>
+            <section class="col-lg-8 pt-lg-4 pb-4 mb-3">
+                @RenderBody()
+            </section>
         </div>
     </div>
 </div>

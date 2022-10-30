@@ -16,3 +16,4 @@
 *.dll
 *.pdb
 */src/Shared/Slim.Shared/obj
+/src/Web/Slim.Pages/Properties

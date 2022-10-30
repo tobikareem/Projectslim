@@ -17,7 +17,7 @@ public class AllProductsModel : PageModel
     private readonly ILogger<AllProductsModel> _logger;
     private readonly IBaseStore<Product> _productBaseStore;
     public List<SelectListItem> RazorPageSelectList { get; set; }
-    public List<string> PrimaryImages { get; set; }
+    public Dictionary<int, string> ProductAndPrimaryImage { get; set; }
     public AllProductsModel(IBaseStore<RazorPage> razorPagesBaseStore, ICacheService cacheService, ILogger<AllProductsModel> logger, IBaseStore<Product> productBaseStore)
     {
         _razorPagesBaseStore = razorPagesBaseStore;
@@ -25,28 +25,14 @@ public class AllProductsModel : PageModel
         _logger = logger;
         _productBaseStore = productBaseStore;
         RazorPageSelectList = new List<SelectListItem>();
-        PrimaryImages = new List<string>();
-        
-        var razorPages = _cacheService.GetOrCreate(CacheKey.GetRazorPages, _razorPagesBaseStore.GetAll).Where(x => PagesForDropDown.Contains(x.PageName));
+        ProductAndPrimaryImage = new Dictionary<int, string>();
+
+        var razorPages = _cacheService.GetOrCreate(CacheKey.GetRazorPages, _razorPagesBaseStore.GetAll).Where(x => SlmConstant.PagesForDropDown.Contains(x.PageName));
         RazorPageSelectList = razorPages.Select(page => new SelectListItem { Text = page.PageName, Value = page.Id.ToString() }).ToList();
     }
     [BindProperty(SupportsGet = true)] public InputModel InModel { get; set; } = new();
     [BindProperty] public List<Product> Products { get; set; } = new();
 
-    private List<string> PagesForDropDown
-    {
-        get
-        {
-            var pages =  new List<string>
-            {
-                "Hair",
-                "Lip Gloss",
-                "Lashes"
-            };
-
-            return pages;
-        }
-    }
 
     public IActionResult OnGet()
     {
@@ -60,7 +46,6 @@ public class AllProductsModel : PageModel
         {
             Products = GetAllProductsByProductId(-1);
         }
-
         return Page();
     }
 
@@ -73,7 +58,8 @@ public class AllProductsModel : PageModel
             var imgPrimary = string.Empty;
             var primaryImage = product.Images.FirstOrDefault(image => image.IsPrimaryImage);
             if (primaryImage == null) return;
-            PrimaryImages.Add(imgPrimary.GetImageSrc(primaryImage.UploadedImage));
+
+            ProductAndPrimaryImage.TryAdd(product.Id, imgPrimary.GetImageSrc(primaryImage.UploadedImage));
         });
 
         Products = productId == -1 ? Products : Products.Where(product => product.RazorPageId == productId).ToList();
