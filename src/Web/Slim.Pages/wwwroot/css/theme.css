@@ -5055,6 +5055,19 @@ textarea.form-control-lg {
 .breadcrumb-item.active {
   color: #7d879c;
 }
+.breadcrumb-item + .breadcrumb-item::before {
+    float: left;
+    padding-right: 0.5rem;
+    color: #a6acb7;
+    content: var(--bs-breadcrumb-divider, "\e90a") /* rtl: var(--bs-breadcrumb-divider, "\e90a") */;
+}
+
+.breadcrumb-item::before {
+    margin-top: 0.0625rem;
+    font-family: "cartzilla-icons";
+    font-size: .9em;
+    vertical-align: middle;
+}
 
 .pagination {
   display: flex;
@@ -13906,6 +13919,7 @@ body {
 
 .footer {
   flex-shrink: 0;
+    position: relative;
 }
 
 a:focus {
