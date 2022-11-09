@@ -13,14 +13,14 @@
 <!-- Hero slider-->
 <section class="tns-carousel tns-controls-lg">
     <div class="tns-carousel-inner" data-carousel-options="{&quot;mode&quot;: &quot;gallery&quot;, &quot;responsive&quot;: {&quot;0&quot;:{&quot;nav&quot;:true, &quot;controls&quot;: false},&quot;992&quot;:{&quot;nav&quot;:false, &quot;controls&quot;: true}}}">
-        
+
         @*#f5b1b0;*@
-        <div class="px-lg-5" style="background-color: #dd93b8;">
+        <div class="px-lg-5 px-md-5" style="background-color: #dd93b8;">
             <div class="d-lg-flex justify-content-between align-items-center ps-lg-4">
                 @*<img class="d-block order-lg-2 me-lg-n5 flex-shrink-0" src="img/home/hero-slider/02.jpg" alt="Women Sportswear">*@
                 <img class="img-thumbnail rounded-circle d-block order-lg-2 flex-shrink-0" src="~/img/home/hero-slider/logo.PNG" alt="Slim Studio">
-                
-                
+
+
                 <div class="position-relative me-lg-n5 py-5 px-4 mb-lg-5 order-lg-1" style="max-width: 42rem; z-index: 10; margin-left: 8%;">
                     <div class="pb-lg-5 mb-lg-5 text-center text-lg-start text-lg-nowrap">
                         <h3 class="h2 text-light fw-light pb-1 from-bottom">@bannerHeading1</h3>
@@ -87,42 +87,44 @@
                 var salesPriceRoundUp = Convert.ToString(salesPrice, CultureInfo.CurrentCulture).Split('.')[1];
                 var salesPriceWholePrice = Convert.ToInt32(Math.Truncate(salesPrice));
 
-                        <div class="col-lg-3 col-md-4 col-sm-6 px-2 mb-4">
-                            <div class="card product-card">
-                                @if (item.IsOnSale)
+                <div class="col-lg-3 col-md-4 col-sm-6 px-2 mb-4">
+                    <div class="card product-card">
+                        @if (item.IsOnSale)
                         {
-                                    <span class="badge rounded-pill text-bg-danger bg-danger">Sale</span>
+                            <span class="badge rounded-pill text-bg-danger bg-danger">Sale</span>
                         }
-                                <button class="btn-wishlist btn-sm" type="button" data-bs-toggle="tooltip" data-bs-placement="left" title="Add to wishlist"><i class="bi bi-heart"></i></button>
+                        <button class="btn-wishlist btn-sm" type="button" data-bs-toggle="tooltip" data-bs-placement="left" title="Add to wishlist"><i class="bi bi-heart"></i></button>
 
-                                <a class="card-img-top d-block overflow-hidden" asp-page="/ProductDetail" asp-route-id="@item.Id">
-                                    <img src="@primary.GetImageSrc(imgPrimary?.UploadedImage)" alt="Product">
-                                </a>
+                        <a class="card-img-top d-block overflow-hidden" asp-page="/ProductDetail" asp-route-id="@item.Id">
+                            <img src="@primary.GetImageSrc(imgPrimary?.UploadedImage)" alt="Product">
+                        </a>
 
-                                <div class="card-body py-2">
-                                    <a class="product-meta d-block fs-xs pb-1" asp-page="/ProductDetail" asp-route-id="@item.Id">@item.Category.CategoryName</a>
-                                    <h3 class="product-title fs-sm"><a asp-page="/ProductDetail" asp-route-id="@item.Id">@item.ProductName</a></h3>
-                                    <div class="d-flex justify-content-between">
-                                        @if (item.IsOnSale)
+                        <div class="card-body py-2">
+                            <a class="product-meta d-block fs-xs pb-1" asp-page="/ProductDetail" asp-route-id="@item.Id">@item.Category.CategoryName</a>
+                            <h3 class="product-title fs-sm"><a asp-page="/ProductDetail" asp-route-id="@item.Id">@item.ProductName</a></h3>
+                            <div class="d-flex justify-content-between">
+                                @if (item.IsOnSale)
                                 {
-                                            <div class="product-price"><span class="text-accent"><s>$@standardPriceWholePrice.<small>@standardPriceRoundUp</small></s></span> <span class="text-accent">$@salesPriceWholePrice<span class="fs-sm">.@salesPriceRoundUp</span></span></div>
+                                    <div class="product-price"><span class="text-accent"><s>$@standardPriceWholePrice.<small>@standardPriceRoundUp</small></s></span> <span class="text-accent">$@salesPriceWholePrice<span class="fs-sm">.@salesPriceRoundUp</span></span></div>
                                 }
                                 else
                                 {
-                                            <div class="product-price"><span class="text-accent">$@standardPriceWholePrice.<small>@standardPriceRoundUp</small></span></div>
+                                    <div class="product-price"><span class="text-accent">$@standardPriceWholePrice.<small>@standardPriceRoundUp</small></span></div>
                                 }
-                                        <div class="star-rating">
-                                            <i class="bi bi-star-fill active"></i><i class="bi bi-star-fill active"></i><i class="bi bi-star-fill active"></i><i class="bi bi-star-half active"></i><i class="bi bi-star"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="card-body card-body-hidden">
-                                    <button class="btn btn-primary btn-sm d-block w-100 mb-2" type="button"><i class="bi bi-cart-check-fill fs-sm me-1"></i>Add to Cart</button>
-                                    <div class="text-center"><a class="nav-link-style fs-ms" href="#quick-view" data-bs-toggle="modal"><i class="bi bi-eye-fill align-middle me-1"></i>Quick view</a></div>
+                                <div class="star-rating">
+                                    <i class="bi bi-star-fill active"></i><i class="bi bi-star-fill active"></i><i class="bi bi-star-fill active"></i><i class="bi bi-star-half active"></i><i class="bi bi-star"></i>
                                 </div>
                             </div>
-                            <hr class="d-sm-none">
                         </div>
+                        <div class="card-body card-body-hidden">
+                                <form asp-page="/Cart" asp-page-handler="NewProductToCart" asp-route-id="@item.Id">
+                                    <button class="btn btn-primary btn-sm d-block w-100 mb-2" type="submit"><i class="bi bi-cart-check-fill fs-sm me-1"></i>Add to Cart</button>
+                                </form>
+                                <div class="text-center"><a class="nav-link-style fs-ms" href="#quick-view" data-bs-toggle="modal"><i class="bi bi-eye-fill align-middle me-1"></i>Quick view</a></div>
+                        </div>
+                    </div>
+                    <hr class="d-sm-none">
+                </div>
             }
         }
 
@@ -387,7 +389,7 @@
                 var primary = string.Empty;
                 var imgPrimary = lip.Images.FirstOrDefault(x => x.IsPrimaryImage);
 
-                        <div class="col-md-3 col-sm-4 col-6"><a class="d-block bg-white shadow-sm rounded-3 py-3 py-sm-4 mb-grid-gutter" asp-page="/ProductDetail" asp-route-id="@lip.Id"><img class="d-block mx-auto lipGlossImg" src="@primary.GetImageSrc(imgPrimary?.UploadedImage)" alt="Brand"></a></div>
+                <div class="col-md-3 col-sm-4 col-6"><a class="d-block bg-white shadow-sm rounded-3 py-3 py-sm-4 mb-grid-gutter" asp-page="/ProductDetail" asp-route-id="@lip.Id"><img class="d-block mx-auto lipGlossImg" src="@primary.GetImageSrc(imgPrimary?.UploadedImage)" alt="Brand"></a></div>
             }
         }
         @*<div class="col-md-3 col-sm-4 col-6"><a class="d-block bg-white shadow-sm rounded-3 py-3 py-sm-4 mb-grid-gutter" href="#"><img class="d-block mx-auto lipGlossImg" src="img/shop/catalog/l1.jpg" alt="Brand"></a></div>*@

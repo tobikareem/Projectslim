@@ -344,3 +344,18 @@ div.mobile-reviews > div.contain-review > p > span {
     white-space: break-spaces;
     word-break: break-word;
 }
+.breadcrumb-light .breadcrumb-item::before {
+    color: rgba(255,255,255,.5);
+}
+.breadcrumb-item + .breadcrumb-item::before {
+    float: left;
+    padding-right: 0.5rem;
+    color: #a6acb7;
+    content: var(--bs-breadcrumb-divider, "\e90a") /* rtl: var(--bs-breadcrumb-divider, "\e90a") */;
+}
+.breadcrumb-item::before {
+    margin-top: 0.0625rem;
+    font-family: "cartzilla-icons";
+    font-size: .9em;
+    vertical-align: middle;
+}
