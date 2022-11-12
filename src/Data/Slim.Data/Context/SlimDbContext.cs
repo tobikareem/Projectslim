@@ -30,6 +30,7 @@ namespace Slim.Data.Context
         public virtual DbSet<Category> Categories { get; set; } = null!;
         public virtual DbSet<Comment> Comments { get; set; }
         public virtual DbSet<Review> Reviews { get; set; }
+        public virtual DbSet<ShoppingCart> ShoppingCarts { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -37,6 +38,7 @@ namespace Slim.Data.Context
             
             if (!optionsBuilder.IsConfigured)
             {
+                // dotnet ef migrations add InitialSchema -o Migrations -c FortuneDbContext
                 optionsBuilder.UseSqlServer("Server=(localdb)\\MSSQLLocalDB;Database=SlimWebDB;Trusted_Connection=True;MultipleActiveResultSets=true");
             }
         }
@@ -139,6 +141,24 @@ namespace Slim.Data.Context
                     .WithMany(p => p.Comments)
                     .HasForeignKey(d => d.ProductId)
                     .HasConstraintName("FK_Comment_Product");
+            });
+
+            modelBuilder.Entity<ShoppingCart>(entity =>
+            {
+                entity.ToTable("ShoppingCart", "slm");
+                
+                entity.Property(e => e.Id).IsRequired();
+                entity.Property(e => e.Quantity);
+                entity.Property(e => e.CartUserId);
+                
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+                entity.Property(e => e.CreatedBy);
+                entity.Property(e => e.ModifiedBy);
+                entity.Property(e => e.Enabled).IsRequired().HasDefaultValueSql("((1))");
+
+                entity.HasOne(d => d.Product);
+
             });
 
             modelBuilder.Entity<Review>(entity =>
