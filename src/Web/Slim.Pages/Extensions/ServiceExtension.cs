@@ -29,6 +29,17 @@ namespace Slim.Pages.Extensions
             builder.Services.AddRazorPages();
             services.AddAntiforgery(o => o.HeaderName = "XSRF-TOKEN");
 
+            builder.Services.AddDistributedMemoryCache();
+
+            builder.Services.AddSession(options =>
+            {
+                options.Cookie.Name = ".SlimWebSite.Session.";
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.Cookie.IsEssential = true;
+                options.Cookie.HttpOnly = true;
+
+            });
+
             #region Add Service Injection
             builder.Services.AddSingleton<ICacheService, CacheService>();
             builder.Services.AddScoped<IBaseStore<RazorPage>, RazorPagesRepo>();
@@ -38,6 +49,7 @@ namespace Slim.Pages.Extensions
             builder.Services.AddScoped<IBaseStore<Category>, CategoryRepository>();
             builder.Services.AddScoped<IBaseStore<Review>, ReviewRepository>();
             builder.Services.AddScoped<IBaseStore<Comment>, CommentRepository>();
+            builder.Services.AddScoped<IBaseStore<ShoppingCart>, CartRepository>();
             #endregion
 
 
