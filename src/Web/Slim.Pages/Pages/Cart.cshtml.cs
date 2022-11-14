@@ -7,32 +7,60 @@ namespace Slim.Pages.Pages
 {
     public class CartModel : PageModel
     {
-        private readonly IBaseStore<ShoppingCart> _shoppingCartBaseStore;
+        private readonly ICart<ShoppingCart> _shoppingCartBaseStore;
+        private readonly IBaseStore<Product> _productStore;
         private readonly ILogger<CartModel> _logger;
-        public CartModel(IBaseStore<ShoppingCart> shopingCart, ILogger<CartModel> logger)
+        public CartModel(ICart<ShoppingCart> shopingCart, IBaseStore<Product> product, ILogger<CartModel> logger)
         {
             _shoppingCartBaseStore = shopingCart;
+            _productStore = product;
 
-            ShoppingCartId = string.Empty;
+            ShoppingCartUserId = string.Empty;
             _logger=logger;
         }
 
-        public string ShoppingCartId { get; set; }
+        private string ShoppingCartUserId { get; set; }
         public const string SessionKeyName = "CartUserId";
+        public List<ShoppingCart> CartItems { get; set; } = new List<ShoppingCart>();
 
         public void OnGet(int? id)
         {
+            ShoppingCartUserId = GetShoppingCartUserId(); 
+            
+            CartItems = _shoppingCartBaseStore.GetAll().Where(x => x.CartUserId == ShoppingCartUserId).ToList();
         }
 
-        public void OnPostNewProductToCart(int? id)
+        public void OnPostNewProductToCart(int id)
         {
-            ShoppingCartId = GetShoppingCartId();
+            ShoppingCartUserId = GetShoppingCartUserId();
 
-            _logger.LogInformation("... Shopping CartId is {cart}", ShoppingCartId);
+            var cartItem = _shoppingCartBaseStore.GetCartUserItem(ShoppingCartUserId, id);
 
+            if (cartItem == default(ShoppingCart))
+            {
+                _logger.LogInformation("... Adding new item to Shopping Cart");
+
+                cartItem = new ShoppingCart
+                {
+                    Quantity = 1,
+                    CreatedDate = DateTime.UtcNow,
+                    CreatedBy = ShoppingCartUserId,
+                    Product = _productStore.GetEntity(id),
+                    CartUserId = ShoppingCartUserId
+                };
+
+                _shoppingCartBaseStore.AddEntity(cartItem, Core.Model.CacheKey.GetShoppingCartItem, true);
+                return;
+            }
+
+            cartItem.Quantity++;
+            cartItem.ModifiedDate = DateTime.UtcNow;
+
+            _shoppingCartBaseStore.UpdateEntity(cartItem, Core.Model.CacheKey.GetShoppingCartItem, true);
+            _logger.LogInformation("... Shopping Product is updated to cart by user {cartUser}", ShoppingCartUserId);
         }
 
-        private string GetShoppingCartId()
+        private string GetShoppingCartUserId()
         {
             var hasSession = HttpContext.Session.GetString(SessionKeyName);
             if (string.IsNullOrWhiteSpace(hasSession))
