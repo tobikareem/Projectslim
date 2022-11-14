@@ -8,12 +8,11 @@ using Slim.Shared.Interfaces.Serv;
 
 namespace Slim.Shared.Repositories
 {
-    public class CartRepository : IBaseStore<ShoppingCart>
+    public class CartRepository : ICart<ShoppingCart>
     {
         private readonly SlimDbContext _context;
         private readonly ILogger<CartRepository> _logger;
         private readonly ICacheService _cacheService;
-
         public const string CacheKey = "CartUserId";
         public string ShoppingCartId { get; set; }
 
@@ -30,7 +29,7 @@ namespace Slim.Shared.Repositories
         {
             try
             {
-               
+
 
 
             }
@@ -111,6 +110,27 @@ namespace Slim.Shared.Repositories
             finally
             {
                 if (hasCache)
+                {
+                    _cacheService.Remove(cacheKey);
+                }
+            }
+        }
+
+        public ShoppingCart GetCartUserItem(string cartUserId, int productId, CacheKey cacheKey = Slim.Core.Model.CacheKey.None, bool hasCache = false)
+        {
+            try
+            {
+                var cartUser = _context.ShoppingCarts.SingleOrDefault(x => x.CartUserId == cartUserId && x.ProductId == productId);
+                return cartUser ?? new ShoppingCart();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("... Error getting cart item for user {user}, {error}", cartUserId, ex);
+                throw;
+            }
+            finally
+            {
+                if(hasCache)
                 {
                     _cacheService.Remove(cacheKey);
                 }

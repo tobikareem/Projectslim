@@ -49,7 +49,7 @@ namespace Slim.Pages.Extensions
             builder.Services.AddScoped<IBaseStore<Category>, CategoryRepository>();
             builder.Services.AddScoped<IBaseStore<Review>, ReviewRepository>();
             builder.Services.AddScoped<IBaseStore<Comment>, CommentRepository>();
-            builder.Services.AddScoped<IBaseStore<ShoppingCart>, CartRepository>();
+            builder.Services.AddScoped<ICart<ShoppingCart>, CartRepository>();
             #endregion
 
 
