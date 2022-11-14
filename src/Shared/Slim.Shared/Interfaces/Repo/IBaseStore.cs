@@ -25,3 +25,8 @@ public interface IImage<T> : IBaseStore<Image>
 
     void DeleteImages(List<Image> images, CacheKey cacheKey = CacheKey.None, bool hasCache = false);
 }
+
+public interface ICart<T>: IBaseStore<ShoppingCart>
+{
+    T GetCartUserItem(string cartUserId, int productId, CacheKey cacheKey = CacheKey.None, bool hasCache = false);
+}

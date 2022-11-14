@@ -67,6 +67,8 @@ namespace  Slim.Pages.Areas.Identity.Pages.Account.Manage
 
         public static string AddNewProduct => "AddNewProduct";
 
+        public static string CreateCategory => "CreateCategory";
+
 
         /// <summary>
         /// This is to add new Products
@@ -111,6 +113,13 @@ namespace  Slim.Pages.Areas.Identity.Pages.Account.Manage
         ///     directly from your code. This API may change or be removed in future releases.
         /// </summary>
         public static string ChangePasswordNavClass(ViewContext viewContext) => PageNavClass(viewContext, ChangePassword);
+
+        /// <summary>
+        /// This page is to add active to the class
+        /// </summary>
+        /// <param name="viewContext"></param>
+        /// <returns></returns>
+        public static string CreateCategoryNavClass(ViewContext viewContext) => PageNavClass(viewContext, CreateCategory);
 
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used

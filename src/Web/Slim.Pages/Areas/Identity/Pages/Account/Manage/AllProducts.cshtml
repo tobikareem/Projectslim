@@ -20,52 +20,46 @@
                             <select asp-for="InModel.RazorPageId" asp-items="Model.RazorPageSelectList"
                                     class="form-select me-2" id="change-product"></select>
                             <span asp-validation-for="InModel.RazorPageId" class="text-danger"></span>
-
-                            @*<form method="post" asp-page-handler="ProductById" asp-route-id="@Model.InModel.RazorPageId">
-                                <button type="submit" class="btn btn-primary btn-sm d-block d-sm-inline-block mt-3 mt-sm-0">
-                                    <i class="ci-add-circle me-2"></i>Get
-                                </button>
-                            </form>*@
                         </div>
                     </div>
 
-<div id="productByIdDiv">
-                    @{
-                        for (var i = 0; i < Model.Products.Count; i++)
-                        {
+                    <div id="productByIdDiv">
+                        @{
+                            for (var i = 0; i < Model.Products.Count; i++)
+                            {
 
-                            <!-- Product-->
-                            <div class="d-block d-sm-flex align-items-center py-4 border-bottom">
+                                <!-- Product-->
+                                <div class="d-block d-sm-flex align-items-center py-4 border-bottom">
 
-                                @{
-                                    var i1 = i;
-                                }
-                                <a class="d-block mb-3 mb-sm-0 me-sm-4 ms-sm-0 mx-auto" asp-page="/ProductDetail" asp-route-id="@Model.Products[i1].Id" style="width: 12.5rem;"><img class="rounded-3" src="@Model.PrimaryImages[i1]" alt="Product"></a>
-                                <div class="text-center text-sm-start">
-                                    <h3 class="h6 product-title mb-2">
-                                        <a asp-page="/ProductDetail" asp-route-id="@Model.Products[i1].Id">@Model.Products[i1].ProductName</a>
-                                    </h3>
                                     @{
-                                        var salesPrice = Model.Products[i].SalePrice;
-                                        // get the numbers after decimal point of salesPrice variable
-                                        var salesPriceRoundUp = Convert.ToString(salesPrice, CultureInfo.CurrentCulture).Split('.')[1];
-                                        var wholePrice = Convert.ToInt32(Math.Truncate(salesPrice));
-
-
+                                        var i1 = i;
                                     }
-                                    <div class="d-inline-block text-accent">$@wholePrice<small>.@salesPriceRoundUp</small></div>
-                                    <div class="d-inline-block text-muted fs-ms border-start ms-2 ps-2">Sales: <span class="fw-medium">26</span></div>
-                                    <div class="d-inline-block text-muted fs-ms border-start ms-2 ps-2">Earnings: <span class="fw-medium">$327.<small>60</small></span></div>
-                                    <div class="d-flex justify-content-center justify-content-sm-start pt-3">
-                                        <a class="btn bg-faded-accent btn-icon me-2" data-bs-toggle="tooltip" title="Download" asp-page="./AddNewProduct" asp-route-id="@Model.Products[i1].Id" asp-page-handler="EditProduct"><i class="bi bi-download text-accent"></i></a>
-                                        <a class="btn bg-faded-info btn-icon me-2"  data-bs-toggle="tooltip" title="Edit" asp-page="./AddNewProduct" asp-route-id="@Model.Products[i1].Id" asp-page-handler="EditProduct"><i class="bi bi-pencil text-info"></i></a>
-                                        <a class="btn bg-faded-danger btn-icon"  data-bs-toggle="tooltip" title="Delete" asp-page="./AddNewProduct" asp-route-id="@Model.Products[i1].Id" asp-page-handler="DeleteProduct"><i class="bi bi-trash3 text-danger"></i></a>
+                                    <a class="d-block mb-3 mb-sm-0 me-sm-4 ms-sm-0 mx-auto" asp-page="/ProductDetail" asp-route-id="@Model.Products[i1].Id" style="width: 12.5rem;"><img class="rounded-3" src="@Model.ProductAndPrimaryImage[Model.Products[i1].Id]" alt="Product"></a>
+                                    <div class="text-center text-sm-start">
+                                        <h3 class="h6 product-title mb-2">
+                                            <a asp-page="/ProductDetail" asp-route-id="@Model.Products[i1].Id">@Model.Products[i1].ProductName</a>
+                                        </h3>
+                                        @{
+                                            var salesPrice = Model.Products[i].SalePrice;
+                                            // get the numbers after decimal point of salesPrice variable
+                                            var salesPriceRoundUp = Convert.ToString(salesPrice, CultureInfo.CurrentCulture).Split('.')[1];
+                                            var wholePrice = Convert.ToInt32(Math.Truncate(salesPrice));
+
+
+                                        }
+                                        <div class="d-inline-block text-accent">$@wholePrice<small>.@salesPriceRoundUp</small></div>
+                                        <div class="d-inline-block text-muted fs-ms border-start ms-2 ps-2">Sales: <span class="fw-medium">26</span></div>
+                                        <div class="d-inline-block text-muted fs-ms border-start ms-2 ps-2">Earnings: <span class="fw-medium">$327.<small>60</small></span></div>
+                                        <div class="d-flex justify-content-center justify-content-sm-start pt-3">
+                                            <a class="btn bg-faded-accent btn-icon me-2" data-bs-toggle="tooltip" title="Download" asp-page="./AddNewProduct" asp-route-id="@Model.Products[i1].Id" asp-page-handler="EditProduct"><i class="bi bi-download text-accent"></i></a>
+                                            <a class="btn bg-faded-info btn-icon me-2"  data-bs-toggle="tooltip" title="Edit" asp-page="./AddNewProduct" asp-route-id="@Model.Products[i1].Id" asp-page-handler="EditProduct"><i class="bi bi-pencil text-info"></i></a>
+                                            <a class="btn bg-faded-danger btn-icon"  data-bs-toggle="tooltip" title="Delete" asp-page="./AddNewProduct" asp-route-id="@Model.Products[i1].Id" asp-page-handler="DeleteProduct"><i class="bi bi-trash3 text-danger"></i></a>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            }
                         }
-                    }
-</div>
+                    </div>
 
 
                 </div>

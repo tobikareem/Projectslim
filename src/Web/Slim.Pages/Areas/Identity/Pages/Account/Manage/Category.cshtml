@@ -1,0 +1,61 @@
+﻿@page
+@model Slim.Pages.Areas.Identity.Pages.Account.Manage.CategoryModel
+@{
+    ViewData["Title"] = "CreateCategory";
+    ViewData["ActivePage"] = ManageNavPages.CreateCategory;
+}
+
+
+<!-- Create Category -->
+
+<div class="row">
+    <div class="col-md-12">
+        <section class="col-lg-12 pt-lg-4 pb-4 mb-3">
+        <div class="pt-2 px-4 ps-lg-0 pe-xl-5">
+            <!-- Title-->
+            <form method="post">
+                <div class="d-sm-flex flex-wrap justify-content-between align-items-center pb-2">
+                    <h2 class="h3 py-2 me-2 text-center text-sm-start">Create a Category</h2>
+                </div>
+
+                
+                <div class="mb-3 py-2">
+                    <label asp-for="Input.RazorPageId" class="col-form-label-lg"></label>
+                    <select asp-for="Input.RazorPageId" asp-items="Model.RazorPageSelectList"
+                            class="form-select me-2" id="uproduct-category"></select>
+                    <span asp-validation-for="Input.RazorPageId" class="text-danger"></span>
+                </div>
+                
+                <div class=" mb-3 py-2">
+                        <label asp-for="Input.CategoryName" class="col-form-label-lg"></label>
+                        <input asp-for="Input.CategoryName" class="form-control me-2" />
+                        <span asp-validation-for="Input.CategoryName" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3 py-2">
+                    <label class="form-label" asp-for="Input.CategoryDescription"></label>
+                    <textarea class="form-control" rows="6" id="unp-product-description"
+                        asp-for="Input.CategoryDescription"></textarea>
+                    <span asp-validation-for="Input.CategoryDescription" class="text-danger"></span>
+                </div>
+
+
+                    <div class="mb-3 py-2">
+                        <label asp-for="Input.CategoryTag" class="col-form-label-lg"></label>
+                        <input asp-for="Input.CategoryTag" class="form-control me-2" />
+                        <span asp-validation-for="Input.CategoryTag" class="text-danger"></span>
+
+                    </div>
+
+                    <div class="mb-3 py-2">
+                        <input type="submit" value="Create" class="btn btn-primary" />
+
+                    </div>
+
+                </form>
+
+            </div>
+        </section>
+
+    </div>
+</div>
