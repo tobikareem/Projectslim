@@ -117,10 +117,9 @@
                             </div>
                         </div>
                         <div class="card-body card-body-hidden">
-                                <form asp-page="/Cart" asp-page-handler="NewProductToCart" asp-route-id="@item.Id">
-                                    <button class="btn btn-primary btn-sm d-block w-100 mb-2" type="submit"><i class="bi bi-cart-check-fill fs-sm me-1"></i>Add to Cart</button>
-                                </form>
-                                <div class="text-center"><a class="nav-link-style fs-ms" href="#quick-view" data-bs-toggle="modal"><i class="bi bi-eye-fill align-middle me-1"></i>Quick view</a></div>
+                            <button class="btn btn-primary btn-sm d-block w-100 mb-2" type="submit" onclick="OnAddItemToCart(@item.Id, '@Url.Page("Cart", "NewProductToCart")', '@Url.Page("Cart", "TotalCartCount")')"><i class="bi bi-cart-check-fill fs-sm me-1"></i>Add to Cart</button>
+
+                            <div class="text-center"><a class="nav-link-style fs-ms" href="#quick-view" data-bs-toggle="modal"><i class="bi bi-eye-fill align-middle me-1"></i>Quick view</a></div>
                         </div>
                     </div>
                     <hr class="d-sm-none">
@@ -395,3 +394,16 @@
         @*<div class="col-md-3 col-sm-4 col-6"><a class="d-block bg-white shadow-sm rounded-3 py-3 py-sm-4 mb-grid-gutter" href="#"><img class="d-block mx-auto lipGlossImg" src="img/shop/catalog/l1.jpg" alt="Brand"></a></div>*@
     </div>
 </section>
+
+@section Scripts{
+    <script>
+        $(document).ready(function() {
+            var priceUrl = '@Url.Page("Cart", "TotalCartPrice")';
+            var cartUrl = '@Url.Page("Cart", "TotalCartCount")';
+
+            GetTotalCartPrice(priceUrl);
+            GetTotalCartItem(cartUrl);
+        });
+
+    </script>
+}

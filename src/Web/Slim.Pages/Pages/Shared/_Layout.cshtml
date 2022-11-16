@@ -16,7 +16,7 @@
 </head>
 <body class="handheld-toolbar-enabled" id="entire">
     <header class="shadow-sm">
-        <!-- Topbar-->
+        <!-- Top bar -->
         <div class="topbar topbar-dark bg-dark">
             <div class="container">
                 <div class="topbar-text dropdown d-md-none">
@@ -78,17 +78,14 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-page="/Appointment">Appointments</a>
                         </li>
-                        @* <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-page="/Index">About</a>
-                        </li>
-                        <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
-                        </li>*@
                     </ul>
                     <partial name="_LoginPartial" />
                 </div>
+                
+                <partial name="_Cart"  />
             </div>
         </nav>
+        
     </header>
     <main role="main" class="pb-3 page-wrapper">
         @RenderBody()

@@ -91,8 +91,9 @@
                                 </div>
                             </div>
                             <div class="card-body card-body-hidden">
-                                <button class="btn btn-primary btn-sm d-block w-100 mb-2" type="button"><i class="bi bi-cart-check-fill fs-sm me-1"></i>Add to Cart</button>
+                                <button class="btn btn-primary btn-sm d-block w-100 mb-2" type="submit" onclick="OnAddItemToCart(@product.Id, '@Url.Page("Cart", "NewProductToCart")', '@Url.Page("Cart", "TotalCartCount")')"><i class="bi bi-cart-check-fill fs-sm me-1"></i>Add to Cart</button>
                                 <div class="text-center"><a class="nav-link-style fs-ms" href="#quick-view" data-bs-toggle="modal"><i class="bi bi-eye-fill align-middle me-1"></i>Quick view</a></div>
+
                             </div>
                         </div>
                         <hr class="d-sm-none">
@@ -104,3 +105,17 @@
     }
 }
 
+@section Scripts
+    {
+    <script>
+        $(document).ready(function () {
+            var priceUrl = '@Url.Page("Cart", "TotalCartPrice")';
+            var cartUrl = '@Url.Page("Cart", "TotalCartCount")';
+
+            GetTotalCartPrice(priceUrl);
+            GetTotalCartItem(cartUrl);
+        });
+
+        
+    </script>
+}

@@ -16,7 +16,7 @@
             <h2 class="text-dark display-1 from-bottom delay-1">@section2</h2>
             <p class="fs-lg text-dark pb-4 from-bottom delay-2">@section3</p>
 
-            <hr class="hair-hr "/>
+            <hr class="hair-hr " />
 
             <p class="fs-lg text-dark pt-4 pb-3 from-bottom fs-5"> @section4</p>
 
@@ -36,23 +36,23 @@
         <div class="col-md-4 mt-9-lashes ">
             <table class="table">
                 <thead class="thead-dark">
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col-6">Service</th>
-                    <th scope="col-4">Price</th>
-                </tr>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col-6">Service</th>
+                        <th scope="col-4">Price</th>
+                    </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <th scope="row">1</th>
-                    <td>Frontal Wig</td>
-                    <td>starting at $60</td>
-                </tr>
-                <tr>
-                    <th scope="row">2</th>
-                    <td>Closure Wig</td>
-                    <td>starting at $60</td>
-                </tr>
+                    <tr>
+                        <th scope="row">1</th>
+                        <td>Frontal Wig</td>
+                        <td>starting at $60</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">2</th>
+                        <td>Closure Wig</td>
+                        <td>starting at $60</td>
+                    </tr>
                 </tbody>
             </table>
 
@@ -215,9 +215,9 @@
     <div class="customer-images">
         <h1 class="display-4">Hair Models</h1>
     </div>
-    
+
     <!--Photo Grid-->
-    
+
     <div class="row cust-img-row">
         <div class="col cust-img-col">
             <img class="img-fluid" src="img/shop/catalog/False-Eyelashes.jpg" alt="Eye Lashes">
@@ -227,20 +227,20 @@
             <img class="img-fluid" src="img/shop/catalog/False-Eyelashes.jpg" alt="Eye Lashes">
         </div>
         <div class="col cust-img-col">
-            <img class="img-fluid" src="img/home/categories/homePageHair.jpg" alt="Eye Lashes"> 
+            <img class="img-fluid" src="img/home/categories/homePageHair.jpg" alt="Eye Lashes">
             <img class="img-fluid" src="img/home/categories/homePageHair.jpg" alt="Eye Lashes">
             <img class="img-fluid" src="img/shop/catalog/False-Eyelashes.jpg" alt="Eye Lashes">
             <img class="img-fluid" src="img/shop/catalog/False-Eyelashes.jpg" alt="Eye Lashes">
             <img class="img-fluid" src="img/shop/catalog/False-Eyelashes.jpg" alt="Eye Lashes">
         </div>
-        
+
         <div class="col cust-img-col">
             <img class="img-fluid" src="img/shop/catalog/False-Eyelashes.jpg" alt="Eye Lashes">
             <img class="img-fluid" src="img/home/categories/homePageHair.jpg" alt="Eye Lashes">
             <img class="img-fluid" src="img/home/categories/homePageHair.jpg" alt="Eye Lashes">
             <img class="img-fluid" src="img/shop/catalog/False-Eyelashes.jpg" alt="Eye Lashes">
         </div>
-        
+
         <div class="col cust-img-col">
             <img class="img-fluid" src="img/home/categories/homePageHair.jpg" alt="Eye Lashes">
             <img class="img-fluid" src="img/shop/catalog/False-Eyelashes.jpg" alt="Eye Lashes">
@@ -249,3 +249,16 @@
         </div>
     </div>
 </section>
+
+@section Scripts
+    {
+    <script>
+        $(document).ready(function () {
+            var priceUrl = '@Url.Page("Cart", "TotalCartPrice")';
+            var cartUrl = '@Url.Page("Cart", "TotalCartCount")';
+
+            GetTotalCartPrice(priceUrl);
+            GetTotalCartItem(cartUrl);
+        });
+    </script>
+            }
