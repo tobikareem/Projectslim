@@ -10,18 +10,20 @@ namespace Slim.Pages.Pages
 {
     public class CartModel : PageModel
     {
-        private readonly ICart<ShoppingCart> _shoppingCartBaseStore;
+        private readonly IBaseCart<ShoppingCart> _shoppingCartBaseStore;
         private readonly IBaseStore<Product> _productStore;
         private readonly ILogger<CartModel> _logger;
         private readonly ICacheService _cacheService;
+        private readonly ICartService _cartService;
 
         public List<SelectListItem> QuantitySelectListItem { get; set; }
 
-        public CartModel(ICart<ShoppingCart> shoppingCart, IBaseStore<Product> product, ILogger<CartModel> logger, ICacheService cacheService)
+        public CartModel(IBaseCart<ShoppingCart> shoppingCart, IBaseStore<Product> product, ILogger<CartModel> logger, ICacheService cacheService, ICartService cartService)
         {
             _shoppingCartBaseStore = shoppingCart;
             _productStore = product;
             _cacheService = cacheService;
+            _cartService = cartService;
 
             ShoppingCartUserId = string.Empty;
             _logger=logger;
@@ -34,15 +36,13 @@ namespace Slim.Pages.Pages
         }
 
         private string ShoppingCartUserId { get; set; }
-        private const string SessionKeyName = "CartUserId";
         [BindProperty] public List<ShoppingCart> CartItems { get; set; } = new();
 
         public decimal TotalCartPrice { get; set; }
 
         public void OnGet(int? id)
         {
-            GetCartItemsForUser();
-
+            CartItems =  _cartService.GetCartItemsForUser(User.Identity?.Name ?? string.Empty, GetShoppingCartUserId());
             TotalCartPrice = GetTotalCartPrice();
         }
 
@@ -67,7 +67,7 @@ namespace Slim.Pages.Pages
 
                 _logger.LogInformation("... Added new item to Shopping Cart by user: {user}", ShoppingCartUserId);
 
-                GetCartItemsForUser();
+                CartItems = _cartService.GetCartItemsForUser(User.Identity?.Name ?? string.Empty, ShoppingCartUserId);
                 TotalCartPrice = GetTotalCartPrice();
 
                 return new JsonResult(TotalCartPrice);
@@ -79,23 +79,14 @@ namespace Slim.Pages.Pages
             _shoppingCartBaseStore.UpdateEntity(cartItem, CacheKey.GetShoppingCartItem, true);
             _logger.LogInformation("... Shopping Product is updated to cart by user {cartUser}", ShoppingCartUserId);
 
-            GetCartItemsForUser();
+            CartItems = _cartService.GetCartItemsForUser(User.Identity?.Name ?? string.Empty, ShoppingCartUserId);
             TotalCartPrice = GetTotalCartPrice();
             return new JsonResult(TotalCartPrice);
         }
 
         public JsonResult OnGetUpdateShoppingCart(string cartItemId, int quantity)
         {
-            var itemsFromCache = _cacheService.GetItem<List<ShoppingCart>>(CacheKey.GetShoppingCartItem);
-
-            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-            if (itemsFromCache == null || !itemsFromCache.Any())
-            {
-                _logger.LogInformation("... No items in the shopping cart");
-                GetCartItemsForUser();
-
-                itemsFromCache = CartItems;
-            }
+            var itemsFromCache = _cartService.GetCartItemsForUser(User.Identity?.Name ?? string.Empty, ShoppingCartUserId);
 
             // get all items where quantity has changed
             var changedItemFromCache = itemsFromCache.FirstOrDefault(x => x.Id == cartItemId);
@@ -110,7 +101,7 @@ namespace Slim.Pages.Pages
             changedItemFromCache.ModifiedDate = DateTime.UtcNow;
             _shoppingCartBaseStore.UpdateEntity(changedItemFromCache, CacheKey.GetShoppingCartItem, true);
 
-            GetCartItemsForUser();
+            CartItems  = _cartService.GetCartItemsForUser(User.Identity?.Name ?? string.Empty, ShoppingCartUserId);
             TotalCartPrice = GetTotalCartPrice();
 
             ShoppingCartUserId = GetShoppingCartUserId();
@@ -134,52 +125,35 @@ namespace Slim.Pages.Pages
             _shoppingCartBaseStore.DeleteEntity(cartItem, CacheKey.GetShoppingCartItem, true);
             _logger.LogInformation("... Shopping Cart Item is removed by user {cartUser}", ShoppingCartUserId);
 
-            GetCartItemsForUser();
+            CartItems  = _cartService.GetCartItemsForUser(User.Identity?.Name ?? string.Empty, ShoppingCartUserId);
             TotalCartPrice = GetTotalCartPrice();
 
             return RedirectToPage("./Index");
         }
-
-        public void GetCartItemsForUser()
-        {
-            ShoppingCartUserId = GetShoppingCartUserId();
-
-            var user = User.Identity?.Name;
-
-            var allCarts = _shoppingCartBaseStore.GetAll().ToList();
-
-            CartItems = allCarts.Where(x => x.CartUserId == ShoppingCartUserId).ToList();
-
-            if (user == null || user == ShoppingCartUserId)
-            {
-                _cacheService.Add(CacheKey.GetShoppingCartItem, CartItems, 60);
-                return;
-            }
-
-            {
-                var more = allCarts.Where(x => x.CartUserId == user).ToList();
-                CartItems.AddRange(more);
-
-                _cacheService.Add(CacheKey.GetShoppingCartItem, CartItems, 60);
-            }
-        }
+        
         private string GetShoppingCartUserId()
         {
-            var hasSession = HttpContext.Session.GetString(SessionKeyName);
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+            if (HttpContext == null)
+            {
+                return string.Empty;
+            }
+            
+            var hasSession = HttpContext.Session.GetString(SlmConstant.SessionKeyName);
             if (string.IsNullOrWhiteSpace(hasSession))
             {
                 if (!string.IsNullOrWhiteSpace(HttpContext.User.Identity?.Name))
                 {
-                    HttpContext.Session.SetString(SessionKeyName, HttpContext.User.Identity.Name);
+                    HttpContext.Session.SetString(SlmConstant.SessionKeyName, HttpContext.User.Identity.Name);
                 }
                 else
                 {
                     var tempCartId = Guid.NewGuid();
-                    HttpContext.Session.SetString(SessionKeyName, tempCartId.ToString());
+                    HttpContext.Session.SetString(SlmConstant.SessionKeyName, tempCartId.ToString());
                 }
             }
 
-            var sessionName = HttpContext.Session.GetString(SessionKeyName);
+            var sessionName = HttpContext.Session.GetString(SlmConstant.SessionKeyName);
 
             return string.IsNullOrEmpty(sessionName) ? string.Empty : sessionName;
 
@@ -202,17 +176,17 @@ namespace Slim.Pages.Pages
 
         public JsonResult OnGetTotalCartCount()
         {
-            GetCartItemsForUser();
+            CartItems  = _cartService.GetCartItemsForUser(User.Identity?.Name ?? string.Empty, ShoppingCartUserId); 
             var totalItem = CartItems.Distinct().Count();
             return new JsonResult(totalItem);
         }
 
         public JsonResult OnGetTotalCartPrice()
         {
-            GetCartItemsForUser();
+            CartItems  = _cartService.GetCartItemsForUser(User.Identity?.Name ?? string.Empty, ShoppingCartUserId);
             var totalPrice = GetTotalCartPrice();
             return new JsonResult(totalPrice);
         }
-        
+
     }
 }

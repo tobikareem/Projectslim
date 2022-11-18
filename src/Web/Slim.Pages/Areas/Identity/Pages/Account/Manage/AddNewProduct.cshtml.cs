@@ -17,7 +17,7 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
     {
         private readonly IBaseStore<RazorPage> _razorPagesBaseStore;
         private readonly ICacheService _cacheService;
-        private readonly IImage<Image> _imageBaseStore;
+        private readonly IBaseImage _imageBaseStore;
         private readonly IBaseStore<Product> _productBaseStore;
         private readonly ILogger<AddNewProductModel> _logger;
         private readonly IBaseStore<Category> _categoryBaseStore;
@@ -30,7 +30,7 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
         private readonly IEnumerable<Category> _categories;
         private readonly IEnumerable<RazorPage> _razorPages;
 
-        public AddNewProductModel(IBaseStore<RazorPage> razorPagesBaseStore, ICacheService cacheService, IImage<Image> imageBaseStore, ILogger<AddNewProductModel> logger, IBaseStore<Product> productBaseStore, IBaseStore<Category> categoryBaseStore)
+        public AddNewProductModel(IBaseStore<RazorPage> razorPagesBaseStore, ICacheService cacheService, IBaseImage imageBaseStore, ILogger<AddNewProductModel> logger, IBaseStore<Product> productBaseStore, IBaseStore<Category> categoryBaseStore)
         {
             _razorPagesBaseStore = razorPagesBaseStore;
             _cacheService = cacheService;

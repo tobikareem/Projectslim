@@ -1,5 +1,5 @@
 ﻿@page
-@using System.Globalization
+@inject Slim.Shared.Interfaces.Serv.ICartService _cartService;
 @using Slim.Pages.Extensions
 @model Slim.Pages.Pages.LipModel
 @{
@@ -49,13 +49,8 @@
                     var primary = string.Empty;
                     var imgPrimary = product.Images.FirstOrDefault(x => x.IsPrimaryImage);
 
-                    var standardPrice = product.StandardPrice;
-                    var standardPriceRoundUp = Convert.ToString(standardPrice, CultureInfo.CurrentCulture).Split('.')[1];
-                    var standardPriceWholePrice = Convert.ToInt32(Math.Truncate(standardPrice));
+                    var price = _cartService.GetPriceForProduct(product.StandardPrice, product.SalePrice);
 
-                    var salesPrice = product.SalePrice;
-                    var salesPriceRoundUp = Convert.ToString(salesPrice, CultureInfo.CurrentCulture).Split('.')[1];
-                    var salesPriceWholePrice = Convert.ToInt32(Math.Truncate(salesPrice));
 
                     <div class="col-lg-3 col-md-4 col-sm-6 px-2 mb-4">
                         <div class="card product-card">
@@ -69,13 +64,13 @@
                                 <a class="product-meta d-block fs-xs pb-1" asp-page="/ProductDetail" asp-route-id="@product.Id">@product.Category.CategoryName</a>
                                 <h3 class="product-title fs-sm"><a asp-page="/ProductDetail" asp-route-id="@product.Id">@product.ProductName</a></h3>
                                 <div class="d-flex justify-content-between">
-                                    @if (salesPrice > 0)
+                                    @if (product.IsOnSale)
                                     {
-                                        <div class="product-price"><span class="text-accent"><s>$@standardPriceWholePrice.<small>@standardPriceRoundUp</small></s></span> <span class="text-accent">$@salesPriceWholePrice<span class="fs-sm">.@salesPriceRoundUp</span></span></div>
+                                        <div class="product-price"><span class="text-accent"><s>$@price.StandardWholePrice.<small>@price.StandardPriceRoundUp</small></s></span> <span class="text-accent">$@price.SalesWholePrice<span class="fs-sm">.@price.SalesPriceRoundUp</span></span></div>
                                     }
                                     else
                                     {
-                                        <div class="product-price"><span class="text-accent">$@standardPriceWholePrice.<small>@standardPriceRoundUp</small></span></div>
+                                        <div class="product-price"><span class="text-accent">$@price.StandardWholePrice.<small>@price.StandardPriceRoundUp</small></span></div>
                                     }
                                     <div class="star-rating">
                                         <i class="bi bi-star-fill active"></i><i class="bi bi-star-fill active"></i><i class="bi bi-star-fill active"></i><i class="bi bi-star-half active"></i><i class="bi bi-star"></i>

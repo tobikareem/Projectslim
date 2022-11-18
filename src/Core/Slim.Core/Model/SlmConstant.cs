@@ -31,5 +31,8 @@
                 return emails;
             }
         }
+
+
+        public const string SessionKeyName = "CartUserId";
     }
 }

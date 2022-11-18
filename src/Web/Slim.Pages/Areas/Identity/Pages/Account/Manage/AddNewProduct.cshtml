@@ -183,5 +183,14 @@
 
 
         });
+
+        $(document).ready(function () {
+            var priceUrl = '@Url.Page("Cart", "TotalCartPrice")';
+            var cartUrl = '@Url.Page("Cart", "TotalCartCount")';
+
+            GetTotalCartPrice(priceUrl);
+            GetTotalCartItem(cartUrl);
+        });
+
     </script>
 }

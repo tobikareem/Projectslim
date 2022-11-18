@@ -12,12 +12,12 @@ public interface IBaseStore <T> where T: class
     void DeleteEntity(T entity, CacheKey cacheKey = CacheKey.None, bool hasCache = false);
 }
 
-public interface IPageSection<T> : IBaseStore<PageSection>
+public interface IPageSection : IBaseStore<PageSection>
 {
     void UpdatePageSections(List<PageSection> pageSections, CacheKey cacheKey = CacheKey.None, bool hasCache = false);
 }
 
-public interface IImage<T> : IBaseStore<Image>
+public interface IBaseImage : IBaseStore<Image>
 {
     void UpdateImages(List<Image> images, CacheKey cacheKey = CacheKey.None, bool hasCache = false);
 
@@ -26,7 +26,7 @@ public interface IImage<T> : IBaseStore<Image>
     void DeleteImages(List<Image> images, CacheKey cacheKey = CacheKey.None, bool hasCache = false);
 }
 
-public interface ICart<out T>: IBaseStore<ShoppingCart>
+public interface IBaseCart<out T>: IBaseStore<ShoppingCart>
 {
     T GetCartUserItem(string cartUserId, int productId, CacheKey cacheKey = CacheKey.None, bool hasCache = false);
     void UpdateCartItems(List<ShoppingCart> cartItems, CacheKey cacheKey = CacheKey.None, bool hasCache = false);

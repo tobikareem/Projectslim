@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Slim.Core.Model;
 using Slim.Data.Context;
 using Slim.Data.Entity;
@@ -8,7 +7,7 @@ using Slim.Shared.Interfaces.Serv;
 
 namespace Slim.Shared.Repositories
 {
-    public class ImageUploadRepo :IImage<Image>
+    public class ImageUploadRepo :IBaseImage
     {
 
         private readonly SlimDbContext _context;
