@@ -106,7 +106,8 @@
                                 </div>
                             </div>
                             <hr>
-                            <button class="btn btn-primary btn-shadow d-block w-100 mt-4" type="button"><i class="bi bi-cart fs-lg me-2"></i>Add to Cart</button>
+                            <button class="btn btn-primary btn-shadow d-block w-100 mt-4" type="submit" onclick="OnAddItemToCart(@Model.Product.Id, '@Url.Page("Cart", "NewProductToCart")', '@Url.Page("Cart", "TotalCartCount")')"><i class="bi bi-cart fs-lg me-2"></i>Add to Cart</button>
+                         
                             <div class="bg-secondary rounded p-3 mt-4 mb-2">
                                 <a class="d-flex align-items-center" href="#">
                                     <img class="rounded-circle" src="~/img/home/banners/offer.jpg" width="50" alt="Slim">
