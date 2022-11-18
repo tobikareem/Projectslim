@@ -2,6 +2,7 @@
 @using System.Globalization
 @using Slim.Pages.Extensions
 @model Slim.Pages.Pages.CartModel
+@inject Slim.Shared.Interfaces.Serv.ICartService _cartService;
 @{
 }
 
@@ -44,14 +45,7 @@
 
                     var primary = string.Empty;
                     var imgPrimary = product.Images.FirstOrDefault(x => x.IsPrimaryImage);
-
-                    var standardPrice = product.StandardPrice;
-                    var standardPriceRoundUp = Convert.ToString(standardPrice, CultureInfo.CurrentCulture).Split('.')[1];
-                    var standardPriceWholePrice = Convert.ToInt32(Math.Truncate(standardPrice));
-
-                    var salesPrice = product.SalePrice;
-                    var salesPriceRoundUp = Convert.ToString(salesPrice, CultureInfo.CurrentCulture).Split('.')[1];
-                    var salesPriceWholePrice = Convert.ToInt32(Math.Truncate(salesPrice));
+                    var productPrice = _cartService.GetPriceForProduct(product.StandardPrice, product.SalePrice);
 
                     <div class="d-sm-flex justify-content-between align-items-center my-2 pb-3 border-bottom">
                         <div class="d-block d-sm-flex align-items-center text-center text-sm-start">
@@ -59,15 +53,15 @@
                                 <img src="@primary.GetImageSrc(imgPrimary?.UploadedImage)" width="160" alt="Product">
                             </a>
                             <div class="pt-2">
-                                <h3 class="product-title fs-base mb-2"><a href="shop-single-v1.html">@product.ProductName</a></h3>
+                                <h3 class="product-title fs-base mb-2"><a asp-page="/ProductDetail" asp-route-id="@product.Id">@product.ProductName</a></h3>
                                 <div class="fs-sm"><span class="text-muted me-2">Size:</span>@product.Category.CategoryName</div>
                                 @if (product.IsOnSale)
                                 {
-                                    <div class="fs-lg text-accent pt-2">$@salesPriceWholePrice.<small>@salesPriceRoundUp</small></div>
+                                    <div class="fs-lg text-accent pt-2">$@productPrice.SalesWholePrice.<small>@productPrice.SalesPriceRoundUp</small></div>
                                 }
                                 else
                                 {
-                                    <div class="fs-lg text-accent pt-2">$@standardPriceWholePrice.<small>@standardPriceRoundUp</small></div>
+                                    <div class="fs-lg text-accent pt-2">$@productPrice.StandardWholePrice.<small>@productPrice.StandardPriceRoundUp</small></div>
                                 }
                             </div>
                         </div>

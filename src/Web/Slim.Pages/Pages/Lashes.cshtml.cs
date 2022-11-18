@@ -11,7 +11,7 @@ namespace Slim.Pages.Pages
     {
         private readonly ILogger<LashesModel> _logger;
         private readonly ICacheService _cacheService;
-        private readonly IPageSection<PageSection> _pageSectionsBaseStore;
+        private readonly IPageSection _pageSectionsBaseStore;
         private readonly IBaseStore<RazorPage> _razorPagesBaseStore;
         private readonly IBaseStore<Category> _categoryBaseStore;
         private readonly IBaseStore<Product> _productBaseStore;
@@ -19,7 +19,7 @@ namespace Slim.Pages.Pages
 
         public Dictionary<string, List<Product>> ProductWithCategories = new();
         
-        public LashesModel(ILogger<LashesModel> logger, ICacheService cacheService, IPageSection<PageSection> pageSectionsBaseStore, IBaseStore<RazorPage> razorPagesBaseStore, IBaseStore<Category> categoryBaseStore, IBaseStore<Product> productBaseStore)
+        public LashesModel(ILogger<LashesModel> logger, ICacheService cacheService, IPageSection pageSectionsBaseStore, IBaseStore<RazorPage> razorPagesBaseStore, IBaseStore<Category> categoryBaseStore, IBaseStore<Product> productBaseStore)
         {
             _logger = logger;
             _cacheService = cacheService;

@@ -42,14 +42,16 @@ namespace Slim.Pages.Extensions
 
             #region Add Service Injection
             builder.Services.AddSingleton<ICacheService, CacheService>();
+            builder.Services.AddScoped<ICartService, CartService>();
+            
             builder.Services.AddScoped<IBaseStore<RazorPage>, RazorPagesRepo>();
-            builder.Services.AddScoped<IPageSection<PageSection>, PageSectionRepo>();
-            builder.Services.AddScoped<IImage<Image>, ImageUploadRepo>();
+            builder.Services.AddScoped<IPageSection, PageSectionRepo>();
+            builder.Services.AddScoped<IBaseImage, ImageUploadRepo>();
             builder.Services.AddScoped<IBaseStore<Product>, ProductRepository>();
             builder.Services.AddScoped<IBaseStore<Category>, CategoryRepository>();
             builder.Services.AddScoped<IBaseStore<Review>, ReviewRepository>();
             builder.Services.AddScoped<IBaseStore<Comment>, CommentRepository>();
-            builder.Services.AddScoped<ICart<ShoppingCart>, CartRepository>();
+            builder.Services.AddScoped<IBaseCart<ShoppingCart>, CartRepository>();
             #endregion
 
 

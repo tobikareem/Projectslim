@@ -11,7 +11,7 @@ namespace Slim.Pages.Pages
     {
         private readonly ILogger<IndexModel> _logger;
         private readonly ICacheService _cacheService;
-        private readonly IPageSection<PageSection> _pageSectionsBaseStore;
+        private readonly IPageSection _pageSectionsBaseStore;
         private readonly IBaseStore<RazorPage> _razorPagesBaseStore;
         private readonly IBaseStore<Product> _productBaseStore;
         private readonly IBaseStore<Category> _categoryBaseStore;
@@ -24,7 +24,7 @@ namespace Slim.Pages.Pages
         public List<Product> LipGloss { get; set; } = new();
 
 
-        public IndexModel(ILogger<IndexModel> logger, ICacheService cacheService, IPageSection<PageSection> pageSectionsBaseStore, IBaseStore<RazorPage> razorPagesBaseStore, IBaseStore<Product> productBaseStore, IBaseStore<Category> categoryBaseStore)
+        public IndexModel(ILogger<IndexModel> logger, ICacheService cacheService, IPageSection pageSectionsBaseStore, IBaseStore<RazorPage> razorPagesBaseStore, IBaseStore<Product> productBaseStore, IBaseStore<Category> categoryBaseStore)
         {
             _logger = logger;
             _cacheService = cacheService;

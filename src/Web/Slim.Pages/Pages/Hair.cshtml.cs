@@ -11,11 +11,11 @@ namespace Slim.Pages.Pages
     {
         private readonly ILogger<HairModel> _logger;
         private readonly ICacheService _cacheService;
-        private readonly IPageSection<PageSection> _pageSectionsBaseStore;
+        private readonly IPageSection _pageSectionsBaseStore;
         private readonly IBaseStore<RazorPage> _razorPagesBaseStore;
         private readonly int _pageId;
 
-        public HairModel(ILogger<HairModel> logger, ICacheService cacheService, IPageSection<PageSection> pageSectionsBaseStore, IBaseStore<RazorPage> razorPagesBaseStore)
+        public HairModel(ILogger<HairModel> logger, ICacheService cacheService, IPageSection pageSectionsBaseStore, IBaseStore<RazorPage> razorPagesBaseStore)
         {
             _logger = logger;
             _cacheService = cacheService;

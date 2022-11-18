@@ -12,7 +12,7 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
     public class WebPagePhotosModel : PageModel
     {
         private readonly IBaseStore<RazorPage> _razorPagesBaseStore;
-        private readonly IPageSection<PageSection> _pageSectionsBaseStore;
+        private readonly IPageSection _pageSectionsBaseStore;
         private readonly ICacheService _cacheService;
         private readonly ILogger<WebPagePhotosModel> _logger;
         public List<SelectListItem> RazorPageSelectList { get; set; }
@@ -20,7 +20,7 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
 
         public List<InputModel> InputModels { get; set; } = new();
 
-        public WebPagePhotosModel(IBaseStore<RazorPage> razorPagesBaseStore, IPageSection<PageSection> pageSectionsBaseStore, ICacheService cacheService, ILogger<WebPagePhotosModel> logger )
+        public WebPagePhotosModel(IBaseStore<RazorPage> razorPagesBaseStore, IPageSection pageSectionsBaseStore, ICacheService cacheService, ILogger<WebPagePhotosModel> logger )
         {
             _razorPagesBaseStore = razorPagesBaseStore;
             _cacheService = cacheService;

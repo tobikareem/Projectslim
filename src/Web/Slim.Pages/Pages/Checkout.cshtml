@@ -1,5 +1,10 @@
 ﻿@page
+@using System.Globalization
+@using System.Security.Claims
+@using Slim.Pages.Extensions
 @model Slim.Pages.Pages.CheckoutModel
+@inject Slim.Shared.Interfaces.Serv.ICartService _cartService;
+
 @{
 }
 
@@ -9,8 +14,9 @@
         <div class="order-lg-2 mb-3 mb-lg-0 pt-lg-2">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb breadcrumb-light flex-lg-nowrap justify-content-center justify-content-lg-start">
-                    <li class="breadcrumb-item"><a class="text-nowrap" href="index.html"><i class="ci-home"></i>Home</a></li>
-                    <li class="breadcrumb-item text-nowrap"><a href="shop-grid-ls.html">Shop</a>
+                    <li class="breadcrumb-item"><a class="text-nowrap" asp-page="/Index"><i class="bi bi-home"></i>Home</a></li>
+                    <li class="breadcrumb-item text-nowrap">
+                        <a asp-page="/Lashes">Lashes</a>
                     </li>
                     <li class="breadcrumb-item text-nowrap active" aria-current="page">Checkout</li>
                 </ol>
@@ -22,10 +28,216 @@
     </div>
 </div>
 
+<div class="container pb-5 mb-2 mb-md-4">
+    <div class="row">
+        <section class="col-lg-8">
+            <!-- Steps-->
+            <div class="steps steps-light pt-2 pb-3 mb-5">
+                <a class="step-item active" asp-page="/Cart">
+                    <div class="step-progress"><span class="step-count">1</span></div>
+                    <div class="step-label"><i class="bi bi-cart"></i>Cart</div>
+                </a><a class="step-item active current" asp-page="/Checkout">
+                    <div class="step-progress"><span class="step-count">2</span></div>
+                    <div class="step-label"><i class="bi bi-user-circle"></i>Details</div>
+                </a><a class="step-item" href="checkout-shipping.html">
+                    <div class="step-progress"><span class="step-count">3</span></div>
+                    <div class="step-label"><i class="bi bi-package"></i>Shipping</div>
+                </a><a class="step-item" href="checkout-payment.html">
+                    <div class="step-progress"><span class="step-count">4</span></div>
+                    <div class="step-label"><i class="bi bi-card"></i>Payment</div>
+                </a><a class="step-item" href="checkout-review.html">
+                    <div class="step-progress"><span class="step-count">5</span></div>
+                    <div class="step-label"><i class="bi bi-check-circle"></i>Review</div>
+                </a>
+            </div>
+            <!-- Autor info-->
+            <div class="d-sm-flex justify-content-between align-items-center bg-secondary p-4 rounded-3 mb-grid-gutter">
+                <div class="d-flex align-items-center">
+                    <div class="img-thumbnail rounded-circle position-relative flex-shrink-0">
+                        <span class="badge bg-warning position-absolute end-0 mt-n2" data-bs-toggle="tooltip" title="Reward points">384</span>
+                        <img class="rounded-circle" src="~/img/home/hero-slider/logo.PNG" width="90" alt="Slim Studio">
+                    </div>
+                    <div class="ps-3">
+                        <h3 class="fs-base mb-0">@User.Claims.Where(x => x.Type == ClaimTypes.Name).Skip(1).FirstOrDefault()?.Value</h3><span class="text-accent fs-sm">@User.Identity?.Name</span>
+                    </div>
+                </div><a class="btn btn-light btn-sm btn-shadow mt-3 mt-sm-0" asp-page="/Account/Manage/Index" asp-area="Identity"><i class="bi bi-edit me-2"></i>Edit profile</a>
+            </div>
+            <!-- Shipping address-->
+            <h2 class="h6 pt-1 pb-3 mb-3 border-bottom">Shipping address</h2>
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="mb-3">
+                        <label class="form-label" asp-for="Input.FirstName"></label>
+                        <input asp-for="Input.FirstName" class="form-control" type="text">
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="mb-3">
+                        <label class="form-label" asp-for="Input.LastName"></label>
+                        <input asp-for="Input.LastName" class="form-control" type="text" >
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="mb-3">
+                        <label class="form-label" asp-for="Input.Email"></label>
+                        <input asp-for="Input.Email" class="form-control" type="email">
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="mb-3">
+                        <label class="form-label" asp-for="Input.PhoneNumber"></label>
+                        <input asp-for="Input.PhoneNumber" class="form-control" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="mb-3">
+                        <label class="form-label" asp-for="Input.Company"></label>
+                        <input asp-for="Input.Company" class="form-control" type="text">
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="mb-3">
+                        <label class="form-label" asp-for="Input.LastName"></label>
+                        <select class="form-select">
+                            <option>Choose country</option>
+                            <option>Australia</option>
+                            <option>Canada</option>
+                            <option>France</option>
+                            <option>Germany</option>
+                            <option>Switzerland</option>
+                            <option>USA</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="mb-3">
+                        <label class="form-label" asp-for="Input.FirstName"></label>
+                        <select class="form-select">
+                            <option>Choose city</option>
+                            <option>Amsterdam</option>
+                            <option>Berlin</option>
+                            <option>Geneve</option>
+                            <option>New York</option>
+                            <option>Paris</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="mb-3">
+                        <label class="form-label" asp-for="Input.ZipCode"></label>
+                        <input asp-for="Input.ZipCode" class="form-control" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="mb-3">
+                        <label class="form-label" asp-for="Input.Address1"></label>
+                        <input asp-for="Input.Address1" class="form-control" type="text" >
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="mb-3">
+                        <label class="form-label" asp-for="Input.Address2"></label>
+                        <input asp-for="Input.Address2" class="form-control" type="text">
+                    </div>
+                </div>
+            </div>
+            <h6 class="mb-3 py-3 border-bottom">Billing address</h6>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" checked asp-for="Input.IsSameAsAddress">
+                <label class="form-check-label" asp-for="Input.IsSameAsAddress"></label>
+            </div>
+            <!-- Navigation (desktop)-->
+            <div class="d-none d-lg-flex pt-4 mt-3">
+                <div class="w-50 pe-3"><a class="btn btn-secondary d-block w-100" asp-page="/Cart"><i class="bi bi-arrow-left mt-sm-0 me-1"></i><span class="d-none d-sm-inline">Back to Cart</span><span class="d-inline d-sm-none">Back</span></a></div>
+                <div class="w-50 ps-2"><a class="btn btn-primary d-block w-100" href="checkout-shipping.html"><span class="d-none d-sm-inline">Proceed to Shipping</span><span class="d-inline d-sm-none">Next</span><i class="bi bi-arrow-right mt-sm-0 ms-1"></i></a></div>
+            </div>
+        </section>
+        <!-- Sidebar-->
+        <aside class="col-lg-4 pt-4 pt-lg-0 ps-xl-5">
+            <div class="bg-white rounded-3 shadow-lg p-4 ms-lg-auto">
+                <div class="py-2 px-xl-2">
+                    <div class="widget mb-3">
+                        <h2 class="widget-title text-center">Order summary</h2>
+
+                        @{
+                            foreach (var item in Model.CartItems)
+                            {
+                                var product = item.Product;
+
+                                if (product == null)
+                                {
+                                    continue;
+                                }
+                                var primary = string.Empty;
+                                var imgPrimary = product.Images.FirstOrDefault(x => x.IsPrimaryImage);
+
+                                var productPrice = _cartService.GetPriceForProduct(product.StandardPrice, product.SalePrice);
+                                
+                                <div class="d-flex align-items-center pb-2 border-bottom">
+                                    <a class="d-block flex-shrink-0" asp-page="/ProductDetail" asp-route-id="@product.Id"><img src="@primary.GetImageSrc(imgPrimary?.UploadedImage)" width="64" alt="Product"></a>
+                                    <div class="ps-2">
+                                        <h6 class="widget-product-title"><a asp-page="/ProductDetail" asp-route-id="@product.Id">@product.ProductName</a></h6>
+                                        
+                                        @if (product.IsOnSale)
+                                        {
+                                            <div class="widget-product-meta"><span class="text-accent me-2">$@productPrice.SalesWholePrice.<small>@productPrice.SalesPriceRoundUp</small></span><span class="text-muted">x @item.Quantity</span></div>
+                                        }
+                                        else
+                                        {
+                                            <div class="widget-product-meta"><span class="text-accent me-2">$@productPrice.StandardWholePrice.<small>@productPrice.StandardPriceRoundUp</small></span><span class="text-muted">x @item.Quantity</span></div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        }
+
+                    </div>
+                    <ul class="list-unstyled fs-sm pb-2 border-bottom">
+                        @{
+                            var price = Model.TotalCartPrice;
+                            var priceRoundUp = Convert.ToString(price, CultureInfo.CurrentCulture).Split('.')[1];
+                            var priceWholePrice = Convert.ToInt32(Math.Truncate(price));
+                        }
+                        <li class="d-flex justify-content-between align-items-center"><span class="me-2">Subtotal:</span><span class="text-end">$@priceWholePrice.<small>@priceRoundUp</small></span></li>
+                        <li class="d-flex justify-content-between align-items-center"><span class="me-2">Shipping:</span><span class="text-end">—</span></li>
+                        <li class="d-flex justify-content-between align-items-center"><span class="me-2">Taxes:</span><span class="text-end">$9.<small>50</small></span></li>
+                        <li class="d-flex justify-content-between align-items-center"><span class="me-2">Discount:</span><span class="text-end">—</span></li>
+                    </ul>
+                    <h3 class="fw-normal text-center my-4">$@priceWholePrice.<small>@priceRoundUp</small></h3>
+                    <form class="needs-validation" method="post" novalidate>
+                        <div class="mb-3">
+                            <input class="form-control" type="text" placeholder="Promo code" required>
+                            <div class="invalid-feedback">Please provide promo code.</div>
+                        </div>
+                        <button class="btn btn-outline-primary d-block w-100" type="submit">Apply promo code</button>
+                    </form>
+                </div>
+            </div>
+        </aside>
+    </div>
+    <!-- Navigation (mobile)-->
+    <div class="row d-lg-none">
+        <div class="col-lg-8">
+            <div class="d-flex pt-4 mt-3">
+                <div class="w-50 pe-3"><a class="btn btn-secondary d-block w-100" asp-page="/Cart"><i class="bi bi-arrow-left mt-sm-0 me-1"></i><span class="d-none d-sm-inline">Back to Cart</span><span class="d-inline d-sm-none">Back</span></a></div>
+                <div class="w-50 ps-2"><a class="btn btn-primary d-block w-100" href="checkout-shipping.html"><span class="d-none d-sm-inline">Proceed to Shipping</span><span class="d-inline d-sm-none">Next</span><i class="bi bi-arrow-right mt-sm-0 ms-1"></i></a></div>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 
 @section Scripts
-{
+    {
     <script>
         $(document).ready(function () {
             var priceUrl = '@Url.Page("Cart", "TotalCartPrice")';

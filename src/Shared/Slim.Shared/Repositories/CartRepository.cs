@@ -8,7 +8,7 @@ using Slim.Shared.Interfaces.Repo;
 using Slim.Shared.Interfaces.Serv;
 
 namespace Slim.Shared.Repositories;
-public class CartRepository : ICart<ShoppingCart>
+public class CartRepository : IBaseCart<ShoppingCart>
 {
     private readonly SlimDbContext _context;
     private readonly ILogger<CartRepository> _logger;
