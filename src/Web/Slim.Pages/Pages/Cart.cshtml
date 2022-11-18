@@ -1,4 +1,6 @@
 ﻿@page "{id?}"
+@using System.Globalization
+@using Slim.Pages.Extensions
 @model Slim.Pages.Pages.CartModel
 @{
 }
@@ -27,77 +29,81 @@
         <!-- List of items-->
         <section class="col-lg-8">
             <div class="d-flex justify-content-between align-items-center pt-3 pb-4 pb-sm-5 mt-1">
-                <h2 class="h6 text-light mb-0">Products</h2><a class="btn btn-outline-primary btn-sm ps-2" href="shop-grid-ls.html"><i class="bi bi-arrow-left-circle me-2"></i>Continue shopping</a>
+                <h2 class="h6 text-light mb-0">Products</h2><a class="btn btn-outline-primary btn-sm ps-2" asp-page="/Index"><i class="bi bi-arrow-left-circle me-2"></i>Back to Home</a>
             </div>
-            <!-- Item-->
-            <div class="d-sm-flex justify-content-between align-items-center my-2 pb-3 border-bottom">
-                <div class="d-block d-sm-flex align-items-center text-center text-sm-start">
-                    <a class="d-inline-block flex-shrink-0 mx-auto me-sm-4" href="shop-single-v1.html"><img src="img/shop/cart/01.jpg" width="160" alt="Product"></a>
-                    <div class="pt-2">
-                        <h3 class="product-title fs-base mb-2"><a href="shop-single-v1.html">Women Colorblock Sneakers</a></h3>
-                        <div class="fs-sm"><span class="text-muted me-2">Size:</span>8.5</div>
-                        <div class="fs-sm"><span class="text-muted me-2">Color:</span>White &amp; Blue</div>
-                        <div class="fs-lg text-accent pt-2">$154.<small>00</small></div>
+            <form method="post" asp-page-handler="UpdateShoppingCart">
+                @for (var item = 0; item < Model.CartItems.Count; item++)
+                {
+
+                    var product = Model.CartItems[item].Product;
+
+                    if (product == null)
+                    {
+                        continue;
+                    }
+
+                    var primary = string.Empty;
+                    var imgPrimary = product.Images.FirstOrDefault(x => x.IsPrimaryImage);
+
+                    var standardPrice = product.StandardPrice;
+                    var standardPriceRoundUp = Convert.ToString(standardPrice, CultureInfo.CurrentCulture).Split('.')[1];
+                    var standardPriceWholePrice = Convert.ToInt32(Math.Truncate(standardPrice));
+
+                    var salesPrice = product.SalePrice;
+                    var salesPriceRoundUp = Convert.ToString(salesPrice, CultureInfo.CurrentCulture).Split('.')[1];
+                    var salesPriceWholePrice = Convert.ToInt32(Math.Truncate(salesPrice));
+
+                    <div class="d-sm-flex justify-content-between align-items-center my-2 pb-3 border-bottom">
+                        <div class="d-block d-sm-flex align-items-center text-center text-sm-start">
+                            <a class="d-inline-block flex-shrink-0 mx-auto me-sm-4" asp-page="/ProductDetail" asp-route-id="@product.Id">
+                                <img src="@primary.GetImageSrc(imgPrimary?.UploadedImage)" width="160" alt="Product">
+                            </a>
+                            <div class="pt-2">
+                                <h3 class="product-title fs-base mb-2"><a href="shop-single-v1.html">@product.ProductName</a></h3>
+                                <div class="fs-sm"><span class="text-muted me-2">Size:</span>@product.Category.CategoryName</div>
+                                @if (product.IsOnSale)
+                                {
+                                    <div class="fs-lg text-accent pt-2">$@salesPriceWholePrice.<small>@salesPriceRoundUp</small></div>
+                                }
+                                else
+                                {
+                                    <div class="fs-lg text-accent pt-2">$@standardPriceWholePrice.<small>@standardPriceRoundUp</small></div>
+                                }
+                            </div>
+                        </div>
+                        <div class="pt-2 pt-sm-0 ps-sm-3 mx-auto mx-sm-0 text-center text-sm-start" style="max-width: 9rem;">
+                            <label class="form-label" for="quantity1">Quantity</label>
+
+                            @{
+                                var item1 = item;
+                            }
+
+                            <select asp-items="@Model.QuantitySelectListItem" asp-for="@Model.CartItems[item1].Quantity" class="form-select" id="quantitySelect"></select>
+                            <input type="hidden" asp-for="@Model.CartItems[item1].Id" id="cartItemId">
+                            <button class="btn btn-link px-0 text-danger" type="submit" asp-page-handler="RemoveCartItem" asp-route-id="@Model.CartItems[item1].Id"><i class="bi bi-trash3 me-2"></i><span class="fs-sm">Remove</span></button>
+                        </div>
                     </div>
-                </div>
-                <div class="pt-2 pt-sm-0 ps-sm-3 mx-auto mx-sm-0 text-center text-sm-start" style="max-width: 9rem;">
-                    <label class="form-label" for="quantity1">Quantity</label>
-                    <input class="form-control" type="number" id="quantity1" min="1" value="1">
-                    <button class="btn btn-link px-0 text-danger" type="button"><i class="bi bi-trash3 me-2"></i><span class="fs-sm">Remove</span></button>
-                </div>
-            </div>
+                }
+            </form>
+
             <!-- Item-->
-            <div class="d-sm-flex justify-content-between align-items-center my-2 pb-3 border-bottom">
-                <div class="d-block d-sm-flex align-items-center text-center text-sm-start">
-                    <a class="d-inline-block flex-shrink-0 mx-auto me-sm-4" href="shop-single-v1.html"><img src="img/shop/cart/02.jpg" width="160" alt="Product"></a>
-                    <div class="pt-2">
-                        <h3 class="product-title fs-base mb-2"><a href="shop-single-v1.html">TH Jeans City Backpack</a></h3>
-                        <div class="fs-sm"><span class="text-muted me-2">Brand:</span>Tommy Hilfiger</div>
-                        <div class="fs-sm"><span class="text-muted me-2">Color:</span>Khaki</div>
-                        <div class="fs-lg text-accent pt-2">$79.<small>50</small></div>
-                    </div>
-                </div>
-                <div class="pt-2 pt-sm-0 ps-sm-3 mx-auto mx-sm-0 text-center text-sm-start" style="max-width: 9rem;">
-                    <label class="form-label" for="quantity2">Quantity</label>
-                    <input class="form-control" type="number" id="quantity2" min="1" value="1">
-                    <button class="btn btn-link px-0 text-danger" type="button"><i class="bi bi-trash3 me-2"></i><span class="fs-sm">Remove</span></button>
-                </div>
+            @*  <div class="d-sm-flex justify-content-between align-items-center my-2 pb-3 border-bottom">
+            <div class="d-block d-sm-flex align-items-center text-center text-sm-start">
+            <a class="d-inline-block flex-shrink-0 mx-auto me-sm-4" href="shop-single-v1.html"><img src="img/shop/cart/01.jpg" width="160" alt="Product"></a>
+            <div class="pt-2">
+            <h3 class="product-title fs-base mb-2"><a href="shop-single-v1.html">Women Colorblock Sneakers</a></h3>
+            <div class="fs-sm"><span class="text-muted me-2">Size:</span>8.5</div>
+            <div class="fs-sm"><span class="text-muted me-2">Color:</span>White &amp; Blue</div>
+            <div class="fs-lg text-accent pt-2">$154.<small>00</small></div>
             </div>
-            <!-- Item-->
-            <div class="d-sm-flex justify-content-between align-items-center my-2 pb-3 border-bottom">
-                <div class="d-block d-sm-flex align-items-center text-center text-sm-start">
-                    <a class="d-inline-block flex-shrink-0 mx-auto me-sm-4" href="shop-single-v1.html"><img src="img/shop/cart/03.jpg" width="160" alt="Product"></a>
-                    <div class="pt-2">
-                        <h3 class="product-title fs-base mb-2"><a href="shop-single-v1.html">3-Color Sun Stash Hat</a></h3>
-                        <div class="fs-sm"><span class="text-muted me-2">Brand:</span>The North Face</div>
-                        <div class="fs-sm"><span class="text-muted me-2">Color:</span>Pink / Beige / Dark blue</div>
-                        <div class="fs-lg text-accent pt-2">$22.<small>50</small></div>
-                    </div>
-                </div>
-                <div class="pt-2 pt-sm-0 ps-sm-3 mx-auto mx-sm-0 text-center text-sm-start" style="max-width: 9rem;">
-                    <label class="form-label" for="quantity3">Quantity</label>
-                    <input class="form-control" type="number" id="quantity3" min="1" value="1">
-                    <button class="btn btn-link px-0 text-danger" type="button"><i class="bi bi-trash3 me-2"></i><span class="fs-sm">Remove</span></button>
-                </div>
             </div>
-            <!-- Item-->
-            <div class="d-sm-flex justify-content-between align-items-center my-2 pb-3 border-bottom">
-                <div class="d-block d-sm-flex align-items-center text-center text-sm-start">
-                    <a class="d-inline-block flex-shrink-0 mx-auto me-sm-4" href="shop-single-v1.html"><img src="img/shop/cart/04.jpg" width="160" alt="Product"></a>
-                    <div class="pt-2">
-                        <h3 class="product-title fs-base mb-2"><a href="shop-single-v1.html">Cotton Polo Regular Fit</a></h3>
-                        <div class="fs-sm"><span class="text-muted me-2">Size:</span>42</div>
-                        <div class="fs-sm"><span class="text-muted me-2">Color:</span>Light blue</div>
-                        <div class="fs-lg text-accent pt-2">$9.<small>00</small></div>
-                    </div>
-                </div>
-                <div class="pt-2 pt-sm-0 ps-sm-3 mx-auto mx-sm-0 text-center text-sm-start" style="max-width: 9rem;">
-                    <label class="form-label" for="quantity4">Quantity</label>
-                    <input class="form-control" type="number" id="quantity4" min="1" value="1">
-                    <button class="btn btn-link px-0 text-danger" type="button"><i class="bi bi-trash3 me-2"></i><span class="fs-sm">Remove</span></button>
-                </div>
+            <div class="pt-2 pt-sm-0 ps-sm-3 mx-auto mx-sm-0 text-center text-sm-start" style="max-width: 9rem;">
+            <label class="form-label" for="quantity1">Quantity</label>
+            <input class="form-control" type="number" id="quantity1" min="1" value="1">
+            <button class="btn btn-link px-0 text-danger" type="button"><i class="bi bi-trash3 me-2"></i><span class="fs-sm">Remove</span></button>
             </div>
-            <button class="btn btn-outline-accent d-block w-100 mt-4" type="button"><i class="bi bi-cloud-upload"></i> Update cart</button>
+            </div>*@
+
         </section>
         <!-- Sidebar-->
         <aside class="col-lg-4 pt-4 pt-lg-0 ps-xl-5">
@@ -105,7 +111,21 @@
                 <div class="py-2 px-xl-2">
                     <div class="text-center mb-4 pb-3 border-bottom">
                         <h2 class="h6 mb-3 pb-1">Subtotal</h2>
-                        <h3 class="fw-normal">$265.<small>00</small></h3>
+                        @{
+                            var price = Model.TotalCartPrice;
+
+                            @if (price != 0)
+                            {
+                                var priceRoundUp = Convert.ToString(price, CultureInfo.CurrentCulture).Split('.')[1];
+                                var priceWholePrice = Convert.ToInt32(Math.Truncate(price));
+                                <h3 class="fw-normal" id="totalPrice">$@priceWholePrice.<small id="totalPriceRoundUp">@priceRoundUp</small></h3>
+                            }
+                            else
+                            {
+                                <h3 class="fw-normal" id="totalPrice">$0.<small id="totalPriceRoundUp">00</small></h3>
+                            }
+                        }
+
                     </div>
                     <div class="mb-3 mb-4">
                         <label class="form-label mb-3" for="order-comments"><span class="badge bg-info fs-xs me-2">Note</span><span class="fw-medium">Additional comments</span></label>
@@ -172,3 +192,54 @@
         </aside>
     </div>
 </div>
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            var priceUrl = '@Url.Page("Cart", "TotalCartPrice")';
+            var cartUrl = '@Url.Page("Cart", "TotalCartCount")';
+
+            GetTotalCartPrice(priceUrl);
+            GetTotalCartItem(cartUrl);
+
+            $('#quantitySelect').change(function () {
+                debugger;
+                // get the selected value
+                var quantity = $(this).val();
+                var selectedId = $('#cartItemId').val();
+
+                $.ajax({
+                    type: 'GET', // define the type of HTTP verb we want to use (POST for our form)
+                    url: '@Url.Page(null, "UpdateShoppingCart")',
+
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("XSRF-TOKEN",
+                            $('input:hidden[name="__RequestVerificationToken"]').val());
+                    },
+                    data: { cartItemId: selectedId, quantity }, // our data object
+                    contentType: "application/json; charset=utf-8",
+                    traditional: true,
+                    async: false,
+                    success:
+                        function (data) {
+                            if (data > 0) {
+                                SetCartIconData(data);
+                            }
+
+                            var cartUrl = '@Url.Page("Cart", "TotalCartCount")';
+                            GetTotalCartItem(cartUrl);
+                        },
+                    error: function (data) {
+                        console.log(data);
+                    }
+
+
+                });
+
+            });
+        })
+
+
+
+    </script>
+}
