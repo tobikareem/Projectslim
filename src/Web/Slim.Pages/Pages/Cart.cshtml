@@ -195,8 +195,7 @@
 
 @section Scripts{
     <script>
-        // Example starter JavaScript for disabling form submissions if there are invalid fields
-        (function () {
+        $(document).ready(function () {
             var priceUrl = '@Url.Page("Cart", "TotalCartPrice")';
             var cartUrl = '@Url.Page("Cart", "TotalCartCount")';
 
@@ -204,7 +203,7 @@
             GetTotalCartItem(cartUrl);
 
             $('#quantitySelect').change(function () {
-
+                debugger;
                 // get the selected value
                 var quantity = $(this).val();
                 var selectedId = $('#cartItemId').val();
@@ -239,7 +238,7 @@
 
             });
         })
-            ();
+
 
 
     </script>
