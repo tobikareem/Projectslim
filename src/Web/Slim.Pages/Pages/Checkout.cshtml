@@ -36,16 +36,20 @@
                 <a class="step-item active" asp-page="/Cart">
                     <div class="step-progress"><span class="step-count">1</span></div>
                     <div class="step-label"><i class="bi bi-cart"></i>Cart</div>
-                </a><a class="step-item active current" asp-page="/Checkout">
+                </a>
+                <a class="step-item active current" asp-page="/Checkout">
                     <div class="step-progress"><span class="step-count">2</span></div>
                     <div class="step-label"><i class="bi bi-user-circle"></i>Details</div>
-                </a><a class="step-item" href="checkout-shipping.html">
+                </a>
+                <a class="step-item" asp-page="/Shipping">
                     <div class="step-progress"><span class="step-count">3</span></div>
                     <div class="step-label"><i class="bi bi-package"></i>Shipping</div>
-                </a><a class="step-item" href="checkout-payment.html">
+                </a>
+                <a class="step-item" asp-page="/Payment">
                     <div class="step-progress"><span class="step-count">4</span></div>
                     <div class="step-label"><i class="bi bi-card"></i>Payment</div>
-                </a><a class="step-item" href="checkout-review.html">
+                </a>
+                <a class="step-item" asp-page="/Review">
                     <div class="step-progress"><span class="step-count">5</span></div>
                     <div class="step-label"><i class="bi bi-check-circle"></i>Review</div>
                 </a>
@@ -74,7 +78,7 @@
                 <div class="col-sm-6">
                     <div class="mb-3">
                         <label class="form-label" asp-for="Input.LastName"></label>
-                        <input asp-for="Input.LastName" class="form-control" type="text" >
+                        <input asp-for="Input.LastName" class="form-control" type="text">
                     </div>
                 </div>
             </div>
@@ -139,7 +143,7 @@
                 <div class="col-sm-6">
                     <div class="mb-3">
                         <label class="form-label" asp-for="Input.Address1"></label>
-                        <input asp-for="Input.Address1" class="form-control" type="text" >
+                        <input asp-for="Input.Address1" class="form-control" type="text">
                     </div>
                 </div>
                 <div class="col-sm-6">
@@ -157,7 +161,7 @@
             <!-- Navigation (desktop)-->
             <div class="d-none d-lg-flex pt-4 mt-3">
                 <div class="w-50 pe-3"><a class="btn btn-secondary d-block w-100" asp-page="/Cart"><i class="bi bi-arrow-left mt-sm-0 me-1"></i><span class="d-none d-sm-inline">Back to Cart</span><span class="d-inline d-sm-none">Back</span></a></div>
-                <div class="w-50 ps-2"><a class="btn btn-primary d-block w-100" href="checkout-shipping.html"><span class="d-none d-sm-inline">Proceed to Shipping</span><span class="d-inline d-sm-none">Next</span><i class="bi bi-arrow-right mt-sm-0 ms-1"></i></a></div>
+                <div class="w-50 ps-2"><a class="btn btn-primary d-block w-100" asp-page="/Shipping"><span class="d-none d-sm-inline">Proceed to Shipping</span><span class="d-inline d-sm-none">Next</span><i class="bi bi-arrow-right mt-sm-0 ms-1"></i></a></div>
             </div>
         </section>
         <!-- Sidebar-->
@@ -180,12 +184,12 @@
                                 var imgPrimary = product.Images.FirstOrDefault(x => x.IsPrimaryImage);
 
                                 var productPrice = _cartService.GetPriceForProduct(product.StandardPrice, product.SalePrice);
-                                
+
                                 <div class="d-flex align-items-center pb-2 border-bottom">
                                     <a class="d-block flex-shrink-0" asp-page="/ProductDetail" asp-route-id="@product.Id"><img src="@primary.GetImageSrc(imgPrimary?.UploadedImage)" width="64" alt="Product"></a>
                                     <div class="ps-2">
                                         <h6 class="widget-product-title"><a asp-page="/ProductDetail" asp-route-id="@product.Id">@product.ProductName</a></h6>
-                                        
+
                                         @if (product.IsOnSale)
                                         {
                                             <div class="widget-product-meta"><span class="text-accent me-2">$@productPrice.SalesWholePrice.<small>@productPrice.SalesPriceRoundUp</small></span><span class="text-muted">x @item.Quantity</span></div>
@@ -228,7 +232,7 @@
         <div class="col-lg-8">
             <div class="d-flex pt-4 mt-3">
                 <div class="w-50 pe-3"><a class="btn btn-secondary d-block w-100" asp-page="/Cart"><i class="bi bi-arrow-left mt-sm-0 me-1"></i><span class="d-none d-sm-inline">Back to Cart</span><span class="d-inline d-sm-none">Back</span></a></div>
-                <div class="w-50 ps-2"><a class="btn btn-primary d-block w-100" href="checkout-shipping.html"><span class="d-none d-sm-inline">Proceed to Shipping</span><span class="d-inline d-sm-none">Next</span><i class="bi bi-arrow-right mt-sm-0 ms-1"></i></a></div>
+                <div class="w-50 ps-2"><a class="btn btn-primary d-block w-100" asp-page="/Shipping"><span class="d-none d-sm-inline">Proceed to Shipping</span><span class="d-inline d-sm-none">Next</span><i class="bi bi-arrow-right mt-sm-0 ms-1"></i></a></div>
             </div>
         </div>
     </div>
