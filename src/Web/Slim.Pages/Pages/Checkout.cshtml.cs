@@ -42,6 +42,21 @@ namespace Slim.Pages.Pages
             CartItems = _cartService.GetCartItemsForUser(loggedInUser, ShoppingCartUserId);
             TotalCartPrice = _cartService.GetTotalCartPrice(loggedInUser, ShoppingCartUserId);
         }
+
+        public IActionResult OnPostRedirectToShipping()
+        {
+            var loggedInUser = User.Identity?.Name ?? string.Empty;
+            ShoppingCartUserId = GetShoppingCartUserId();
+            if (!ModelState.IsValid)
+            {
+                TotalCartPrice = _cartService.GetTotalCartPrice(loggedInUser, ShoppingCartUserId);
+                return Page();
+            }
+
+
+
+            return RedirectToPage("/Shipping");
+        }
         
         private string GetShoppingCartUserId()
         {

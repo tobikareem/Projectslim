@@ -180,7 +180,11 @@
                                 </div>
                             </div>
                         </div>
-                    </div><a class="btn btn-primary btn-shadow d-block w-100 mt-4" asp-page="./Checkout"><i class="bi bi-credit-card-2-back"></i> Proceed to Checkout</a>
+                    </div>
+                    @if (Model.TotalCartPrice > 0)
+                    {
+                        <a class="btn btn-primary btn-shadow d-block w-100 mt-4" asp-page="./Checkout"><i class="bi bi-credit-card-2-back"></i> Proceed to Checkout</a>
+                    }
                 </div>
             </div>
         </aside>
