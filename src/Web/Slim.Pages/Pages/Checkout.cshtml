@@ -68,17 +68,21 @@
             </div>
             <!-- Shipping address-->
             <h2 class="h6 pt-1 pb-3 mb-3 border-bottom">Shipping address</h2>
+
             <div class="row">
                 <div class="col-sm-6">
                     <div class="mb-3">
                         <label class="form-label" asp-for="Input.FirstName"></label>
                         <input asp-for="Input.FirstName" class="form-control" type="text">
+                        <span asp-validation-for="Input.FirstName" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="col-sm-6">
                     <div class="mb-3">
                         <label class="form-label" asp-for="Input.LastName"></label>
                         <input asp-for="Input.LastName" class="form-control" type="text">
+                        <span asp-validation-for="Input.LastName" class="text-danger"></span>
+
                     </div>
                 </div>
             </div>
@@ -87,12 +91,16 @@
                     <div class="mb-3">
                         <label class="form-label" asp-for="Input.Email"></label>
                         <input asp-for="Input.Email" class="form-control" type="email">
+                        <span asp-validation-for="Input.Email" class="text-danger"></span>
+
                     </div>
                 </div>
                 <div class="col-sm-6">
                     <div class="mb-3">
                         <label class="form-label" asp-for="Input.PhoneNumber"></label>
-                        <input asp-for="Input.PhoneNumber" class="form-control" type="text">
+                        <input asp-for="Input.PhoneNumber" class="form-control" type="text">                       
+                        <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+
                     </div>
                 </div>
             </div>
@@ -136,6 +144,8 @@
                     <div class="mb-3">
                         <label class="form-label" asp-for="Input.ZipCode"></label>
                         <input asp-for="Input.ZipCode" class="form-control" type="text">
+                        <span asp-validation-for="Input.ZipCode" class="text-danger"></span>
+
                     </div>
                 </div>
             </div>
@@ -144,6 +154,8 @@
                     <div class="mb-3">
                         <label class="form-label" asp-for="Input.Address1"></label>
                         <input asp-for="Input.Address1" class="form-control" type="text">
+                        <span asp-validation-for="Input.Address1" class="text-danger"></span>
+
                     </div>
                 </div>
                 <div class="col-sm-6">
@@ -159,10 +171,12 @@
                 <label class="form-check-label" asp-for="Input.IsSameAsAddress"></label>
             </div>
             <!-- Navigation (desktop)-->
-            <div class="d-none d-lg-flex pt-4 mt-3">
-                <div class="w-50 pe-3"><a class="btn btn-secondary d-block w-100" asp-page="/Cart"><i class="bi bi-arrow-left mt-sm-0 me-1"></i><span class="d-none d-sm-inline">Back to Cart</span><span class="d-inline d-sm-none">Back</span></a></div>
-                <div class="w-50 ps-2"><a class="btn btn-primary d-block w-100" asp-page="/Shipping"><span class="d-none d-sm-inline">Proceed to Shipping</span><span class="d-inline d-sm-none">Next</span><i class="bi bi-arrow-right mt-sm-0 ms-1"></i></a></div>
-            </div>
+            <form method="post">
+                <div class="d-none d-lg-flex pt-4 mt-3">
+                    <div class="w-50 pe-3"><button class="btn btn-secondary d-block w-100" asp-page="/Cart"><i class="bi bi-arrow-left mt-sm-0 me-1"></i><span class="d-none d-sm-inline">Back to Cart</span><span class="d-inline d-sm-none">Back</span></button></div>
+                    <div class="w-50 ps-2"><button class="btn btn-primary d-block w-100" type="submit" asp-page-handler="RedirectToShipping"><span class="d-none d-sm-inline">Proceed to Shipping</span><span class="d-inline d-sm-none">Next</span><i class="bi bi-arrow-right mt-sm-0 ms-1"></i></button></div>
+                </div>
+            </form>
         </section>
         <!-- Sidebar-->
         <aside class="col-lg-4 pt-4 pt-lg-0 ps-xl-5">
@@ -217,6 +231,7 @@
                     </ul>
                     <h3 class="fw-normal text-center my-4">$@priceWholePrice.<small>@priceRoundUp</small></h3>
                     <form class="needs-validation" method="post" novalidate>
+
                         <div class="mb-3">
                             <input class="form-control" type="text" placeholder="Promo code" required>
                             <div class="invalid-feedback">Please provide promo code.</div>
@@ -231,8 +246,8 @@
     <div class="row d-lg-none">
         <div class="col-lg-8">
             <div class="d-flex pt-4 mt-3">
-                <div class="w-50 pe-3"><a class="btn btn-secondary d-block w-100" asp-page="/Cart"><i class="bi bi-arrow-left mt-sm-0 me-1"></i><span class="d-none d-sm-inline">Back to Cart</span><span class="d-inline d-sm-none">Back</span></a></div>
-                <div class="w-50 ps-2"><a class="btn btn-primary d-block w-100" asp-page="/Shipping"><span class="d-none d-sm-inline">Proceed to Shipping</span><span class="d-inline d-sm-none">Next</span><i class="bi bi-arrow-right mt-sm-0 ms-1"></i></a></div>
+                <div class="w-50 pe-3"><button class="btn btn-secondary d-block w-100" asp-page="/Cart"><i class="bi bi-arrow-left mt-sm-0 me-1"></i><span class="d-none d-sm-inline">Back to Cart</span><span class="d-inline d-sm-none">Back</span></button></div>
+                <div class="w-50 ps-2"><button class="btn btn-primary d-block w-100" asp-page="/Shipping"><span class="d-none d-sm-inline">Proceed to Shipping</span><span class="d-inline d-sm-none">Next</span><i class="bi bi-arrow-right mt-sm-0 ms-1"></i></button></div>
             </div>
         </div>
     </div>
