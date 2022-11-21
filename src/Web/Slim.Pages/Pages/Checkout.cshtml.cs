@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-using System.Reflection.Emit;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -7,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Slim.Core.Model;
 using Slim.Data.Entity;
-using Slim.Shared.Interfaces.Repo;
 using Slim.Shared.Interfaces.Serv;
 
 namespace Slim.Pages.Pages
@@ -15,18 +12,15 @@ namespace Slim.Pages.Pages
     [Authorize]
     public class CheckoutModel : PageModel
     {
-        private readonly IBaseCart<ShoppingCart> _shoppingCartBaseStore;
-        private readonly IBaseStore<Product> _productStore;
+        private readonly IUserService _userService;
         private readonly ILogger<CheckoutModel> _logger;
-        private readonly ICacheService _cacheService;
         private readonly ICartService _cartService;
         private readonly UserManager<IdentityUser> _userManager;
-        public CheckoutModel(IBaseCart<ShoppingCart> shoppingCartBaseStore, IBaseStore<Product> productStore, ILogger<CheckoutModel> logger, ICacheService cacheService, ICartService cartService, UserManager<IdentityUser> userMgr)
+
+        public CheckoutModel(IUserService userService, ILogger<CheckoutModel> logger, ICartService cartService, UserManager<IdentityUser> userMgr)
         {
-            _shoppingCartBaseStore = shoppingCartBaseStore;
-            _productStore = productStore;
+            _userService = userService;
             _logger = logger;
-            _cacheService = cacheService;
             _cartService = cartService;
             _userManager = userMgr;
 
@@ -59,6 +53,7 @@ namespace Slim.Pages.Pages
                 TotalCartPrice = _cartService.GetTotalCartPrice(loggedInUser, ShoppingCartUserId);
                 await LoadUserInformationAsync();
                 StatusMessage = "Missing some User Information";
+                _logger.LogWarning("Missing some User Information");
                 return RedirectToPage();
             }
 
@@ -71,136 +66,77 @@ namespace Slim.Pages.Pages
                 if (!setPhoneResult.Succeeded)
                 {
                     StatusMessage = "Unexpected error when trying to set phone number.";
+                    _logger.LogWarning("Unexpected error when trying to set phone number.");
                     return RedirectToPage();
                 }
             }
 
-            var userClaims = await _userManager.GetClaimsAsync(user);
-
-            foreach (var userClaim in userClaims)
+            if (!string.IsNullOrWhiteSpace(Input.Address1))
             {
-                if (userClaim.Type == ClaimTypes.StreetAddress && Input.Address1 != userClaim.Value)
+                var isSuccess = await _userService.UpsertUserClaim(user, ClaimTypes.StreetAddress, Input.Address1);
+                if (!isSuccess)
                 {
-                    var oldClaim = new Claim(ClaimTypes.StreetAddress, userClaim.Value);
-                    var newClaim = new Claim(ClaimTypes.StreetAddress, Input.Address1);
-                    var replaced = await _userManager.ReplaceClaimAsync(user, oldClaim, newClaim);
-                    if (!replaced.Succeeded)
-                    {
-                        StatusMessage = $"Unable to replace {nameof(Input.Address1)}";
-                        return RedirectToPage();
-                    }
+                    StatusMessage = "Unexpected error when trying to set Address1.";
+                    _logger.LogWarning("Unexpected error when trying to set Address1.");
+                    return RedirectToPage();
                 }
-
-                if (userClaim.Type == nameof(Input.Address2) && Input.Address2 != userClaim.Value)
-                {
-                    var oldClaim = new Claim(nameof(Input.Address2), userClaim.Value);
-                    var newClaim = new Claim(nameof(Input.Address2), Input.Address2);
-                    var replaced = await _userManager.ReplaceClaimAsync(user, oldClaim, newClaim);
-                    if (!replaced.Succeeded)
-                    {
-                        StatusMessage = $"Unable to replace {nameof(Input.Address2)}";
-                        return RedirectToPage();
-                    }
-                }
-
-                if (userClaim.Type ==  nameof(Input.ZipCode) && Input.ZipCode != userClaim.Value)
-                {
-                    var oldClaim = new Claim(nameof(Input.ZipCode), userClaim.Value);
-                    var newClaim = new Claim(nameof(Input.ZipCode), Input.ZipCode);
-                    var replaced = await _userManager.ReplaceClaimAsync(user, oldClaim, newClaim);
-                    if (!replaced.Succeeded)
-                    {
-                        StatusMessage = $"Unable to replace {nameof(Input.ZipCode)}";
-                        return RedirectToPage();
-                    }
-                }
-
-                if (userClaim.Type == nameof(Input.IsSameAsAddress) && Input.IsSameAsAddress != Convert.ToBoolean(userClaim.Value))
-                {
-                    var oldClaim = new Claim(nameof(Input.IsSameAsAddress), userClaim.Value);
-                    var newClaim = new Claim(nameof(Input.IsSameAsAddress), Input.IsSameAsAddress.ToString());
-                    var replaced = await _userManager.ReplaceClaimAsync(user, oldClaim, newClaim);
-                    if (!replaced.Succeeded)
-                    {
-                        StatusMessage = $"Unable to select this option for same address";
-                        return RedirectToPage();
-                    }
-                }
-
-                // Billing Address
-                if (userClaim.Type == nameof(Input.BillingAddress1) && Input.BillingAddress1 != userClaim.Value)
-                {
-                    var oldClaim = new Claim(nameof(Input.BillingAddress1), userClaim.Value);
-                    var newClaim = new Claim(nameof(Input.BillingAddress1), Input.BillingAddress1);
-                    var replaced = await _userManager.ReplaceClaimAsync(user, oldClaim, newClaim);
-                    if (!replaced.Succeeded)
-                    {
-                        StatusMessage = "Unable to replace Billing Address1";
-                        return RedirectToPage();
-                    }
-                }
-
-                if (userClaim.Type == nameof(Input.BillingAddress2) && Input.BillingAddress2 != userClaim.Value)
-                {
-                    var oldClaim = new Claim(nameof(Input.BillingAddress2), userClaim.Value);
-                    var newClaim = new Claim(nameof(Input.BillingAddress2), Input.BillingAddress2);
-                    var replaced = await _userManager.ReplaceClaimAsync(user, oldClaim, newClaim);
-                    if (!replaced.Succeeded)
-                    {
-                        StatusMessage = "Unable to replace Billing Address2";
-                        return RedirectToPage();
-                    }
-                }
-
-                if (userClaim.Type ==  nameof(Input.BillingZipCode) && Input.BillingZipCode != userClaim.Value)
-                {
-                    var oldClaim = new Claim(nameof(Input.BillingZipCode), userClaim.Value);
-                    var newClaim = new Claim(nameof(Input.BillingZipCode), Input.BillingZipCode);
-                    var replaced = await _userManager.ReplaceClaimAsync(user, oldClaim, newClaim);
-                    if (!replaced.Succeeded)
-                    {
-                        StatusMessage = $"Unable to replace Billing Zip code";
-                        return RedirectToPage();
-                    }
-                }
-
             }
 
-            var expectedClaims = new List<AbsentClaim> {
-              new AbsentClaim{ClaimName = ClaimTypes.StreetAddress, ClaimValue = Input.Address1 },
-                 new AbsentClaim{ClaimName = nameof(Input.Address2), ClaimValue = Input.Address2 },
-                 new AbsentClaim{ClaimName = nameof(Input.ZipCode),ClaimValue = Input.ZipCode },
-                new AbsentClaim{ClaimName = nameof(Input.IsSameAsAddress),ClaimValue = Input.IsSameAsAddress.ToString() },
-                 new AbsentClaim{ClaimName = nameof(Input.BillingAddress1),ClaimValue = Input.BillingAddress1 },
-                 new AbsentClaim{ClaimName = nameof(Input.BillingAddress2),ClaimValue = Input.BillingAddress2 },
-                 new AbsentClaim{ClaimName = nameof(Input.BillingZipCode), ClaimValue = Input.BillingZipCode }
-            };
-
-            var absentClaims = expectedClaims.Select(x => x.ClaimName).Except(userClaims.Select(x => x.Type));
-
-            if (!absentClaims.Any())
+            if (!string.IsNullOrWhiteSpace(Input.Address2))
             {
-                return RedirectToPage("/Shipping");
+                var isSuccess = await _userService.UpsertUserClaim(user, CustomClaims.Address2, Input.Address2);
+                if (!isSuccess)
+                {
+                    StatusMessage = "Unexpected error when trying to set Address2.";
+                    return RedirectToPage();
+                }
             }
 
-            var claims = new List<Claim>();
-
-            foreach (var claim in absentClaims)
+            if (!string.IsNullOrWhiteSpace(Input.ZipCode))
             {
-                var cName = expectedClaims.First(x => x.ClaimName == claim);
-                var c = new Claim(claim, cName.ClaimValue);
-                claims.Add(c);
+                var isSuccess = await _userService.UpsertUserClaim(user, CustomClaims.Zipcode, Input.ZipCode);
+                if (!isSuccess)
+                {
+                    StatusMessage = "Unexpected error when trying to set Zipcode.";
+                    return RedirectToPage();
+                }
             }
 
-            var addUserClaims = await _userManager.AddClaimsAsync(user, claims);
-
-            if (!addUserClaims.Succeeded)
+            var isSame = await _userService.UpsertUserClaim(user, CustomClaims.IsSameAsAddress, Input.IsSameAsAddress.ToString());
+            if (!isSame)
             {
-                StatusMessage = "Unexpected error when trying to save information. please contact support.";
+                StatusMessage = "Unable to select this option for same address";
                 return RedirectToPage();
             }
 
-            return RedirectToPage("/Shipping");
+            if (!string.IsNullOrWhiteSpace(Input.BillingAddress1))
+            {
+                var isSuccess = await _userService.UpsertUserClaim(user, CustomClaims.BillingAddress1, Input.BillingAddress1);
+                if (!isSuccess)
+                {
+                    StatusMessage = "Unable to replace Billing Address1.";
+                    return RedirectToPage();
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(Input.BillingAddress2))
+            {
+                var isSuccess = await _userService.UpsertUserClaim(user, CustomClaims.BillingAddress2, Input.BillingAddress2);
+                if (!isSuccess)
+                {
+                    StatusMessage = "Unable to replace Billing Address2.";
+                    return RedirectToPage();
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(Input.BillingZipCode)) return RedirectToPage("/Shipping");
+            {
+                var isSuccess = await _userService.UpsertUserClaim(user, CustomClaims.BillingZipCode, Input.BillingZipCode);
+                if (isSuccess) return RedirectToPage("/Shipping");
+                StatusMessage = "Unable to replace Billing Zip code.";
+                return RedirectToPage();
+            }
+
         }
 
         private string GetShoppingCartUserId()
@@ -243,22 +179,17 @@ namespace Slim.Pages.Pages
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber,
                 IsSameAsAddress = isSame,
-                ZipCode = userClaims.FirstOrDefault(x => x.Type == nameof(Input.ZipCode))?.Value ?? string.Empty,
-                Address1 = userClaims.FirstOrDefault(x => x.Type == ClaimTypes.StreetAddress)?.Value ?? string.Empty,
-                Address2 = userClaims.FirstOrDefault(x => x.Type == nameof(Input.Address2))?.Value ?? string.Empty,
+                Address1 = User.FindFirstValue(ClaimTypes.StreetAddress),
+                Address2 = User.FindFirstValue(CustomClaims.Address2),
+                ZipCode = User.FindFirstValue(CustomClaims.Zipcode),
 
-                BillingAddress1 = userClaims.FirstOrDefault(x => x.Type == nameof(Input.BillingAddress1))?.Value ?? string.Empty,
-                BillingAddress2 = userClaims.FirstOrDefault(x => x.Type == nameof(Input.BillingAddress2))?.Value ?? string.Empty,
-                BillingZipCode = userClaims.FirstOrDefault(x => x.Type == nameof(Input.BillingZipCode))?.Value ?? string.Empty,
+                BillingAddress1 = User.FindFirstValue(CustomClaims.BillingAddress1),
+                BillingAddress2 = User.FindFirstValue(CustomClaims.BillingAddress2),
+                BillingZipCode = User.FindFirstValue(CustomClaims.BillingZipCode),
 
 
             };
         }
-
-        public class AbsentClaim
-        {
-            public string ClaimName { get; set; }
-            public string ClaimValue { get; set; }
-        }
+        
     }
 }
