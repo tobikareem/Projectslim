@@ -1,5 +1,7 @@
-﻿@using Microsoft.CodeAnalysis
+﻿@inject Slim.Shared.Interfaces.Repo.IBaseStore<UserPageImage> _userPageImageRepo
 @using Slim.Core.Model
+@using Slim.Data.Entity
+@using Slim.Pages.Extensions
 @{
     if (ViewData.TryGetValue("ParentLayout", out var parentLayout))
     {
@@ -9,13 +11,25 @@
     {
         Layout = "/Areas/Identity/Pages/_Layout.cshtml";
     }
+
+    var imgPrimary = string.Empty;
+    var userImage = _userPageImageRepo.GetAll().FirstOrDefault(x => x.CreatedBy == User.Identity?.Name && x.ImageDescription == "Profile Image");
 }
 
 <!-- Dashboard header-->
 <div class="page-title-overlap bg-accent pt-4">
     <div class="container d-flex flex-wrap flex-sm-nowrap justify-content-center justify-content-sm-between align-items-center pt-2">
         <div class="d-flex align-items-center pb-3">
-            <div class="img-thumbnail rounded-circle position-relative flex-shrink-0" style="width: 6.375rem;"><img class="rounded-circle" src="~/img/home/hero-slider/logo.PNG" alt="Slim Studio"></div>
+            <div class="img-thumbnail rounded-circle position-relative flex-shrink-0" style="width: 6.375rem;">
+                @if (userImage != null)
+                {
+                    <img class="rounded-circle" src="@imgPrimary.GetImageSrc(userImage.UploadedImage)" alt="Slim Studio">
+                }
+                else
+                {
+                    <img class="rounded-circle" src="~/img/home/hero-slider/logo.PNG" alt="Slim Studio">
+                }
+            </div>
             <div class="ps-3">
                 @{
                     var userYear = User.Claims.FirstOrDefault(c => c.Type == ResourceRole.UserSignUpDate)?.Value?.Split("-")[0];

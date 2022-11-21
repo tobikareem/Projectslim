@@ -16,12 +16,12 @@ namespace Slim.Data.Context
         public SlimDbContext(DbContextOptions<SlimDbContext> options)
             : base(options)
         {
-            
+
         }
 
         public virtual DbSet<Image> Images { get; set; } = null!;
         public virtual DbSet<PageSection> PageSections { get; set; } = null!;
-        public virtual DbSet<ProductImage> ProductImages{ get; set; } = null!;
+        public virtual DbSet<ProductImage> ProductImages { get; set; } = null!;
         public virtual DbSet<PageSectionResource> PageSectionResources { get; set; } = null!;
         public virtual DbSet<RazorPage> RazorPages { get; set; } = null!;
         public virtual DbSet<RazorPageResourceActionMap> RazorPageResourceActionMaps { get; set; } = null!;
@@ -31,11 +31,12 @@ namespace Slim.Data.Context
         public virtual DbSet<Comment> Comments { get; set; }
         public virtual DbSet<Review> Reviews { get; set; }
         public virtual DbSet<ShoppingCart> ShoppingCarts { get; set; } = null!;
+        public virtual DbSet<UserPageImage> UserPageImages { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.EnableSensitiveDataLogging(true);
-            
+
             if (!optionsBuilder.IsConfigured)
             {
                 // dotnet ef migrations add InitialSchema -o Migrations -c FortuneDbContext
@@ -58,7 +59,7 @@ namespace Slim.Data.Context
                 entity.Property(e => e.CreatedBy);
                 entity.Property(e => e.ModifiedBy);
                 entity.Property(e => e.Enabled).IsRequired().HasDefaultValueSql("((1))");
-                
+
             });
 
             modelBuilder.Entity<Product>(entity =>
@@ -146,11 +147,11 @@ namespace Slim.Data.Context
             modelBuilder.Entity<ShoppingCart>(entity =>
             {
                 entity.ToTable("ShoppingCart", "slm");
-                
+
                 entity.Property(e => e.Id).IsRequired();
                 entity.Property(e => e.Quantity);
                 entity.Property(e => e.CartUserId);
-                
+
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
                 entity.Property(e => e.CreatedBy);
@@ -198,6 +199,20 @@ namespace Slim.Data.Context
                     .HasForeignKey(d => d.ProductId)
                     .OnDelete(DeleteBehavior.NoAction)
                     .HasConstraintName("FK_ProductImage_ProductProd");
+            });
+
+            modelBuilder.Entity<UserPageImage>(entity =>
+            {
+                entity.Property(e => e.ImageId).IsRequired();
+                entity.Property(e => e.UploadedImage).IsRequired();
+                entity.Property(e => e.ImageDescription);
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+                entity.Property(e => e.CreatedBy);
+                entity.Property(e => e.ModifiedBy);
+                entity.Property(e => e.Enabled).IsRequired().HasDefaultValueSql("((1))");
+
             });
 
             modelBuilder.Entity<PageSection>(entity =>
