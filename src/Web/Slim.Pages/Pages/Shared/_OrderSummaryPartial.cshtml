@@ -1,0 +1,67 @@
+﻿@using Slim.Data.Entity
+@using Slim.Pages.Extensions
+@using System.Globalization
+@inject Slim.Shared.Interfaces.Serv.ICartService _cartService;
+
+@model List<ShoppingCart>
+
+<aside class="col-lg-4 pt-4 pt-lg-0 ps-xl-5">
+    <div class="bg-white rounded-3 shadow-lg p-4 ms-lg-auto">
+        <div class="py-2 px-xl-2">
+            <div class="widget mb-3">
+                <h2 class="widget-title text-center">Order summary</h2>
+
+                @{
+                    foreach (var item in Model)
+                    {
+                        var product = item.Product;
+
+                        if (product == null)
+                        {
+                            continue;
+                        }
+                        var primary = string.Empty;
+                        var imgPrimary = product.Images.FirstOrDefault(x => x.IsPrimaryImage);
+
+                        var productPrice = _cartService.GetPriceForProduct(product.StandardPrice, product.SalePrice);
+
+                        <div class="d-flex align-items-center pb-2 border-bottom">
+                            <a class="d-block flex-shrink-0" asp-page="/ProductDetail" asp-route-id="@product.Id"><img src="@primary.GetImageSrc(imgPrimary?.UploadedImage)" width="64" alt="Product"></a>
+                            <div class="ps-2">
+                                <h6 class="widget-product-title"><a asp-page="/ProductDetail" asp-route-id="@product.Id">@product.ProductName</a></h6>
+
+                                @if (product.IsOnSale)
+                                {
+                                    <div class="widget-product-meta"><span class="text-accent me-2">$@productPrice.SalesWholePrice.<small>@productPrice.SalesPriceRoundUp</small></span><span class="text-muted">x @item.Quantity</span></div>
+                                }
+                                else
+                                {
+                                    <div class="widget-product-meta"><span class="text-accent me-2">$@productPrice.StandardWholePrice.<small>@productPrice.StandardPriceRoundUp</small></span><span class="text-muted">x @item.Quantity</span></div>
+                                }
+                            </div>
+                        </div>
+                    }
+                }
+
+            </div>
+            <ul class="list-unstyled fs-sm pb-2 border-bottom">
+                @{
+                    var price = _cartService.GetTotalCartPrice(User.Identity?.Name, string.Empty);
+                    var priceRoundUp = Convert.ToString(price, CultureInfo.CurrentCulture).Split('.')[1];
+                    var priceWholePrice = Convert.ToInt32(Math.Truncate(price));
+                }
+                <li class="d-flex justify-content-between align-items-center"><span class="me-2">Subtotal:</span><span class="text-end">$@priceWholePrice.<small>@priceRoundUp</small></span></li>
+                <li class="d-flex justify-content-between align-items-center"><span class="me-2">Shipping:</span><span class="text-end">—</span></li>
+                <li class="d-flex justify-content-between align-items-center"><span class="me-2">Taxes:</span><span class="text-end">$9.<small>50</small></span></li>
+                <li class="d-flex justify-content-between align-items-center"><span class="me-2">Discount:</span><span class="text-end">—</span></li>
+            </ul>
+            <h3 class="fw-normal text-center my-4">$@priceWholePrice.<small>@priceRoundUp</small></h3>
+
+            <div class="mb-3">
+                <input class="form-control" type="text" placeholder="Promo code" required>
+                <div class="invalid-feedback">Please provide promo code.</div>
+            </div>
+            <button class="btn btn-outline-primary d-block w-100" type="button">Apply promo code</button>
+        </div>
+    </div>
+</aside>

@@ -54,7 +54,7 @@
                             </a>
                             <div class="pt-2">
                                 <h3 class="product-title fs-base mb-2"><a asp-page="/ProductDetail" asp-route-id="@product.Id">@product.ProductName</a></h3>
-                                <div class="fs-sm"><span class="text-muted me-2">Size:</span>@product.Category.CategoryName</div>
+                                <div class="fs-sm"><span class="text-muted me-2">Category:</span>@product.Category.CategoryName</div>
                                 @if (product.IsOnSale)
                                 {
                                     <div class="fs-lg text-accent pt-2">$@productPrice.SalesWholePrice.<small>@productPrice.SalesPriceRoundUp</small></div>
@@ -201,7 +201,6 @@
             GetTotalCartItem(cartUrl);
 
             $('#quantitySelect').change(function () {
-                debugger;
                 // get the selected value
                 var quantity = $(this).val();
                 var selectedId = $('#cartItemId').val();

@@ -239,7 +239,7 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
                         image.IsPrimaryImage = true;
                         image.Enabled = true;
                         image.CreatedDate = DateTime.UtcNow;
-                        image.CreatedBy = "Test User";
+                        image.CreatedBy = User.Identity?.Name;
                     }
                     else
                     {
@@ -293,7 +293,7 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
                                 IsPrimaryImage = false,
                                 Enabled = true,
                                 CreatedDate = DateTime.UtcNow,
-                                CreatedBy = "Test User"
+                                CreatedBy = User.Identity?.Name
                             };
                             images.Add(image);
                         }
