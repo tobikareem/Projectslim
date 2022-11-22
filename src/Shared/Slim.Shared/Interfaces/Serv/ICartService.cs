@@ -26,6 +26,14 @@ public interface ICartService
     /// <param name="standardPrice"></param>
     /// <param name="salesPrice"></param>
     /// <returns></returns>
-    (int StandardWholePrice, string StandardPriceRoundUp, int SalesWholePrice, string SalesPriceRoundUp)
-        GetPriceForProduct(decimal standardPrice, decimal salesPrice);
+    (int StandardWholePrice, string StandardPriceRoundUp, int SalesWholePrice, string SalesPriceRoundUp) GetPriceForProduct(decimal standardPrice, decimal salesPrice);
+
+    /// <summary>
+    /// Get the Products in the cart
+    /// </summary>
+    /// <param name="products"></param>
+    /// <param name="loggedInUser"></param>
+    /// <param name="defaultSessionUser"></param>
+    /// <returns></returns>
+    List<Product> GetProductsWithInCartCheck(IEnumerable<Product> products, string loggedInUser, string defaultSessionUser);
 }

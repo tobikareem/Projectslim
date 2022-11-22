@@ -97,9 +97,18 @@ function OnAddItemToCart(productId, url, totalCartUrl) {
         success: function (data) {
             if (data > 0) {
                 SetCartIconData(data);
-
             }
-            
+
+            // hide the add to cart button and display a added to cart button
+            $('#add-to-cart-' + productId).prop('disabled', true);
+
+            // change the class of the button to btn btn-secondary
+            $('#add-to-cart-' + productId).removeClass('btn-primary');
+            $('#add-to-cart-' + productId).addClass('btn-secondary');
+
+            // add html to the button to display added to cart <i class="bi bi-bag-plus-fill fs-sm me-1"></i>
+            $('#add-to-cart-' + productId).html('<i class="bi bi-bag-plus-fill fs-sm me-1"></i> Added to cart');
+
             GetTotalCartItem(totalCartUrl);
         }
     });

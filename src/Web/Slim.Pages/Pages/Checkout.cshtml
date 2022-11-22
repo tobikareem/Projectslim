@@ -70,7 +70,7 @@
                         {
                             <img class="rounded-circle" src="~/img/home/hero-slider/logo.PNG" width="90" alt="Slim Studio">
                         }
-                        
+
                     </div>
                     <div class="ps-3">
                         <h3 class="fs-base mb-0">@User.Claims.Where(x => x.Type == ClaimTypes.Name).Skip(1).FirstOrDefault()?.Value</h3><span class="text-accent fs-sm">@User.Identity?.Name</span>
@@ -118,8 +118,8 @@
                         </div>
                     </div>
                 </div>
-                
-                <partial name="_AddressPagePartial" for="Input"/>
+
+                <partial name="_AddressPagePartial" for="Input" />
 
                 <!-- Navigation (desktop)-->
                 <div class="d-none d-lg-flex pt-4 mt-3">
@@ -130,8 +130,8 @@
         </section>
 
         <!-- Sidebar-->
-       <partial name="_OrderSummaryPartial" for="@Model.CartItems" />
-     
+        <partial name="_OrderSummaryPartial" for="@Model.CartItems" />
+
     </div>
 
     <!-- Navigation (mobile)-->
@@ -151,22 +151,26 @@
     <partial name="_ValidationScriptsPartial" />
     <script>
         $(document).ready(function () {
-            var priceUrl = '@Url.Page("Cart", "TotalCartPrice")';
-            var cartUrl = '@Url.Page("Cart", "TotalCartCount")';
-
-            GetTotalCartPrice(priceUrl);
-            GetTotalCartItem(cartUrl);
+            // check if checkbox is checked
+            if ($('#checkBilling').is(':checked')) {
+                // if checked, hide the address fields
+                $('#billing').hide();
+            }
 
             $("#checkBilling").change(function () {
-
-                var isChanged = $(this).val();
-
-                if (isChanged) {
+                debugger;
+                if (this.checked) {
                     $("#billing").hide();
                 } else {
                     $("#billing").show();
                 }
             });
+
+            var priceUrl = '@Url.Page("Cart", "TotalCartPrice")';
+            var cartUrl = '@Url.Page("Cart", "TotalCartCount")';
+
+            GetTotalCartPrice(priceUrl);
+            GetTotalCartItem(cartUrl);
         });
     </script>
 }
