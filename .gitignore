@@ -23,3 +23,7 @@
 /src/Web/Slim.Pages/Properties
 .DS_Store
 /src/Shared/Slim.Shared/bin/
+/src/Slim.Web.sln.DotSettings
+/src/Shared/Slim.Shared/bin/Debug/net6.0/Slim.Shared.deps.json
+/src/Shared/Slim.Shared/bin/Debug/net6.0/Slim.Shared.dll
+/src/Shared/Slim.Shared/bin/Debug/net6.0/Slim.Shared.pdb

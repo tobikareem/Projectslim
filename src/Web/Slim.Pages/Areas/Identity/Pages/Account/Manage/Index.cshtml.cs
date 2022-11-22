@@ -62,6 +62,7 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
 
             Input = new AddressModel
             {
+                Email = user.Email,
                 PhoneNumber = phoneNumber,
                 Address1 = User.FindFirstValue(ClaimTypes.StreetAddress),
                 Address2 = User.FindFirstValue(CustomClaims.Address2),
@@ -110,12 +111,12 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
-
-            //if (!ModelState.IsValid)
-            //{
-            //    await LoadAsync(user);
-            //    return Page();
-            //}
+            
+            if (!ModelState.IsValid)
+            {
+                await LoadAsync(user);
+                return Page();
+            }
 
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
             if (Input.PhoneNumber != phoneNumber)

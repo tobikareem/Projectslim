@@ -98,7 +98,6 @@ function OnAddItemToCart(productId, url, totalCartUrl) {
             if (data > 0) {
                 SetCartIconData(data);
             }
-
             // hide the add to cart button and display a added to cart button
             $('#add-to-cart-' + productId).prop('disabled', true);
 
