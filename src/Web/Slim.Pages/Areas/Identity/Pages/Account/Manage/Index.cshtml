@@ -44,6 +44,22 @@
 
     <script>
         $(document).ready(function () {
+            // check if checkbox is checked
+            if ($('#checkBilling').is(':checked')) {
+                // if checked, hide the address fields
+                $('#billing').hide();
+            }
+
+            $("#checkBilling").change(function () {
+                debugger;
+                if (this.checked) {
+                    $("#billing").hide();
+                } else {
+                    $("#billing").show();
+                }
+            });
+
+
             var priceUrl = '@Url.Page("Cart", "TotalCartPrice")';
             var cartUrl = '@Url.Page("Cart", "TotalCartCount")';
 

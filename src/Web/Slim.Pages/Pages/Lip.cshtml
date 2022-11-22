@@ -98,7 +98,15 @@
                                     </div>
                                 </div>
                                 <div class="d-flex mb-2">
-                                    <button class="btn btn-primary btn-sm" type="submit" onclick="OnAddItemToCart(@product.Id, '@Url.Page("Cart", "NewProductToCart")', '@Url.Page("Cart", "TotalCartCount")')"><i class="bi bi-cart-check-fill fs-sm me-1"></i>Add to Cart</button>
+                                    @if (product.IsProductInCart)
+                                    {
+                                        <button class="btn btn-secondary btn-sm d-block w-100 mb-2" type="button" disabled><i class="bi bi-bag-plus-fill fs-sm me-1"></i>Added to Cart</button>
+
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-primary btn-sm" type="submit" onclick="OnAddItemToCart(@product.Id, '@Url.Page("Cart", "NewProductToCart")', '@Url.Page("Cart", "TotalCartCount")')"><i class="bi bi-cart-check-fill fs-sm me-1"></i>Add to Cart</button>
+                                    }
                                 </div>
                             </div>
 

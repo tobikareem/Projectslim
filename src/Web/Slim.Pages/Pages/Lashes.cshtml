@@ -86,8 +86,16 @@
                                 </div>
                             </div>
                             <div class="card-body card-body-hidden">
-                                <button class="btn btn-primary btn-sm d-block w-100 mb-2" type="submit" onclick="OnAddItemToCart(@product.Id, '@Url.Page("Cart", "NewProductToCart")', '@Url.Page("Cart", "TotalCartCount")')"><i class="bi bi-cart-check-fill fs-sm me-1"></i>Add to Cart</button>
-                                <div class="text-center"><a class="nav-link-style fs-ms" href="#quick-view" data-bs-toggle="modal"><i class="bi bi-eye-fill align-middle me-1"></i>Quick view</a></div>
+                                
+                                @if (product.IsProductInCart)
+                                {
+                                    <button class="btn btn-secondary btn-sm d-block w-100 mb-2" type="button" disabled><i class="bi bi-bag-plus-fill fs-sm me-1"></i>Added to Cart</button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-primary btn-sm d-block w-100 mb-2" type="submit" onclick="OnAddItemToCart(@product.Id, '@Url.Page("Cart", "NewProductToCart")', '@Url.Page("Cart", "TotalCartCount")')"><i class="bi bi-cart-check-fill fs-sm me-1"></i>Add to Cart</button>
+                                }
+
 
                             </div>
                         </div>

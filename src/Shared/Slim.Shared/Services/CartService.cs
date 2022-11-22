@@ -61,5 +61,18 @@ namespace Slim.Shared.Services
 
             return (standardPriceWholePrice, standardPriceRoundUp, salesPriceWholePrice, salesPriceRoundUp);
         }
+
+        public List<Product> GetProductsWithInCartCheck(IEnumerable<Product> products, string loggedInUser, string defaultSessionUser)
+        {
+            var cartItems = GetCartItemsForUser(loggedInUser, defaultSessionUser);
+            var productIds = cartItems.Select(x => x.ProductId).ToList();
+            var productsWithInCartCheck = products.Select(x =>
+            {
+                x.IsProductInCart = productIds.Contains(x.Id);
+                return x;
+            }).ToList();
+
+            return productsWithInCartCheck;
+        }
     }
 }

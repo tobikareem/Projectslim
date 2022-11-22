@@ -14,8 +14,7 @@ namespace Slim.Pages.Pages
         private readonly IPageSection _pageSectionsBaseStore;
         private readonly IBaseStore<RazorPage> _razorPagesBaseStore;
         private readonly IBaseStore<Product> _productBaseStore;
-        private readonly IUserService _userService;
-        private readonly int _pageId;
+        private readonly ICartService _cartService;
 
         private IEnumerable<RazorPage> _razorPages;
              
@@ -23,36 +22,29 @@ namespace Slim.Pages.Pages
         public List<Product> Hair { get; set; } = new();
         public List<Product> LipGloss { get; set; } = new();
 
-
-        public IndexModel(ILogger<IndexModel> logger, ICacheService cacheService, IPageSection pageSectionsBaseStore, IBaseStore<RazorPage> razorPagesBaseStore, IBaseStore<Product> productBaseStore, IUserService userService)
+        public IndexModel(ILogger<IndexModel> logger, ICacheService cacheService, IPageSection pageSectionsBaseStore, IBaseStore<RazorPage> razorPagesBaseStore, IBaseStore<Product> productBaseStore, ICartService cartService)
         {
             _logger = logger;
             _cacheService = cacheService;
             _pageSectionsBaseStore = pageSectionsBaseStore;
             _razorPagesBaseStore = razorPagesBaseStore;
             _productBaseStore = productBaseStore;
-            _userService = userService;
-
-             _razorPages = _cacheService.GetOrCreate(CacheKey.GetRazorPages, _razorPagesBaseStore.GetAll);
-            
-            _pageId = _razorPages
-                         .FirstOrDefault(x =>
-                             string.Compare(x.PageName, "Home", StringComparison.OrdinalIgnoreCase) == 0)?.Id ??
-                     0;
+            _razorPages = _cacheService.GetOrCreate(CacheKey.GetRazorPages, _razorPagesBaseStore.GetAll);
+            _cartService = cartService;
         }
 
         [BindProperty(SupportsGet = true)] public List<PageSection> PageSections { get; set; } = new();
-
+        public Dictionary<int, IGrouping<int, ShoppingCart>> ShoppingCart = new();
+             
         public void OnGet()
         {
             PageSections = _cacheService.GetOrCreate(CacheKey.GetPageSections, _pageSectionsBaseStore.GetAll).ToList();
 
-            var products = GetAllProducts();
+            var products = _cartService.GetProductsWithInCartCheck(GetAllProducts(), User.Identity?.Name ?? string.Empty, GetCartUserId());
 
             var lashesRazorPageId = _razorPages.FirstOrDefault(x => x.PageName.ToLowerInvariant() == "lashes")?.Id ?? 1;
             var hairRazorPageId = _razorPages.FirstOrDefault(x => x.PageName.ToLowerInvariant() == "hair")?.Id ?? 1;
             var lipRazorPageId = _razorPages.FirstOrDefault(x => x.PageName.ToLowerInvariant() == "lip gloss")?.Id ?? 1;
-
             Lashes = products.Where(x => x.RazorPageId == lashesRazorPageId).Take(8).ToList();
             Hair = products.Where(x => x.RazorPageId == hairRazorPageId).ToList();
             LipGloss = products.Where(x => x.RazorPageId == lipRazorPageId).Take(12).ToList();
@@ -61,6 +53,30 @@ namespace Slim.Pages.Pages
 
         }
 
+        private string GetCartUserId()
+        {
+            var hasSession = HttpContext.Session.GetString(SlmConstant.SessionKeyName);
+            if (string.IsNullOrWhiteSpace(hasSession))
+            {
+                if (!string.IsNullOrWhiteSpace(HttpContext.User.Identity?.Name))
+                {
+                    HttpContext.Session.SetString(SlmConstant.SessionKeyName, HttpContext.User.Identity.Name);
+                }
+                else
+                {
+                    var tempCartId = Guid.NewGuid();
+                    HttpContext.Session.SetString(SlmConstant.SessionKeyName, tempCartId.ToString());
+                }
+            }
+
+            var sessionName = HttpContext.Session.GetString(SlmConstant.SessionKeyName);
+
+            return string.IsNullOrEmpty(sessionName) ? string.Empty : sessionName;
+        }
+
+
+
         private List<Product> GetAllProducts() =>_cacheService.GetOrCreate(CacheKey.GetProducts, _productBaseStore.GetAll).ToList();
+        
     }
 }

@@ -1,6 +1,5 @@
 ﻿using Slim.Data.Model;
-using System.ComponentModel.DataAnnotations;
-using System.Xml.Linq;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Slim.Data.Entity
 {
@@ -27,7 +26,7 @@ namespace Slim.Data.Entity
         public bool IsTrending { get; set; }
         public int ProductQuantity { get; set; }
         public int? CategoryId { get; set; }
-
+        [NotMapped] public bool IsProductInCart { get; set; }
         public ICollection<Image> Images { get; set; }
         public ICollection<ProductImage> ProductImages { get; set; }
         public ICollection<Comment> Comments { get; set; }
