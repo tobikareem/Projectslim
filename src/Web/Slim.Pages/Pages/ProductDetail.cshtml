@@ -283,7 +283,7 @@
                     </div>
                 </div>
                 <hr class="mt-4 mb-3">
-                <div class="row py-4">
+                <div class="row py-4" id="reviewLists">
                     <!-- Reviews list-->
                     <div class="col-md-7">
                         <div class="d-flex justify-content-end pb-4">
@@ -302,14 +302,24 @@
                         @{
                             var reviews = Model.Product.Reviews.ToList();
 
-                            foreach (var review in reviews)
+                            foreach (var review in reviews.OrderByDescending(x => x.CreatedDate))
                             {
                                 <div class="product-review pb-4 mb-4 border-bottom">
                                     <div class="d-flex mb-3">
                                         <div class="d-flex align-items-center me-4 pe-2">
-                                            <img class="rounded-circle" src="~/img/shop/single/gallery/02.jpg" width="50" alt="@review.FullName">
+                                            @if (Model.ProfileImage is { Length: > 0 })
+                                            {
+                                                var imgPrimary = string.Empty;
+                                                <img class="rounded-circle" src="@imgPrimary.GetImageSrc(Model.ProfileImage)" width="50" alt="@review.FullName">
+                                            }
+                                            else
+                                            {
+                                                <img class="rounded-circle" src="#" width="50" alt="@review.FullName">
+                                            }
+                                            
                                             <div class="ps-3">
-                                                <h6 class="fs-sm mb-0">@review.FullName</h6><span class="fs-ms text-muted">@review.CreatedDate.ToShortDateString()</span>
+                                                <h6 class="fs-sm mb-0">@review.FullName</h6><span class="fs-ms text-muted">@review.CreatedDate.ToShortDateString()</span> 
+                                                
                                             </div>
                                         </div>
                                         <div>
@@ -317,10 +327,21 @@
                                                 @{
                                                     var rating = review.Rating;
                                                     var enumerate = Enumerable.Range(0, rating);
-
+                                                    var count = 0;
                                                     foreach (var _ in enumerate)
                                                     {
                                                         <i class="star-rating-icon bi bi-star-fill active"></i>
+                                                        count++;
+                                                    }
+
+                                                    if (count < 5)
+                                                    {
+                                                        var emptyStar = 5 - count;
+                                                        var emptyStarEnum = Enumerable.Range(0, emptyStar);
+                                                        foreach (var _ in emptyStarEnum)
+                                                        {
+                                                            <i class="star-rating-icon bi bi-star-fill"></i>
+                                                        }
                                                     }
                                                 }
                                             </div>
@@ -349,7 +370,8 @@
                     <div class="col-md-5 mt-2 pt-4 mt-md-0 pt-md-0">
                         <div class="bg-secondary py-grid-gutter px-grid-gutter rounded-3">
                             <h3 class="h4 pb-2">Write a review</h3>
-                            <form class="needs-validation" method="post" asp-page-handler="UserReviewSubmit">
+                            <partial name="Shared/_StatusMessage" for="StatusMessage"/>
+                            <form class="needs-validation" method="post" asp-page-handler="SubmitUserReview" id="reviewForm">
                                 <div class="mb-3">
                                     <label class="form-label" asp-for="Review.FullName"></label>
                                     <input class="form-control" asp-for="Review.FullName">
@@ -398,7 +420,7 @@
                     <div class="col-lg-8">
 
                         @{
-                            foreach (var productComment in Model.Product.Comments)
+                            foreach (var productComment in Model.Product.Comments.OrderByDescending(x => x.CreatedDate))
                             {
                                 <div class="d-flex align-items-start py-4 border-bottom">
 
@@ -437,7 +459,7 @@
                                     }
                                     <form class="needs-validation w-100 ms-3" method="post" asp-page-handler="UserCommentSubmit">
                                         <div class="mb-3">
-                                            <textarea class="form-control" rows="4" placeholder="Write comment..." asp-for="UserComment.UserComment"></textarea>
+                                            <textarea class="form-control" rows="4" placeholder="Write comment..." asp-for="UserComment"></textarea>
                                             <div class="invalid-feedback">Please write your comment.</div>
                                         </div>
                                         <button class="btn btn-primary btn-sm" type="submit">Post comment</button>

@@ -256,7 +256,7 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
                     var index = fileName.Value.LastIndexOf(".", StringComparison.Ordinal);
                     var fileExtension = fileName.Value[(index + 1)..];
 
-                    if (fileExtension.ToLowerInvariant() is "jpg" or "png" or "jpeg")
+                    if (fileExtension.ToLowerInvariant() is "jpg" or "png" or "jpeg" or "heic")
                     {
                         image.ImageId = Guid.NewGuid();
                         image.UploadedImage = ms.ToArray();
