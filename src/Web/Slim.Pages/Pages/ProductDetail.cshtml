@@ -20,10 +20,10 @@
     }
 
     var fiveStarPercent = decimal.Divide(fiveStar, total) * 100;
-    var fourStarPercent = decimal.Divide(fourStar, total)  * 100;
+    var fourStarPercent = decimal.Divide(fourStar, total) * 100;
     var threeStarPercent = decimal.Divide(three, total) * 100;
     var twoStarPercent = decimal.Divide(twoStar, total) * 100;
-    var oneStarPercent = decimal.Divide(oneStar, total)  * 100;
+    var oneStarPercent = decimal.Divide(oneStar, total) * 100;
     var average = Model.Product.Reviews.Count > 0 ? Model.Product.Reviews.Average(r => r.Rating) : 0;
     var percentage = Math.Round((average / 5 * 100), 1);
 
@@ -102,7 +102,7 @@
                                             <label class="form-check-label fw-medium text-dark" for="license-std">Sales Price</label>
                                         </div>
                                         <h5 class="mb-0 text-accent fw-normal">$@price.SalesWholePrice.<small>@price.SalesPriceRoundUp</small></h5>
-                                       
+
                                     </div>
                                     <div class="accordion-collapse collapse show" id="standard-license" data-bs-parent="#licenses">
                                         <div class="accordion-body py-0 pb-2">
@@ -150,7 +150,7 @@
                             <div class="bg-secondary rounded p-3 mb-2"><i class="bi bi-download h5 text-muted align-middle mb-0 mt-n1 me-2"></i><span class="d-inline-block h6 mb-0 me-1">715</span><span class="fs-sm">Sales</span></div>
                             <div class="bg-secondary rounded p-3 mb-4">
                                 <div class="star-rating">
-                                    
+
                                     @{
                                         var enumerates1 = Enumerable.Range(0, (int)average);
 
@@ -216,7 +216,7 @@
                     <div class="col-lg-4 col-md-5">
                         <h3 class="h4 mb-4">@Model.Product.Reviews.Count Reviews</h3>
                         @{
-                            
+
                         }
                         <div class="star-rating me-2">
 
@@ -401,22 +401,22 @@
                             foreach (var productComment in Model.Product.Comments)
                             {
                                 <div class="d-flex align-items-start py-4 border-bottom">
-                                    <img class="rounded-circle" src="~/img/home/marketplace-hero.jpg" width="50" alt="@productComment.FullName">
+
+                                    @if (Model.ProfileImage is { Length: > 0 })
+                                    {
+                                        var imgPrimary = string.Empty;
+                                        <img class="rounded-circle" src="@imgPrimary.GetImageSrc(Model.ProfileImage)" width="50" alt="@productComment.FullName">
+                                    }
+                                    else
+                                    {
+                                        <img class="rounded-circle" src="~/img/home/marketplace-hero.jpg" width="50" alt="@productComment.FullName">
+                                    }
                                     <div class="ps-3">
                                         <div class="d-flex justify-content-between align-items-center mb-2">
-                                            <h6 class="fs-md mb-0">@productComment.FullName</h6><a class="nav-link-style fs-sm fw-medium" href="#"><i class="bi bi-reply me-2"></i>Reply</a>
+                                            <h6 class="fs-md mb-0">@productComment.FullName</h6>
                                         </div>
                                         <p class="fs-md mb-1">@productComment.UserComment</p><span class="fs-ms text-muted"><i class="bi bi-time align-middle me-2"></i>@productComment.CreatedDate.ToShortDateString()</span>
-                                        <!-- comment reply-->
-                                      <!--  <div class="d-flex align-items-start border-top pt-4 mt-4">
-                                            <img class="rounded-circle" src="img/testimonials/01.jpg" width="50" alt="Sara Palson">
-                                            <div class="ps-3">
-                                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                                    <h6 class="fs-md mb-0">Sara Palson</h6>
-                                                </div>
-                                                <p class="fs-md mb-1">Egestas sed sed risus pretium quam vulputate dignissim. A diam sollicitudin tempor id eu nisl. Ut porttitor leo a diam. Bibendum at varius vel pharetra vel turpis nunc.</p><span class="fs-ms text-muted"><i class="bi bi-time align-middle me-2"></i>Sep 13, 2019</span>
-                                            </div>
-                                          </div>  -->
+                                       
                                     </div>
                                 </div>
                             }
@@ -425,7 +425,16 @@
                         <div class="card border-0 shadow my-2">
                             <div class="card-body">
                                 <div class="d-flex align-items-start">
-                                    <img class="rounded-circle border p-2" src="img/marketplace/account/avatar-sm.png" width="50" alt="Createx Studio">
+
+                                    @if (Model.ProfileImage is { Length: > 0 })
+                                    {
+                                        var imgPrimary = string.Empty;
+                                        <img class="rounded-circle border p-2" src="@imgPrimary.GetImageSrc(Model.ProfileImage)" width="50" alt="Createx Studio">
+                                    }
+                                    else
+                                    {
+                                        <img class="rounded-circle border p-2" src="img/marketplace/account/avatar-sm.png" width="50" alt="Createx Studio">
+                                    }
                                     <form class="needs-validation w-100 ms-3" method="post" asp-page-handler="UserCommentSubmit">
                                         <div class="mb-3">
                                             <textarea class="form-control" rows="4" placeholder="Write comment..." asp-for="UserComment.UserComment"></textarea>
@@ -445,7 +454,7 @@
 </div>
 
 @section Scripts
-{
+    {
     <script>
         $(document).ready(function () {
             var priceUrl = '@Url.Page("Cart", "TotalCartPrice")';

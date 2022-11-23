@@ -133,12 +133,6 @@ namespace Slim.Pages.Pages
         
         private string GetShoppingCartUserId()
         {
-            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-            if (HttpContext == null)
-            {
-                return string.Empty;
-            }
-            
             var hasSession = HttpContext.Session.GetString(SlmConstant.SessionKeyName);
             if (string.IsNullOrWhiteSpace(hasSession))
             {
@@ -176,6 +170,7 @@ namespace Slim.Pages.Pages
 
         public JsonResult OnGetTotalCartCount()
         {
+            ShoppingCartUserId = GetShoppingCartUserId();
             CartItems  = _cartService.GetCartItemsForUser(User.Identity?.Name ?? string.Empty, ShoppingCartUserId); 
             var totalItem = CartItems.Distinct().Count();
             return new JsonResult(totalItem);
@@ -183,6 +178,7 @@ namespace Slim.Pages.Pages
 
         public JsonResult OnGetTotalCartPrice()
         {
+            ShoppingCartUserId = GetShoppingCartUserId();
             CartItems  = _cartService.GetCartItemsForUser(User.Identity?.Name ?? string.Empty, ShoppingCartUserId);
             var totalPrice = GetTotalCartPrice();
             return new JsonResult(totalPrice);

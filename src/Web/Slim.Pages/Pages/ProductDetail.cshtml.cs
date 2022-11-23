@@ -1,7 +1,12 @@
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
+using System.Xml.Linq;
+
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+
 using Slim.Core.Model;
 using Slim.Data.Entity;
 using Slim.Shared.Interfaces.Repo;
@@ -14,9 +19,12 @@ namespace Slim.Pages.Pages
         private readonly IBaseStore<Product> _productBaseStore;
         private readonly IBaseStore<Review> _reviewBaseStore;
         private readonly IBaseStore<Comment> _commentBaseStore;
+        private readonly UserManager<IdentityUser> _userManager;
+        private readonly IBaseCart<ShoppingCart> _baseCart;
+        private readonly IBaseStore<UserPageImage> _userPageImage;
         private ILogger<ProductDetailModel> _logger;
         private ICacheService _cacheService;
-        private readonly IBaseCart<ShoppingCart> _baseCart;
+        private readonly ICartService _cartService;
         public List<ImageData> ImagesToShow { get; set; }
         private string _cartUserId = string.Empty;
 
@@ -24,13 +32,19 @@ namespace Slim.Pages.Pages
             IBaseStore<Product> productBaseStore,
             ILogger<ProductDetailModel> logger,
             IBaseCart<ShoppingCart> baseCart,
-            ICacheService cacheService, IBaseStore<Review> reviewBaseStore, IBaseStore<Comment> commentBaseStore)
+            ICacheService cacheService, IBaseStore<Review> reviewBaseStore,
+            IBaseStore<Comment> commentBaseStore, UserManager<IdentityUser> userManager,
+            ICartService cartService,
+            IBaseStore<UserPageImage> userPageImage)
         {
             _productBaseStore = productBaseStore;
             _logger = logger;
             _cacheService = cacheService;
             _reviewBaseStore = reviewBaseStore;
             _commentBaseStore = commentBaseStore;
+            _userManager = userManager;
+            _cartService = cartService;
+            _userPageImage = userPageImage;
             _baseCart = baseCart;
 
             ImagesToShow = new List<ImageData>();
@@ -41,12 +55,14 @@ namespace Slim.Pages.Pages
         [BindProperty] public ReviewModel Review { get; set; } = new();
         [BindProperty] public UserCommentModel UserComment { get; set; } = new();
 
+        public byte[]? ProfileImage { get; set; }
 
-        public Task<IActionResult> OnGetAsync(int? id)
+
+        public async Task<IActionResult> OnGetAsync(int? id)
         {
             if (id == null)
             {
-                return Task.FromResult<IActionResult>(NotFound());
+                return NotFound();
             }
 
             var product =
@@ -57,11 +73,29 @@ namespace Slim.Pages.Pages
             _cartUserId = GetCartUserId();
 
             var cartItem = _baseCart.GetCartUserItem(_cartUserId, id.GetValueOrDefault());
-            product.IsProductInCart = !string.IsNullOrWhiteSpace(cartItem.Id);
-            
+            product.IsProductInCart = false;
+
             Product = product;
 
-            return Task.FromResult<IActionResult>(Page());
+            if (User.Identity?.Name != null)
+            {
+                var userImages = _cacheService.GetOrCreate(CacheKey.UserProfileImage, () => _userPageImage.GetAll()).ToList();
+
+                if (userImages.Any())
+                {
+                    ProfileImage = userImages.FirstOrDefault(x => x.CreatedBy == User.Identity?.Name && x.Enabled == true)?.UploadedImage;
+                }
+            }
+
+            var isUserRedirected = _cacheService.GetItem<Comment>(CacheKey.AddThisUsersComment);
+
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+            if (isUserRedirected == null)
+            {
+                return Page();
+            }
+
+            return await OnPostUserCommentSubmit();
         }
 
         public IActionResult OnPostUserReviewSubmit()
@@ -85,22 +119,38 @@ namespace Slim.Pages.Pages
             _reviewBaseStore.AddEntity(userReview, CacheKey.GetReviews, true);
             return RedirectToPage("/ProductDetail", new { id = Product.Id });
         }
-        
-        public IActionResult OnPostUserCommentSubmit()
-        {
-            // TODO: Model Validation
 
+        public async Task<IActionResult> OnPostUserCommentSubmit()
+        {
             var userComment = new Comment
             {
-                CreatedBy = "Test User", // Authorize user
+                CreatedBy = "Test User",
                 CreatedDate = DateTime.UtcNow,
-                FullName = UserComment.FullName,
-                Email = UserComment.Email,
                 UserComment = UserComment.UserComment,
                 ProductId = Product.Id
             };
 
+            if (string.IsNullOrWhiteSpace(User.Identity?.Name))
+            {
+                _cacheService.Add(CacheKey.AddThisUsersComment, userComment, 10);
+                return RedirectToPage("/Account/Login", new { area = "Identity", ReturnUrl = $"/ProductDetail/{Product.Id}" });
+            }
+
+            var isUserRedirected = _cacheService.GetItem<Comment>(CacheKey.AddThisUsersComment);
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+            if (isUserRedirected != null)
+            {
+                userComment = _cacheService.GetItem<Comment>(CacheKey.AddThisUsersComment);
+            }
+
+            var user = await _userManager.GetUserAsync(User);
+            var firstName = User.Claims.Where(x => x.Type == ClaimTypes.Name).Skip(1).FirstOrDefault()?.Value;
+            userComment.CreatedBy = User.Identity.Name;
+            userComment.FullName = $"{firstName} {User.FindFirstValue(ClaimTypes.Surname)}";
+            userComment.Email = user.Email;
+
             _commentBaseStore.AddEntity(userComment, CacheKey.GetComments, true);
+            _cacheService.Remove(CacheKey.AddThisUsersComment);
 
             return Page();
         }
