@@ -157,4 +157,30 @@ public class CartRepository : IBaseCart<ShoppingCart>
             }
         }
     }
+
+    public List<ShoppingCart> GetAllCartItemsByUserId(string cartUserId)
+    {
+        return _context.ShoppingCarts.Where(x => x.CartUserId == cartUserId).ToList();
+    }
+
+    public void DeleteAllCartItems(List<ShoppingCart> cartItems, CacheKey cacheKey = CacheKey.None, bool hasCache = false)
+    {
+        try
+        {
+            _context.ShoppingCarts.RemoveRange(cartItems);
+            _context.SaveChanges(true);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("Exception occurred trying to delete all cart items {message}", ex.Message);
+        }
+        finally
+        {
+            if (hasCache)
+            {
+                _cacheService.Remove(cacheKey);
+            }
+        }
+        
+    }
 }

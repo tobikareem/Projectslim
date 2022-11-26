@@ -58,9 +58,9 @@ namespace Slim.Pages.Pages
                 {
                     Quantity = 1,
                     CreatedDate = DateTime.UtcNow,
-                    CreatedBy = ShoppingCartUserId,
+                    CreatedBy = User.Identity?.Name ?? ShoppingCartUserId,
                     Product = _productStore.GetEntity(id),
-                    CartUserId = ShoppingCartUserId
+                    CartUserId = User.Identity?.Name ?? ShoppingCartUserId
                 };
 
                 _shoppingCartBaseStore.AddEntity(cartItem, CacheKey.GetShoppingCartItem, true);
@@ -86,6 +86,7 @@ namespace Slim.Pages.Pages
 
         public JsonResult OnGetUpdateShoppingCart(string cartItemId, int quantity)
         {
+            ShoppingCartUserId = GetShoppingCartUserId();
             var itemsFromCache = _cartService.GetCartItemsForUser(User.Identity?.Name ?? string.Empty, ShoppingCartUserId);
 
             // get all items where quantity has changed
@@ -99,6 +100,7 @@ namespace Slim.Pages.Pages
 
             changedItemFromCache.Quantity = quantity;
             changedItemFromCache.ModifiedDate = DateTime.UtcNow;
+            changedItemFromCache.ModifiedBy = ShoppingCartUserId;
             _shoppingCartBaseStore.UpdateEntity(changedItemFromCache, CacheKey.GetShoppingCartItem, true);
 
             CartItems  = _cartService.GetCartItemsForUser(User.Identity?.Name ?? string.Empty, ShoppingCartUserId);

@@ -13,6 +13,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Slim.Core.Model;
+using Slim.Data.Entity;
+using Slim.Shared.Interfaces.Repo;
 
 namespace Slim.Pages.Areas.Identity.Pages.Account
 {
@@ -24,13 +26,15 @@ namespace Slim.Pages.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<IdentityUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly IBaseCart<ShoppingCart> _shoppingCart;
 
         public RegisterModel(
             UserManager<IdentityUser> userManager,
             IUserStore<IdentityUser> userStore,
             SignInManager<IdentityUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            IBaseCart<ShoppingCart> shoppingCart)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -38,6 +42,7 @@ namespace Slim.Pages.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _shoppingCart = shoppingCart;
         }
 
         /// <summary>
@@ -142,6 +147,25 @@ namespace Slim.Pages.Areas.Identity.Pages.Account
             {
                 _logger.LogInformation("User created a new account with password.");
 
+                var defaultSessionId = GetUserDefaultSessionName();
+                if (!string.IsNullOrWhiteSpace(defaultSessionId))
+                {
+                    var cartItems = _shoppingCart.GetAllCartItemsByUserId(defaultSessionId);
+
+                    if (cartItems != null && cartItems.Any())
+                    {
+                        foreach (var cartItem in cartItems)
+                        {
+                            cartItem.CreatedBy = Input.Email;
+                            cartItem.CartUserId = Input.Email;
+                            cartItem.ModifiedDate = DateTime.UtcNow;
+                            cartItem.ModifiedBy = Input.Email;
+                        }
+
+                        _shoppingCart.UpdateCartItems(cartItems, CacheKey.GetShoppingCartItem, true);
+                    }
+                }
+
                 var userId = await _userManager.GetUserIdAsync(user);
                 var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                 code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
@@ -183,6 +207,18 @@ namespace Slim.Pages.Areas.Identity.Pages.Account
                     $"Ensure that '{nameof(IdentityUser)}' is not an abstract class and has a parameterless constructor, or alternatively " +
                     $"override the register page in /Areas/Identity/Pages/Account/Register.cshtml");
             }
+        }
+
+        private string GetUserDefaultSessionName()
+        {
+            var hasSession = HttpContext.Session.GetString(SlmConstant.SessionKeyName);
+            if (string.IsNullOrWhiteSpace(hasSession))
+            {
+                return string.Empty;
+            }
+
+            var sessionName = HttpContext.Session.GetString(SlmConstant.SessionKeyName);
+            return string.IsNullOrEmpty(sessionName) ? string.Empty : sessionName;
         }
 
         private IUserEmailStore<IdentityUser> GetEmailStore()

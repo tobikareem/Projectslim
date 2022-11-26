@@ -22,8 +22,9 @@
                                 <div class="input-group-text"><label class="sr-only" asp-for="Input.FirstName"><i class="bi bi-person-circle text-muted mt-n1 me-2"></i></label></div>
                             </div>
                             <input type="text" class="form-control" asp-for="Input.FirstName" placeholder="First name" autocomplete="username" aria-required="true">
-                            <span asp-validation-for="Input.FirstName" class="text-danger"></span>
+ 
                         </div>
+                        <span asp-validation-for="Input.FirstName" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3 pb-2">
@@ -32,8 +33,9 @@
                                 <div class="input-group-text"><label class="sr-only" asp-for="Input.LastName"><i class="bi bi-person-circle text-muted mt-n1 me-2"></i></label></div>
                             </div>
                             <input type="text" class="form-control" asp-for="Input.LastName" placeholder="Last name" autocomplete="username" aria-required="true">
-                            <span asp-validation-for="Input.LastName" class="text-danger"></span>
                         </div>
+                        <span asp-validation-for="Input.LastName" class="text-danger"></span>
+
                     </div>
 
                     <div class="mb-3 pb-2">
@@ -42,8 +44,9 @@
                                 <div class="input-group-text"><label class="sr-only" asp-for="Input.Email"><i class="bi bi-envelope text-muted mt-n1 me-2"></i></label></div>
                             </div>
                             <input type="text" class="form-control" asp-for="Input.Email" placeholder="Email" autocomplete="username" aria-required="true">
-                            <span asp-validation-for="Input.Email" class="text-danger"></span>
                         </div>
+                        <span asp-validation-for="Input.Email" class="text-danger"></span>
+
                     </div>
 
                     <div class="mb-3 pb-2">
@@ -52,8 +55,9 @@
                                 <div class="input-group-text"><label class="sr-only" asp-for="Input.Password"><i class="bi bi-binoculars-fill text-muted mt-n1 me-2"></i></label></div>
                             </div>
                             <input class="form-control" asp-for="Input.Password" placeholder="Password" autocomplete="new-password" aria-required="true">
-                            <span asp-validation-for="Input.Password" class="text-danger"></span>
                         </div>
+                        <span asp-validation-for="Input.Password" class="text-danger"></span>
+
                     </div>
 
                     <div class="mb-3 pb-2">
@@ -62,8 +66,9 @@
                                 <div class="input-group-text"><label class="sr-only" asp-for="Input.ConfirmPassword"><i class="bi bi-binoculars-fill text-muted mt-n1 me-2"></i></label></div>
                             </div>
                             <input class="form-control" asp-for="Input.ConfirmPassword" placeholder="Confirm Password" autocomplete="new-password" aria-required="true">
-                            <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
                         </div>
+                        <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+
                     </div>
                     <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary mb-3 pb-2">Register</button>
                 </form>

@@ -30,4 +30,6 @@ public interface IBaseCart<out T>: IBaseStore<ShoppingCart>
 {
     T GetCartUserItem(string cartUserId, int productId, CacheKey cacheKey = CacheKey.None, bool hasCache = false);
     void UpdateCartItems(List<ShoppingCart> cartItems, CacheKey cacheKey = CacheKey.None, bool hasCache = false);
+    List<ShoppingCart> GetAllCartItemsByUserId(string cartUserId);
+    void DeleteAllCartItems(List<ShoppingCart> cartItems, CacheKey cacheKey = CacheKey.None, bool hasCache = false);
 }

@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Slim.Core.Model;
 using Slim.Data.Entity;
 using Slim.Shared.Interfaces.Serv;
+using Slim.Shared.Services;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Xml.Linq;
@@ -14,29 +16,51 @@ namespace Slim.Pages.Pages
         private readonly ICartService _cartService;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly ILogger<ReviewModel> _logger;
+        private readonly IUserService _userService;
         private string ShoppingCartUserId { get; set; }
 
-        public ReviewModel(ICartService cartService, UserManager<IdentityUser> userManager, ILogger<ReviewModel> logger)
+        public ReviewModel(ICartService cartService, UserManager<IdentityUser> userManager, ILogger<ReviewModel> logger, IUserService userService)
         {
             _cartService = cartService;
             _userManager = userManager;
             _logger = logger;
 
             ShoppingCartUserId = string.Empty;
+            _userService=userService;
         }
         public List<ShoppingCart> CartItems { get; set; } = new();
         public decimal TotalCartPrice { get; set; }
 
         public InputModel Input { get; set; } = new();
 
-        public async Task OnGet()
+        public async Task<IActionResult> OnGet()
         {
             var loggedInUser = User.Identity?.Name ?? string.Empty;
             ShoppingCartUserId = GetShoppingCartUserId();
             CartItems = _cartService.GetCartItemsForUser(loggedInUser, ShoppingCartUserId);
             TotalCartPrice = _cartService.GetTotalCartPrice(loggedInUser, ShoppingCartUserId);
 
-            await LoadUserInformationAsync();
+
+            var userInfo = await _userService.LoadUserAddressInformationAsync(User);
+
+            if (!userInfo.nullOrEmptyProperties.Any())
+            {
+                return Page();
+            }
+
+            var essentials = SlmConstant.EssentialAddressModel;
+
+            if (!userInfo.addressModel.IsSameAsAddress)
+            {
+                essentials.AddRange(SlmConstant.EssentialBillingAddressModel);
+            }
+
+            if (essentials.Any(x => userInfo.nullOrEmptyProperties.Contains(x)))
+            {
+                return RedirectToPage("/Checkout", new { isRedirect = true });
+            }
+
+            return Page();
         }
 
 
@@ -68,34 +92,7 @@ namespace Slim.Pages.Pages
 
         }
 
-        private async Task LoadUserInformationAsync()
-        {
-            var user = await _userManager.GetUserAsync(User);
-            var userClaims = await _userManager.GetClaimsAsync(user);
-
-
-            bool.TryParse(userClaims.FirstOrDefault(x => x.Type == nameof(Input.ZipCode))?.Value, out var isSame);
-
-            var firstName = User.Claims.Where(x => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name").Skip(1).FirstOrDefault()?.Value ?? string.Empty;
-            var lastName = User.FindFirstValue(ClaimTypes.Surname);
-            var phoneNumber = user.PhoneNumber;
-
-            var zipCode = userClaims.FirstOrDefault(x => x.Type == nameof(Input.ZipCode))?.Value ?? string.Empty;
-            var address1 = userClaims.FirstOrDefault(x => x.Type == ClaimTypes.StreetAddress)?.Value ?? string.Empty;
-            var address2 = userClaims.FirstOrDefault(x => x.Type == nameof(Input.Address2))?.Value ?? string.Empty;
-
-
-            Input = new InputModel
-            {
-                FullName = $"{firstName} {lastName}",
-                Address = $"{address1}, {address2}, {zipCode}",
-                PhoneNumber = phoneNumber,
-            };
-
-
-
-        }
-
+       
         public class InputModel
         {
             public string FullName { get; set; } = string.Empty;
