@@ -34,5 +34,30 @@
 
 
         public const string SessionKeyName = "CartUserId";
+
+        public static List<string> EssentialAddressModel
+        {
+            get
+            {
+                return new List<string>{
+                nameof(AddressModel.FirstName),
+                nameof(AddressModel.LastName),
+                nameof(AddressModel.Email),
+                nameof(AddressModel.Address1),
+                nameof(AddressModel.ZipCode)
+            };
+            }
+        }
+        public static List<string> EssentialBillingAddressModel
+        {
+            get
+            {
+                return new List<string>{
+                nameof(AddressModel.BillingAddress1),
+                nameof(AddressModel.BillingAddress2),
+                nameof(AddressModel.BillingZipCode)
+            };
+            }
+        }
     }
 }

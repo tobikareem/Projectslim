@@ -35,29 +35,60 @@ namespace Slim.Pages.Pages
         [TempData] public string StatusMessage { get; set; } = string.Empty;
 
 
-        public async Task OnGet()
+        public async Task OnGet(bool isRedirect = false)
         {
             var loggedInUser = User.Identity?.Name ?? string.Empty;
             ShoppingCartUserId = GetShoppingCartUserId();
             CartItems = _cartService.GetCartItemsForUser(loggedInUser, ShoppingCartUserId);
             TotalCartPrice = _cartService.GetTotalCartPrice(loggedInUser, ShoppingCartUserId);
-            await LoadUserInformationAsync();
+
+            var userInfo = await _userService.LoadUserAddressInformationAsync(User);
+            Input = userInfo.addressModel;
+
+            StatusMessage = String.Empty;
+
+            if (isRedirect)
+            {
+                var essentials = SlmConstant.EssentialAddressModel;
+
+                if (!userInfo.addressModel.IsSameAsAddress)
+                {
+                    essentials.AddRange(SlmConstant.EssentialBillingAddressModel);
+                }
+
+                if (essentials.Any(x => userInfo.nullOrEmptyProperties.Contains(x)))
+                {
+                    foreach (var prop in essentials)
+                    {
+                        ModelState.AddModelError(prop, $"The {prop} field is required.");
+                    }
+                    StatusMessage = "Error. Please, fill in required information";
+                }
+
+            }
+
+
         }
 
         public async Task<IActionResult> OnPostRedirectToShipping()
         {
             var loggedInUser = User.Identity?.Name ?? string.Empty;
             ShoppingCartUserId = GetShoppingCartUserId();
+
             if (!ModelState.IsValid)
             {
                 TotalCartPrice = _cartService.GetTotalCartPrice(loggedInUser, ShoppingCartUserId);
-                await LoadUserInformationAsync();
+
+                var userInfo = await _userService.LoadUserAddressInformationAsync(User);
+                Input = userInfo.addressModel;
+
                 StatusMessage = "Missing some User Information";
                 _logger.LogWarning("Missing some User Information");
                 return RedirectToPage();
             }
 
             var user = await _userManager.GetUserAsync(User);
+
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
 
             if (phoneNumber != Input.PhoneNumber)
@@ -71,71 +102,46 @@ namespace Slim.Pages.Pages
                 }
             }
 
-            if (!string.IsNullOrWhiteSpace(Input.Address1))
+            foreach (var property in Input.GetType().GetProperties())
             {
-                var isSuccess = await _userService.UpsertUserClaim(user, ClaimTypes.StreetAddress, Input.Address1);
-                if (!isSuccess)
+                var claimType = property.Name;
+
+                if (claimType == nameof(Input.PhoneNumber))
                 {
-                    StatusMessage = "Unexpected error when trying to set Address1.";
-                    _logger.LogWarning("Unexpected error when trying to set Address1.");
-                    return RedirectToPage();
+                    continue;
+                }
+
+                var value = property.GetValue(Input);
+                if (value != null)
+                {
+
+                    if (claimType == nameof(Input.Address1))
+                    {
+                        claimType = ClaimTypes.StreetAddress;
+                    }
+
+                    var claimValue = value.ToString();
+
+                    var isSuccess = await _userService.UpsertUserClaim(user, claimType, claimValue ?? string.Empty);
+                    if (!isSuccess)
+                    {
+                        StatusMessage = $"Unexpected error when trying to set {nameof(property.Name)}";
+                        _logger.LogWarning($"Unexpected error when trying to set {nameof(property.Name)}.");
+                        return RedirectToPage();
+                    }
+                }
+                else
+                {
+                    var claim = User.FindFirst(claimType);
+                    if (claim != null)
+                    {
+                        _ = await _userManager.RemoveClaimAsync(user, claim);
+                    }
+
                 }
             }
 
-            if (!string.IsNullOrWhiteSpace(Input.Address2))
-            {
-                var isSuccess = await _userService.UpsertUserClaim(user, CustomClaims.Address2, Input.Address2);
-                if (!isSuccess)
-                {
-                    StatusMessage = "Unexpected error when trying to set Address2.";
-                    return RedirectToPage();
-                }
-            }
-
-            if (!string.IsNullOrWhiteSpace(Input.ZipCode))
-            {
-                var isSuccess = await _userService.UpsertUserClaim(user, CustomClaims.Zipcode, Input.ZipCode);
-                if (!isSuccess)
-                {
-                    StatusMessage = "Unexpected error when trying to set Zipcode.";
-                    return RedirectToPage();
-                }
-            }
-
-            var isSame = await _userService.UpsertUserClaim(user, CustomClaims.IsSameAsAddress, Input.IsSameAsAddress.ToString());
-            if (!isSame)
-            {
-                StatusMessage = "Unable to select this option for same address";
-                return RedirectToPage();
-            }
-
-            if (!string.IsNullOrWhiteSpace(Input.BillingAddress1))
-            {
-                var isSuccess = await _userService.UpsertUserClaim(user, CustomClaims.BillingAddress1, Input.BillingAddress1);
-                if (!isSuccess)
-                {
-                    StatusMessage = "Unable to replace Billing Address1.";
-                    return RedirectToPage();
-                }
-            }
-
-            if (!string.IsNullOrWhiteSpace(Input.BillingAddress2))
-            {
-                var isSuccess = await _userService.UpsertUserClaim(user, CustomClaims.BillingAddress2, Input.BillingAddress2);
-                if (!isSuccess)
-                {
-                    StatusMessage = "Unable to replace Billing Address2.";
-                    return RedirectToPage();
-                }
-            }
-
-            if (string.IsNullOrWhiteSpace(Input.BillingZipCode)) return RedirectToPage("/Shipping");
-            {
-                var isSuccess = await _userService.UpsertUserClaim(user, CustomClaims.BillingZipCode, Input.BillingZipCode);
-                if (isSuccess) return RedirectToPage("/Shipping");
-                StatusMessage = "Unable to replace Billing Zip code.";
-                return RedirectToPage();
-            }
+            return RedirectToPage("/Shipping");
 
         }
 
@@ -167,29 +173,6 @@ namespace Slim.Pages.Pages
 
         }
 
-        private async Task LoadUserInformationAsync()
-        {
-            var user = await _userManager.GetUserAsync(User);
-            var userClaims = await _userManager.GetClaimsAsync(user);
-            bool.TryParse(userClaims.FirstOrDefault(x => x.Type == nameof(Input.ZipCode))?.Value, out var isSame);
-            Input = new AddressModel
-            {
-                FirstName = User.Claims.Where(x => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name").Skip(1).FirstOrDefault()?.Value ?? string.Empty,
-                LastName = User.FindFirstValue(ClaimTypes.Surname),
-                Email = user.Email,
-                PhoneNumber = user.PhoneNumber,
-                IsSameAsAddress = isSame,
-                Address1 = User.FindFirstValue(ClaimTypes.StreetAddress),
-                Address2 = User.FindFirstValue(CustomClaims.Address2),
-                ZipCode = User.FindFirstValue(CustomClaims.Zipcode),
 
-                BillingAddress1 = User.FindFirstValue(CustomClaims.BillingAddress1),
-                BillingAddress2 = User.FindFirstValue(CustomClaims.BillingAddress2),
-                BillingZipCode = User.FindFirstValue(CustomClaims.BillingZipCode),
-
-
-            };
-        }
-        
     }
 }

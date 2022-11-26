@@ -70,9 +70,12 @@
 
                             @{
                                 var item1 = item;
+                                // www.flyfi.com
                             }
 
-                            <select asp-items="@Model.QuantitySelectListItem" asp-for="@Model.CartItems[item1].Quantity" class="form-select" id="quantitySelect"></select>
+                            <select asp-items="@Model.QuantitySelectListItem" asp-for="@Model.CartItems[item1].Quantity" class="form-select"
+                                id="quantitySelect_@item1"
+                                onchange="OnSelectItemChanged(quantitySelect_@item1, '@Model.CartItems[item1].Id')"></select>
                             <input type="hidden" asp-for="@Model.CartItems[item1].Id" id="cartItemId">
                             <button class="btn btn-link px-0 text-danger" type="submit" asp-page-handler="RemoveCartItem" asp-route-id="@Model.CartItems[item1].Id"><i class="bi bi-trash3 me-2"></i><span class="fs-sm">Remove</span></button>
                         </div>
@@ -108,15 +111,15 @@
                         @{
                             var price = Model.TotalCartPrice;
 
-                            @if (price != 0)
+                                @if (price != 0)
                             {
                                 var priceRoundUp = Convert.ToString(price, CultureInfo.CurrentCulture).Split('.')[1];
                                 var priceWholePrice = Convert.ToInt32(Math.Truncate(price));
-                                <h3 class="fw-normal" id="totalPrice">$@priceWholePrice.<small id="totalPriceRoundUp">@priceRoundUp</small></h3>
+                                    <h3 class="fw-normal" id="totalPrice">$@priceWholePrice.<small id="totalPriceRoundUp">@priceRoundUp</small></h3>
                             }
                             else
                             {
-                                <h3 class="fw-normal" id="totalPrice">$0.<small id="totalPriceRoundUp">00</small></h3>
+                                    <h3 class="fw-normal" id="totalPrice">$0.<small id="totalPriceRoundUp">00</small></h3>
                             }
                         }
 
@@ -200,42 +203,73 @@
             GetTotalCartPrice(priceUrl);
             GetTotalCartItem(cartUrl);
 
-            $('#quantitySelect').change(function () {
-                // get the selected value
-                var quantity = $(this).val();
-                var selectedId = $('#cartItemId').val();
+            //$('#quantitySelect').change(function () {
+            //    // get the selected value
+            //    var quantity = $(this).val();
+            //    var selectedId = $('#cartItemId').val();
 
-                $.ajax({
-                    type: 'GET', // define the type of HTTP verb we want to use (POST for our form)
-                    url: '@Url.Page(null, "UpdateShoppingCart")',
+            //    $.ajax({
+            //        type: 'GET', // define the type of HTTP verb we want to use (POST for our form)
+            //        url: '@Url.Page(null, "UpdateShoppingCart")',
 
-                    beforeSend: function (xhr) {
-                        xhr.setRequestHeader("XSRF-TOKEN",
-                            $('input:hidden[name="__RequestVerificationToken"]').val());
-                    },
-                    data: { cartItemId: selectedId, quantity }, // our data object
-                    contentType: "application/json; charset=utf-8",
-                    traditional: true,
-                    async: false,
-                    success:
-                        function (data) {
-                            if (data > 0) {
-                                SetCartIconData(data);
-                            }
+            //        beforeSend: function (xhr) {
+            //            xhr.setRequestHeader("XSRF-TOKEN",
+            //                $('input:hidden[name="__RequestVerificationToken"]').val());
+            //        },
+            //        data: { cartItemId: selectedId, quantity }, // our data object
+            //        contentType: "application/json; charset=utf-8",
+            //        traditional: true,
+            //        async: false,
+            //        success:
+            //            function (data) {
+            //                if (data > 0) {
+            //                    SetCartIconData(data);
+            //                }
 
-                            var cartUrl = '@Url.Page("Cart", "TotalCartCount")';
-                            GetTotalCartItem(cartUrl);
-                        },
-                    error: function (data) {
-                        console.log(data);
-                    }
+            //                var cartUrl = '@Url.Page("Cart", "TotalCartCount")';
+            //                GetTotalCartItem(cartUrl);
+            //            },
+            //        error: function (data) {
+            //            console.log(data);
+            //        }
 
 
-                });
+            //    });
 
-            });
+            //});
         })
 
+        function OnSelectItemChanged(id, selectedCartId) {
+            var quantity = Number(id.selectedIndex) + 1;
+
+            $.ajax({
+                type: 'GET', // define the type of HTTP verb we want to use (POST for our form)
+                url: '@Url.Page(null, "UpdateShoppingCart")',
+
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("XSRF-TOKEN",
+                        $('input:hidden[name="__RequestVerificationToken"]').val());
+                },
+                data: { cartItemId: selectedCartId, quantity }, // our data object
+                contentType: "application/json; charset=utf-8",
+                traditional: true,
+                async: false,
+                success:
+                    function (data) {
+                        if (data > 0) {
+                            SetCartIconData(data);
+                        }
+
+                        var cartUrl = '@Url.Page("Cart", "TotalCartCount")';
+                        GetTotalCartItem(cartUrl);
+                    },
+                error: function (data) {
+                    console.log(data);
+                }
+
+
+            });
+        }
 
 
     </script>

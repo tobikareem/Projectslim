@@ -7,6 +7,10 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Slim.Core.Model;
+using Slim.Data.Entity;
+using Slim.Shared.Interfaces.Repo;
+using Slim.Shared.Interfaces.Serv;
 
 namespace Slim.Pages.Areas.Identity.Pages.Account
 {
@@ -14,11 +18,12 @@ namespace Slim.Pages.Areas.Identity.Pages.Account
     {
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
-
-        public LoginModel(SignInManager<IdentityUser> signInManager, ILogger<LoginModel> logger)
+        private readonly IBaseCart<ShoppingCart> _shoppingCart;
+        public LoginModel(SignInManager<IdentityUser> signInManager, ILogger<LoginModel> logger, IBaseCart<ShoppingCart> shoppingCart)
         {
             _signInManager = signInManager;
             _logger = logger;
+            _shoppingCart = shoppingCart;
         }
 
         /// <summary>
@@ -110,6 +115,26 @@ namespace Slim.Pages.Areas.Identity.Pages.Account
             if (result.Succeeded)
             {
                 _logger.LogInformation("User logged in.");
+                var defaultSessionId = GetUserDefaultSessionName();
+
+                if (!string.IsNullOrWhiteSpace(defaultSessionId))
+                {
+                    var cartItems = _shoppingCart.GetAllCartItemsByUserId(defaultSessionId);
+
+                    if (cartItems != null && cartItems.Any())
+                    {
+                        foreach (var cartItem in cartItems)
+                        {
+                            cartItem.CreatedBy = Input.Email;
+                            cartItem.CartUserId = Input.Email;
+                            cartItem.ModifiedDate = DateTime.UtcNow;
+                            cartItem.ModifiedBy = Input.Email;
+                        }
+
+                        _shoppingCart.UpdateCartItems(cartItems, CacheKey.GetShoppingCartItem, true);
+                    }
+                }
+
                 return LocalRedirect(returnUrl);
             }
             if (result.RequiresTwoFactor)
@@ -126,8 +151,18 @@ namespace Slim.Pages.Areas.Identity.Pages.Account
                 ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                 return Page();
             }
+        }
 
-            // If we got this far, something failed, redisplay form
+        private string GetUserDefaultSessionName()
+        {
+            var hasSession = HttpContext.Session.GetString(SlmConstant.SessionKeyName);
+            if (string.IsNullOrWhiteSpace(hasSession))
+            {
+                return string.Empty;
+            }
+
+            var sessionName = HttpContext.Session.GetString(SlmConstant.SessionKeyName);
+            return string.IsNullOrEmpty(sessionName) ? string.Empty : sessionName;
         }
     }
 }

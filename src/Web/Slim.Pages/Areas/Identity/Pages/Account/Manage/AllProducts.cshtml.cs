@@ -33,6 +33,8 @@ public class AllProductsModel : PageModel
     [BindProperty(SupportsGet = true)] public InputModel InModel { get; set; } = new();
     [BindProperty] public List<Product> Products { get; set; } = new();
 
+    public int YourProductCount;
+
 
     public IActionResult OnGet()
     {
@@ -46,6 +48,7 @@ public class AllProductsModel : PageModel
         {
             Products = GetAllProductsByProductId(-1);
         }
+        YourProductCount = Products.Count;
         return Page();
     }
 
@@ -63,6 +66,7 @@ public class AllProductsModel : PageModel
         });
 
         Products = productId == -1 ? Products : Products.Where(product => product.RazorPageId == productId).ToList();
+        YourProductCount = Products.Count;
 
         return Products;
     }
@@ -70,6 +74,7 @@ public class AllProductsModel : PageModel
     public IActionResult OnGetProductById(int id)
     {
         Products = GetAllProductsByProductId(id);
+        YourProductCount = Products.Count;
         return Page();
     }
 

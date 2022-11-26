@@ -2,9 +2,9 @@
 <div class="row">
     <div class="col-sm-12">
         <div class="mb-3">
-            <label class="form-label" asp-for="Address1"></label>
+            <label class="form-label" asp-for="Address1"></label> <span class="text-danger">*</span>
             <input asp-for="Address1" class="form-control" type="text">
-            @*  <span asp-validation-for="Address1" class="text-danger"></span>*@
+              <span asp-validation-for="Address1" class="text-danger"></span>
 
         </div>
     </div>
@@ -19,9 +19,9 @@
     </div>
     <div class="col-sm-6">
         <div class="mb-3">
-            <label class="form-label" asp-for="ZipCode"></label>
+            <label class="form-label" asp-for="ZipCode"></label> <span class="text-danger">*</span>
             <input asp-for="ZipCode" class="form-control" type="text">
-            @*      <span asp-validation-for="ZipCode" class="text-danger"></span>*@
+                 <span asp-validation-for="ZipCode" class="text-danger"></span>
 
         </div>
     </div>
@@ -30,7 +30,7 @@
 <h6 class="mb-3 py-3 border-bottom">Billing address</h6>
 <div class="form-check">
     <input class="form-check-input" type="checkbox" id="checkBilling" asp-for="IsSameAsAddress">
-    <label class="form-check-label" asp-for="IsSameAsAddress"></label>
+    <label class="form-check-label" asp-for="IsSameAsAddress"></label> 
 </div>
 
 
@@ -38,9 +38,9 @@
     <div class="row">
         <div class="col-sm-12">
             <div class="mb-3">
-                <label class="form-label" asp-for="BillingAddress1"></label>
+                <label class="form-label" asp-for="BillingAddress1"></label> <span class="text-danger">*</span>
                 <input asp-for="BillingAddress1" class="form-control" type="text">
-                @* <span asp-validation-for="BillingAddress1" class="text-danger"></span>*@
+                 <span asp-validation-for="BillingAddress1" class="text-danger"></span>
 
             </div>
         </div>
@@ -49,15 +49,15 @@
     <div class="row">
         <div class="col-sm-6">
             <div class="mb-3">
-                <label class="form-label" asp-for="BillingAddress2"></label>
+                <label class="form-label" asp-for="BillingAddress2"></label> 
                 <input asp-for="BillingAddress2" class="form-control" type="text">
             </div>
         </div>
         <div class="col-sm-6">
             <div class="mb-3">
-                <label class="form-label" asp-for="BillingZipCode"></label>
+                <label class="form-label" asp-for="BillingZipCode"></label> <span class="text-danger">*</span>
                 <input asp-for="BillingZipCode" class="form-control" type="text">
-                @*          <span asp-validation-for="BillingZipCode" class="text-danger"></span>*@
+                         <span asp-validation-for="BillingZipCode" class="text-danger"></span>
 
             </div>
         </div>

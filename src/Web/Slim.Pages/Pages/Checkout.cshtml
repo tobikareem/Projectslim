@@ -1,4 +1,5 @@
-﻿@page
+﻿@page "{isRedirect:bool?}";
+
 @using System.Security.Claims
 @using Slim.Data.Entity
 @using Slim.Pages.Extensions
@@ -86,14 +87,14 @@
                 <div class="row">
                     <div class="col-sm-6">
                         <div class="mb-3">
-                            <label class="form-label" asp-for="Input.FirstName"></label>
+                            <label class="form-label" asp-for="Input.FirstName"></label> <span class="text-danger">*</span>
                             <input asp-for="Input.FirstName" class="form-control" type="text">
                             <span asp-validation-for="Input.FirstName" class="text-danger"></span>
                         </div>
                     </div>
                     <div class="col-sm-6">
                         <div class="mb-3">
-                            <label class="form-label" asp-for="Input.LastName"></label>
+                            <label class="form-label" asp-for="Input.LastName"></label> <span class="text-danger">*</span>
                             <input asp-for="Input.LastName" class="form-control" type="text">
                             <span asp-validation-for="Input.LastName" class="text-danger"></span>
 
@@ -103,7 +104,7 @@
                 <div class="row">
                     <div class="col-sm-6">
                         <div class="mb-3">
-                            <label class="form-label" asp-for="Input.Email"></label>
+                            <label class="form-label" asp-for="Input.Email"></label> <span class="text-danger">*</span>
                             <input asp-for="Input.Email" class="form-control" type="email">
                             <span asp-validation-for="Input.Email" class="text-danger"></span>
 
