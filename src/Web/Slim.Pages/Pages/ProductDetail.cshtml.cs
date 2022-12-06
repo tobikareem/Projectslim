@@ -3,6 +3,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Newtonsoft.Json;
 using NuGet.Packaging;
 using Slim.Core.Model;
 using Slim.Data.Entity;
@@ -45,7 +46,9 @@ namespace Slim.Pages.Pages
         [BindProperty] public Product Product { get; set; }
         [BindProperty] public ReviewModel Review { get; set; } = new();
         [BindProperty] public string UserComment { get; set; } = string.Empty;
-        public string StatusMessage { get; set; } = string.Empty;
+        [TempData] public string TempComment { get; set; } = string.Empty;
+        [TempData] public string TempReview { get; set; } = string.Empty;
+        [TempData] public string StatusMessage { get; set; } = string.Empty;
         public byte[]? ProfileImage { get; set; }
 
 
@@ -62,20 +65,66 @@ namespace Slim.Pages.Pages
 
             if (user != null)
             {
-               Review.FullName = $"{User.Claims.Where(x => x.Type == ClaimTypes.Name).Skip(1).FirstOrDefault()?.Value} {User.FindFirstValue(ClaimTypes.Surname)}";
-               Review.Email = user.Email;
+                Review.FullName = $"{User.Claims.Where(x => x.Type == ClaimTypes.Name).Skip(1).FirstOrDefault()?.Value} {User.FindFirstValue(ClaimTypes.Surname)}";
+                Review.Email = user.Email;
             }
 
-            var isUserRedirected = _cacheService.GetItem<Comment>(CacheKey.AddThisUsersComment);
-            if (isUserRedirected == null)
+
+            if (TempData["TempReview"] == null && TempData["TempComment"] == null)
             {
                 return Page();
             }
 
-            _logger.LogInformation("User {user} is redirected from Login Page", User.Identity?.Name);
+            if (TempData["TempComment"] != null)
+            {
+                _logger.LogInformation("User {user} is redirected from Login Page for their Comment", User.Identity?.Name);
+                return await OnPostUserCommentSubmit();
+            }
 
-            return await OnPostUserCommentSubmit();
-            
+            _logger.LogInformation("User {user} is redirected from Login Page for their Review", User.Identity?.Name);
+            return OnPostSubmitUserReview();
+        }
+
+        public async Task<IActionResult> OnPostUserCommentSubmit()
+        {
+            var userComment = new Comment
+            {
+                CreatedDate = DateTime.UtcNow,
+                UserComment = UserComment,
+                ProductId = Product.Id
+            };
+
+            if (string.IsNullOrWhiteSpace(User.Identity?.Name))
+            {
+                TempComment = UserComment;
+                return RedirectToPage("/Account/Login", new { area = "Identity", returnUrl = $"/ProductDetail/{Product.Id}" });
+            }
+
+            if (TempData["TempComment"] != null)
+            {
+                userComment.UserComment = Convert.ToString(TempData["TempComment"]) ?? string.Empty;
+            }
+
+            var user = await _userManager.GetUserAsync(User);
+            userComment.CreatedBy = User.Identity.Name;
+            userComment.FullName = $"{User.Claims.Where(x => x.Type == ClaimTypes.Name).Skip(1).FirstOrDefault()?.Value} {User.FindFirstValue(ClaimTypes.Surname)}";
+            userComment.Email = user.Email;
+
+            _commentBaseStore.AddEntity(userComment, CacheKey.GetComments, true);
+
+            Product = GetProductAndProfilePicture(Product.Id);
+
+            if (Product.Comments.Any() && Product.Comments.Any(x => x.Id != userComment.Id))
+            {
+                Product.Comments.Add(userComment);
+            }
+            else
+            {
+                var comments = _cacheService.GetOrCreate(CacheKey.GetComments, () => _commentBaseStore.GetAll()).Where(x => x.ProductId == Product.Id).ToList();
+                Product.Comments.AddRange(comments);
+            }
+            TempData.Clear();
+            return RedirectToPage("/ProductDetail", new { id = Product.Id });
         }
 
         public IActionResult OnPostSubmitUserReview()
@@ -92,35 +141,28 @@ namespace Slim.Pages.Pages
                 Email = Review.Email
             };
 
-            var isValid = ValidateUserReviewModel(userReview);
+            if (string.IsNullOrWhiteSpace(User.Identity?.Name))
+            {
+                TempReview = JsonConvert.SerializeObject(userReview);
+                return RedirectToPage("/Account/Login", new { area = "Identity", returnUrl = $"/ProductDetail/{Product.Id}" });
+            }
 
-            if (!isValid)
+            var isUserRedirectedReview = TempData["TempReview"];
+
+            if (isUserRedirectedReview != null)
+            {
+                userReview = JsonConvert.DeserializeObject<Review>(Convert.ToString(isUserRedirectedReview) ?? string.Empty);
+            }
+
+            if (userReview == null || !ValidateUserReviewModel(userReview))
             {
                 Product = GetProductAndProfilePicture(Product.Id);
                 return Page();
             }
 
-            if (string.IsNullOrWhiteSpace(User.Identity?.Name))
-            {
-                _cacheService.Add(CacheKey.AddThisUsersReview, userReview, 10);
-                return RedirectToPage("/Account/Login", new { area = "Identity", returnUrl = $"/ProductDetail/{Product.Id}" });
-            }
-
-            var isUserRedirected = _cacheService.GetItem<Review>(CacheKey.AddThisUsersComment);
-
-            if (isUserRedirected != null)
-            {
-                userReview = _cacheService.GetItem<Review>(CacheKey.AddThisUsersComment);
-            }
-            
             userReview.CreatedBy = User.Identity.Name;
 
             _reviewBaseStore.AddEntity(userReview, CacheKey.GetReviews, true);
-
-            if (isUserRedirected != null)
-            {
-                _cacheService.Remove(CacheKey.AddThisUsersReview);
-            }
 
             Product = GetProductAndProfilePicture(Product.Id);
 
@@ -133,7 +175,8 @@ namespace Slim.Pages.Pages
                 var reviews = _cacheService.GetOrCreate(CacheKey.GetReviews, () => _reviewBaseStore.GetAll()).Where(x => x.ProductId == Product.Id).ToList();
                 Product.Reviews.AddRange(reviews);
             }
-
+            
+            TempData.Clear();
             return RedirectToPage("/ProductDetail", new { id = Product.Id });
         }
 
@@ -150,7 +193,7 @@ namespace Slim.Pages.Pages
                 StatusMessage = $"Error. {nameof(userReview.Email)} must have a value";
                 return false;
             }
-            
+
             if (userReview.Rating == 0)
             {
                 StatusMessage = "Error. Please, rate the product";
@@ -161,58 +204,8 @@ namespace Slim.Pages.Pages
             StatusMessage = "Error. Please, write a review";
             return false;
 
-
-
         }
 
-        public async Task<IActionResult> OnPostUserCommentSubmit()
-        {
-            var userComment = new Comment
-            {
-                CreatedDate = DateTime.UtcNow,
-                UserComment = UserComment,
-                ProductId = Product.Id
-            };
-
-            if (string.IsNullOrWhiteSpace(User.Identity?.Name))
-            {
-                _cacheService.Add(CacheKey.AddThisUsersComment, userComment, 10);
-                return RedirectToPage("/Account/Login", new { area = "Identity", returnUrl = $"/ProductDetail/{Product.Id}" });
-            }
-
-            var isUserRedirected = _cacheService.GetItem<Comment>(CacheKey.AddThisUsersComment);
-
-            if (isUserRedirected != null)
-            {
-                userComment = _cacheService.GetItem<Comment>(CacheKey.AddThisUsersComment);
-            }
-
-            var user = await _userManager.GetUserAsync(User);
-            userComment.CreatedBy = User.Identity.Name;
-            userComment.FullName = $"{User.Claims.Where(x => x.Type == ClaimTypes.Name).Skip(1).FirstOrDefault()?.Value} {User.FindFirstValue(ClaimTypes.Surname)}";
-            userComment.Email = user.Email;
-
-            _commentBaseStore.AddEntity(userComment, CacheKey.GetComments, true);
-
-            if (isUserRedirected != null)
-            {
-                _cacheService.Remove(CacheKey.AddThisUsersComment);
-            }
-
-            Product = GetProductAndProfilePicture(Product.Id);
-
-            if (Product.Comments.Any() && Product.Comments.Any(x => x.Id != userComment.Id))
-            {
-                Product.Comments.Add(userComment);
-            }
-            else
-            {
-                var comments = _cacheService.GetOrCreate(CacheKey.GetComments, () => _commentBaseStore.GetAll()).Where(x => x.ProductId == Product.Id).ToList();
-                Product.Comments.AddRange(comments);
-            }
-
-            return RedirectToPage("/ProductDetail", new { id = Product.Id });
-        }
         private string GetCartUserId()
         {
             var hasSession = HttpContext.Session.GetString(SlmConstant.SessionKeyName);
