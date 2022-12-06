@@ -36,7 +36,6 @@ namespace Slim.Pages.Extensions
                 options.Cookie.Name = ".SlimWebSite.Session.";
                 options.IdleTimeout = TimeSpan.FromMinutes(30);
                 options.Cookie.IsEssential = true;
-                options.Cookie.HttpOnly = true;
 
             });
 
