@@ -8,9 +8,9 @@
             {
                 var pages = new List<string>
                 {
-                    "Hair",
-                    "Lip Gloss",
-                    "Lashes"
+                    "Bags",
+                    "Shoes",
+                    "Accessories"
                 };
 
                 return pages;
@@ -23,9 +23,10 @@
             {
                 var emails = new List<string>
                 {
-                    "elizabeth.lucys@hotmail.com",
+                    //"elizabeth.lucys@hotmail.com",
                     "captain@tobikareem.com",
-                    "odunayoadegbaju@yahoo.com"
+                    "odunayoadegbaju@yahoo.com",
+                    "adetunjitemitope11@gmail.com"
                 };
 
                 return emails;

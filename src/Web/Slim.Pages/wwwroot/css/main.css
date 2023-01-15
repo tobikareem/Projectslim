@@ -102,6 +102,11 @@ section.top-section {
     z-index: 10;
 }
 
+.width-70-rem {
+    max-width: 70rem;
+    z-index: 10;
+}
+
 .p-10-3 {
     padding-top: 10rem !important;
     padding-bottom: 3rem !important;

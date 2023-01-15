@@ -22,7 +22,7 @@ namespace Slim.Data.Entity
         public decimal SalePrice { get; set; }
         public string? ProductTags { get; set; }
         public bool IsOnSale { get; set; }
-        public bool IsNewProduct { get; set; } = true;
+        public bool IsNewProduct { get; set; }
         public bool IsTrending { get; set; }
         public int ProductQuantity { get; set; }
         public int? CategoryId { get; set; }

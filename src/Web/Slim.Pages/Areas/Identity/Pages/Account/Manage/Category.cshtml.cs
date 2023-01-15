@@ -11,17 +11,15 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
 {
     public class CategoryModel : PageModel
     {
-        public List<SelectListItem> CategorySelectList { get; set; }
         private readonly IBaseStore<Category> _categoryRepository;
         private readonly ILogger<CategoryModel> _logger;
         private readonly ICacheService _cacheService;
         private readonly IEnumerable<Category> _categories;
         private readonly IBaseStore<RazorPage> _razorPagesBaseStore;
-
-
-        public List<SelectListItem> RazorPageSelectList { get; set; }
-        
         private readonly IEnumerable<RazorPage> _razorPages;
+
+        public List<SelectListItem> RazorPageSelectList { get; set; } = new();
+        public List<SelectListItem> CategorySelectList { get; set; } = new();
         
         public CategoryModel(IBaseStore<Category> categoryRepository, ILogger<CategoryModel> logger, ICacheService cacheService, IBaseStore<RazorPage> razorPagesBaseStore)
         {
@@ -31,23 +29,24 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
             _razorPagesBaseStore = razorPagesBaseStore;
 
             _categories = _cacheService.GetOrCreate(CacheKey.ProductCategories, _categoryRepository.GetAll, 60);
-            CategorySelectList = _categories.Select(c => new SelectListItem { Value = c.Id.ToString(), Text = c.CategoryName }).ToList();
-
             _razorPages = _cacheService.GetOrCreate(CacheKey.GetRazorPages, _razorPagesBaseStore.GetAll).Where(x => SlmConstant.PagesForDropDown.Contains(x.PageName));
-
-            RazorPageSelectList = _razorPages.Select(page => new SelectListItem { Text = page.PageName, Value = page.Id.ToString() }).ToList();
         }
 
         [BindProperty] public InputModel Input { get; set; } = new();
+        [TempData] public string StatusMessage { get; set; } = string.Empty;
 
         public void OnGet()
         {
+            Init();
         }
 
         public IActionResult OnPostAsync()
         {
-            if (!ModelState.IsValid)
+
+            if (string.IsNullOrWhiteSpace(Input.CategoryName))
             {
+                StatusMessage = "Error. Category Name can not be empty.";
+                Init();
                 return Page();
             }
 
@@ -55,17 +54,17 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
             {
                 ModelState.AddModelError(string.Empty, "Category already exists");
                 _logger.LogWarning("The Category {categoryName} already exists", Input.CategoryName);
+                Init();
                 return Page();
             }
 
-            // TODO: Authenticated User
             var category = new Category
             {
                 CategoryName = Input.CategoryName,
                 CategoryDescription = Input.CategoryDescription,
                 CategoryTags = Input.CategoryTag,
                 CreatedDate = DateTime.UtcNow,
-                CreatedBy = "Test user",
+                CreatedBy = User.Identity?.Name,
                 RazorPageId = Convert.ToInt32(Input.RazorPageId)
             };
 
@@ -73,15 +72,72 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
 
             _logger.LogInformation("Category created a new category with ID '{CategoryID}'", category.Id);
 
-            return RedirectToPage("./AllProducts");
+            return RedirectToPage("./AddNewProduct");
         }
 
+        public IActionResult OnPostEditCategoryInfo()
+        {
+            var category = _categories.FirstOrDefault(c => c.Id == Convert.ToInt32(Input.CategoryEditId));
 
+            var hasChanges = false;
+
+            if (Input.CanDelete && category != null)
+            {
+                _categoryRepository.DeleteEntity(category, CacheKey.ProductCategories, true);
+                return RedirectToPage("./AddNewProduct");
+            }
+
+            if (category == null)
+            {
+                Init();
+                return Page();
+            }
+
+            if (category.CategoryName != Input.CategoryEditName)
+            {
+                hasChanges = true;
+                category.CategoryName = Input.CategoryEditName;
+            }
+
+            if(category.CategoryDescription != Input.CategoryEditDescription)
+            {
+                hasChanges = true;
+                category.CategoryDescription = Input.CategoryEditDescription;
+            }
+
+            if (category.CategoryTags != Input.CategoryEditTag)
+            {
+                hasChanges = true;
+                category.CategoryTags = Input.CategoryEditTag;
+            }
+
+            if (hasChanges)
+            {
+                _categoryRepository.UpdateEntity(category, CacheKey.ProductCategories, true);
+            }
+            return RedirectToPage("./AddNewProduct");
+        }
+
+        private void Init()
+        {
+            var pageId = _razorPages.FirstOrDefault(x => string.Compare(x.PageName, "Bags", StringComparison.OrdinalIgnoreCase) == 0)?.Id ?? 1;
+            RazorPageSelectList = _razorPages.Select(page => new SelectListItem { Text = page.PageName, Value = page.Id.ToString() }).ToList();
+
+            var editCategory = _categories.Where(x => x.RazorPageId == pageId).ToList();
+            CategorySelectList =editCategory.Select(category => new SelectListItem { Text = category.CategoryName, Value = category.Id.ToString() }).ToList();
+
+            Input = new InputModel
+            {
+                CategoryEditName = editCategory.FirstOrDefault()?.CategoryName ?? string.Empty,
+                CategoryEditDescription = editCategory.FirstOrDefault()?.CategoryDescription ?? string.Empty,
+                CategoryEditTag = editCategory.FirstOrDefault()?.CategoryTags ?? string.Empty
+            };
+        }
 
         public class InputModel
         {
 
-            [Required, Display(Name = "Product")]
+            [Required, Display(Name = "Select a Product Type")]
             public string RazorPageId { get; set; } = default!;
 
             [Required, Display(Name = "Name the category")]
@@ -92,6 +148,24 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
 
             [Display(Name = "Tags")]
             public string CategoryTag { get; set; } = default!;
+
+            [Display(Name = "Select Old Category to Edit")]
+            public string CategoryEditId { get; set; } = default!;
+
+            [Display(Name = "New Category to Edit")]
+            public string CategoryEditType { get; set; } = default!;
+
+            [Display(Name = "New Category Name")]
+            public string CategoryEditName { get; set; } = default!;
+
+            [Display(Name = "New Category Description")]
+            public string CategoryEditDescription { get; set; } = default!;
+
+            [Display(Name = "New Category Tags")]
+            public string CategoryEditTag { get; set; } = default!;
+
+            [Display(Name = "Delete existing category")]
+            public bool CanDelete { get; set; }
         }
     }
 }

@@ -24,11 +24,6 @@ namespace Slim.Shared.Repositories
         {
             try
             {
-                if (hasCache)
-                {
-                    _cacheService.Remove(cacheKey);
-                }
-
                 _context.RazorPages.Add(entity);
                 _context.SaveChanges();
             }
@@ -37,12 +32,35 @@ namespace Slim.Shared.Repositories
                 _logger.LogError("Unable to add new Razor Page: {message}", e.Message);
                 throw;
             }
+            finally
+            {
+                if (hasCache)
+                {
+                    _cacheService.Remove(cacheKey);
+                }
+            }
             
         }
 
         public void UpdateEntity(RazorPage entity, CacheKey cacheKey = CacheKey.None, bool hasCache = false)
         {
-            throw new NotImplementedException();
+            try
+            {
+                _context.RazorPages.Update(entity);
+                _context.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("Unable to Update the Razor Page: {message}", e.Message);
+                throw;
+            }
+            finally
+            {
+                if (hasCache)
+                {
+                    _cacheService.Remove(cacheKey);
+                }
+            }
         }
 
         public RazorPage GetEntity(int id)

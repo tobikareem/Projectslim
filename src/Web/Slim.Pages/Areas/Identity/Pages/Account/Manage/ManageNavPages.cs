@@ -69,6 +69,7 @@ namespace  Slim.Pages.Areas.Identity.Pages.Account.Manage
 
         public static string CreateCategory => "CreateCategory";
 
+        public static string CreateWebPages => "CreateWebPages";
 
         /// <summary>
         /// This is to add new Products
@@ -120,6 +121,13 @@ namespace  Slim.Pages.Areas.Identity.Pages.Account.Manage
         /// <param name="viewContext"></param>
         /// <returns></returns>
         public static string CreateCategoryNavClass(ViewContext viewContext) => PageNavClass(viewContext, CreateCategory);
+
+        /// <summary>
+        /// Create Web Pages
+        /// </summary>
+        /// <param name="viewContext"></param>
+        /// <returns></returns>
+        public static string CreateWebPageNavClass(ViewContext viewContext) => PageNavClass(viewContext, CreateWebPages);
 
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used

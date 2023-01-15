@@ -43,14 +43,15 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
             TextCaptions = new TestCaptions();
             _razorPages = _cacheService.GetOrCreate(CacheKey.GetRazorPages, _razorPagesBaseStore.GetAll).Where(x => SlmConstant.PagesForDropDown.Contains(x.PageName)).ToList();
             _categories = _cacheService.GetOrCreate(CacheKey.ProductCategories, _categoryBaseStore.GetAll);
-            
-            var pageId = _razorPages.FirstOrDefault(x => string.Compare(x.PageName, "Hair", StringComparison.OrdinalIgnoreCase) == 0)?.Id ?? 1;
+
+            var pageId = _razorPages.FirstOrDefault(x => string.Compare(x.PageName, "Bags", StringComparison.OrdinalIgnoreCase) == 0)?.Id ?? 1;
 
             RazorPageSelectList = _razorPages.Select(page => new SelectListItem { Text = page.PageName, Value = page.Id.ToString() }).ToList();
             CategorySelectList = _categories.Where(x => x.RazorPageId == pageId).Select(category => new SelectListItem { Text = category.CategoryName, Value = category.Id.ToString() }).ToList();
         }
 
         [BindProperty(SupportsGet = true)] public InputModel InModel { get; set; } = new();
+        [TempData] public string StatusMessage { get; set; } = string.Empty;
 
         public void OnGet()
         {
@@ -124,6 +125,7 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
 
             if (!ModelState.IsValid)
             {
+                StatusMessage = "Error. Missing validations.";
                 return Page();
             }
 
@@ -137,15 +139,15 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
         {
             var product = new Product
             {
-                CreatedBy ="Test User",
+                CreatedBy = User.Identity?.Name,
                 CreatedDate = DateTime.UtcNow,
                 ProductDescription = InModel.ProductDescription,
                 ProductName = InModel.ProductName,
-                SalePrice = InModel.SalePrice,
+                SalePrice = Convert.ToDecimal(InModel.SalePrice),
                 Enabled = true,
                 Images = ValidateFileUploads(),
                 RazorPageId = int.Parse(InModel.RazorPageId),
-                StandardPrice = InModel.StandardPrice,
+                StandardPrice = Convert.ToDecimal(InModel.StandardPrice),
                 IsNewProduct = InModel.IsNewProduct,
                 IsOnSale = InModel.IsOnSale,
                 IsTrending = InModel.IsTrending,
@@ -171,6 +173,8 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
             prd.RazorPageId = int.Parse(InModel.RazorPageId);
             prd.ProductQuantity = InModel.ProductQuantity;
             prd.CategoryId = InModel.Category;
+            prd.ModifiedBy = User.Identity?.Name;
+            prd.ModifiedDate = DateTime.UtcNow;
 
             if (InModel.ProductImage != null)
             {
@@ -217,6 +221,7 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
             {
                 if (InModel.ProductImage == null)
                 {
+                    StatusMessage = "Error. Please upload at least one image";
                     ModelState.AddModelError("File Upload", "Please upload at least one image");
                     return image;
                 }
@@ -226,13 +231,13 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
 
 
                 // upload the file if less than 2 MB
-                if (ms.Length < 2097152)
+                if (ms.Length <= 2097152)
                 {
                     var fileName = ContentDispositionHeaderValue.Parse(InModel.ProductImage.ContentDisposition).FileName.Trim();
                     var index = fileName.Value.LastIndexOf(".", StringComparison.Ordinal);
                     var fileExtension = fileName.Value[(index + 1)..];
 
-                    if (fileExtension.ToLowerInvariant() is "jpg" or "png" or "jpeg")
+                    if (fileExtension.ToLowerInvariant() is "jpg" or "png" or "jpeg" or "heif" or "heic")
                     {
                         image.ImageId = Guid.NewGuid();
                         image.UploadedImage = ms.ToArray();
@@ -251,11 +256,13 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
                 {
                     var fileName = ContentDispositionHeaderValue.Parse(InModel.ProductImage.ContentDisposition).FileName.Trim();
                     ModelState.AddModelError("ProductImage", $"The file {fileName} is too large. Must be less than 2 MB");
+                    StatusMessage = $"Error. The file {fileName} is too large. Must be less than 2 MB";
                 }
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Error uploading file for product");
+                StatusMessage = "Error. Can not upload file";
                 throw;
             }
 
@@ -273,6 +280,7 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
                     return images;
                 }
 
+                var errFile = string.Empty;
 
                 foreach (var file in InModel.ProductImages)
                 {
@@ -306,7 +314,13 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
                     {
                         var fileName = ContentDispositionHeaderValue.Parse(InModel.ProductImage.ContentDisposition).FileName.Trim();
                         ModelState.AddModelError("ProductImage", $"The file {fileName} is too large.");
+                        errFile += $"{fileName}, ";
                     }
+                }
+
+                if (!string.IsNullOrWhiteSpace(errFile))
+                {
+                    StatusMessage = $"Error. Files {errFile}uploaded is too large. Must be less than 2 MB";
                 }
             }
             catch (Exception e)
@@ -323,7 +337,6 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
             var images = new List<Image>();
             try
             {
-
                 var image = UploadProductImage();
                 images.Add(image);
 
@@ -334,7 +347,7 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
             catch (Exception e)
             {
                 _logger.LogError(e, "Error uploading file");
-                throw;
+                StatusMessage = "Error validating file";
             }
 
             return images;

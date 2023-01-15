@@ -1,24 +1,24 @@
-﻿@page "/hair"
-@model Slim.Pages.Pages.HairModel
-@{
+﻿@page
+@model Slim.Pages.Pages.HairdoModel
+@*@{
     var section1 = @Model.PageSections.FirstOrDefault(x => x.PageSectionName == "Section 1")?.Description ?? "Hurry up! Limited time offer.";
     var section2 = @Model.PageSections.FirstOrDefault(x => x.PageSectionName == "Section 2")?.Description ?? "$LIM Salon";
     var section3 = @Model.PageSections.FirstOrDefault(x => x.PageSectionName == "Section 3")?.Description ?? "Across London...";
     var section4 = @Model.PageSections.FirstOrDefault(x => x.PageSectionName == "Section 4")?.Description ?? "Since 1993, $LIM has committed to the craft of making hair.";
     var service = @Model.PageSections.FirstOrDefault(x => x.PageSectionName == "Exceptional Service")?.Description ?? string.Empty;
 }
-
+*@
 
 <section class="top-section">
     <div class="position-relative mx-auto p-10-3  px-0 mb-lg-5 order-lg-1 hair-section">
         <div class="pb-lg-5 mb-lg-5 text-center text-lg-start text-lg-nowrap">
-            <h3 class="fs-6 text-dark fw-light pb-1 from-bottom">@section1</h3>
-            <h2 class="text-dark display-1 from-bottom delay-1">@section2</h2>
-            <p class="fs-lg text-dark pb-4 from-bottom delay-2">@section3</p>
+            <h3 class="fs-6 text-dark fw-light pb-1 from-bottom">section1</h3>
+            <h2 class="text-dark display-1 from-bottom delay-1">section2</h2>
+            <p class="fs-lg text-dark pb-4 from-bottom delay-2">section3</p>
 
             <hr class="hair-hr " />
 
-            <p class="fs-lg text-dark pt-4 pb-3 from-bottom fs-5"> @section4</p>
+            <p class="fs-lg text-dark pt-4 pb-3 from-bottom fs-5"> section4</p>
 
             <span class="pt-5">
                 <a class="btn btn-lg linkBtn" asp-page="/Appointment">Book Online</a>
@@ -60,7 +60,7 @@
                 <h2 class="fs-3 text-light"> Exceptional Service</h2>
 
                 <p class="fs-6 text-light mt-5 justify-content-md-center">
-                    @service
+                    service
                 </p>
 
                 <span class="pt-5">

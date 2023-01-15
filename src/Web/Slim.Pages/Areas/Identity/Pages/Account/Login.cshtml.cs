@@ -84,6 +84,11 @@ namespace Slim.Pages.Areas.Identity.Pages.Account
 
         public async Task OnGetAsync(string returnUrl = null)
         {
+            if (returnUrl != null && returnUrl.EndsWith("Logout"))
+            {
+                returnUrl = null;
+            }
+
             if (!string.IsNullOrEmpty(ErrorMessage))
             {
                 ModelState.AddModelError(string.Empty, ErrorMessage);
@@ -101,6 +106,11 @@ namespace Slim.Pages.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
+            if (returnUrl != null && returnUrl.EndsWith("Logout"))
+            {
+                returnUrl = null;
+            }
+
             returnUrl ??= Url.Content("~/");
 
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
