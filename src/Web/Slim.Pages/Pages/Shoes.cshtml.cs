@@ -31,7 +31,7 @@ namespace Slim.Pages.Pages
             _cartService = cartService;
 
             var razorPages = _cacheService.GetOrCreate(CacheKey.GetRazorPages, _razorPagesBaseStore.GetAll);
-            _pageId = razorPages.FirstOrDefault(x => string.Compare(x.PageName, "Lashes", StringComparison.OrdinalIgnoreCase) == 0)?.Id ?? 0;
+            _pageId = razorPages.FirstOrDefault(x => string.Compare(x.PageName, "shoes", StringComparison.OrdinalIgnoreCase) == 0)?.Id ?? 0;
         }
 
         [BindProperty(SupportsGet = true)] public List<PageSection> PageSections { get; set; } = new();

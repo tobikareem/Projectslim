@@ -8,5 +8,6 @@
         public const string Create = "Slm_CreateOnly";
         public const string Delete = "Slm_DeleteOnly";
         public const string UserSignUpDate = "SignUpDate";
+        public const string UserFirstName = "UserFirstName";
     }
 }

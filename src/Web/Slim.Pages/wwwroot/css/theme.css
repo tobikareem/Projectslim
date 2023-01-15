@@ -4191,6 +4191,7 @@ textarea.form-control-lg {
   padding-left: 0;
   margin-bottom: 0;
   list-style: none;
+    cursor: pointer;
 }
 
 .nav-link {
@@ -4247,14 +4248,13 @@ textarea.form-control-lg {
 
 .nav-pills .nav-link {
   background: none;
-  border: 0;
-  border-radius: 0.3125rem;
+  border: 1px solid gray;
 }
-.nav-pills .nav-link.active,
-.nav-pills .show > .nav-link {
-  color: #fff;
-  background-color: #fe696a;
-}
+    .nav-pills .nav-link.active,
+    .nav-pills .show > .nav-link {
+        color: #796d56;
+        background-color: #ebe9e1;
+    }
 
 .nav-fill > .nav-link,
 .nav-fill .nav-item {
@@ -16328,10 +16328,10 @@ a.nav-link:hover .media-tab-media {
   color: #4b566b;
   font-size: 0.9375rem;
 }
-.nav-pills .nav-link:hover:not(.active):not([aria-expanded=true]), .nav-pills .nav-link.show {
-  color: #4b566b;
-  background-color: #dfe4ef;
-}
+    .nav-pills .nav-link:hover:not(.active):not([aria-expanded=true]), .nav-pills .nav-link.show {
+        color: #fff;
+        background-color: #796d56;
+    }
 .nav-pills .nav-link.disabled {
   background-color: #fafbfc;
   color: #7d879c;
@@ -16339,9 +16339,9 @@ a.nav-link:hover .media-tab-media {
 .nav-pills .nav-link.disabled:hover:not(.active) {
   background-color: transparent;
 }
-.nav-pills .nav-link.active {
-  box-shadow: 0 0.5rem 1.125rem -0.5rem rgba(254, 105, 106, 0.9);
-}
+    .nav-pills .nav-link.active {
+        box-shadow: 0 0.5rem 1.125rem -0.5rem #796d56;
+    }
 .nav-pills .nav-link i {
   margin-top: -0.25rem;
 }

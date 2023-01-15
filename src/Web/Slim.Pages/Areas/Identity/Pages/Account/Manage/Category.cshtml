@@ -6,56 +6,215 @@
 }
 
 
-<!-- Create Category -->
-
-<div class="row">
-    <div class="col-md-12">
-        <section class="col-lg-12 pt-lg-4 pb-4 mb-3">
-        <div class="pt-2 px-4 ps-lg-0 pe-xl-5">
-            <!-- Title-->
-            <form method="post">
-                <div class="d-sm-flex flex-wrap justify-content-between align-items-center pb-2">
-                    <h2 class="h3 py-2 me-2 text-center text-sm-start">Create a Category</h2>
-                </div>
-
-                
-                <div class="mb-3 py-2">
-                    <label asp-for="Input.RazorPageId" class="col-form-label-lg"></label>
-                    <select asp-for="Input.RazorPageId" asp-items="Model.RazorPageSelectList"
-                            class="form-select me-2" id="uproduct-category"></select>
-                    <span asp-validation-for="Input.RazorPageId" class="text-danger"></span>
-                </div>
-                
-                <div class=" mb-3 py-2">
-                        <label asp-for="Input.CategoryName" class="col-form-label-lg"></label>
-                        <input asp-for="Input.CategoryName" class="form-control me-2" />
-                        <span asp-validation-for="Input.CategoryName" class="text-danger"></span>
-                    </div>
-
-                    <div class="mb-3 py-2">
-                    <label class="form-label" asp-for="Input.CategoryDescription"></label>
-                    <textarea class="form-control" rows="6" id="unp-product-description"
-                        asp-for="Input.CategoryDescription"></textarea>
-                    <span asp-validation-for="Input.CategoryDescription" class="text-danger"></span>
-                </div>
+<div class="mb-3 py-2">
+    <label asp-for="Input.RazorPageId" class="col-form-label-lg"></label>
+    <select asp-for="Input.RazorPageId" asp-items="Model.RazorPageSelectList" class="form-select me-2" id="razorPage-categoryId"></select>
+    <span asp-validation-for="Input.RazorPageId" class="text-danger"></span>
+</div>
 
 
-                    <div class="mb-3 py-2">
-                        <label asp-for="Input.CategoryTag" class="col-form-label-lg"></label>
-                        <input asp-for="Input.CategoryTag" class="form-control me-2" />
-                        <span asp-validation-for="Input.CategoryTag" class="text-danger"></span>
-
-                    </div>
-
-                    <div class="mb-3 py-2">
-                        <input type="submit" value="Create" class="btn btn-primary" />
-
-                    </div>
-
-                </form>
-
+<ul class="nav nav-tabs nav-justified" role="tablist">
+    <li class="nav-item">
+        <a class="nav-link px-0 active" href="#editPage" data-bs-toggle="tab" role="tab">
+            <div class="d-none d-lg-block"><i class="bi bi-pen opacity-60 me-2"></i>Edit Type</div>
+            <div class="d-lg-none text-center">
+                <i class="ci-user opacity-60 d-block fs-xl mb-2"></i><span class="fs-ms">Edit Product Type</span>
             </div>
-        </section>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link px-0" href="#createPage" data-bs-toggle="tab" role="tab">
+            <div class="d-none d-lg-block"><i class="ci-bell opacity-60 me-2"></i>Create Type</div>
+            <div class="d-lg-none text-center">
+                <i class="bi bi-image-alt opacity-60 d-block fs-xl mb-2"></i><span class="fs-ms">
+                    Create Product Type
+                </span>
+            </div>
+        </a>
+    </li>
+</ul>
+
+
+<div class="tab-content">
+    
+    <partial name="_StatusMessage" for="StatusMessage" />
+
+    <!-- Profile-->
+    <div class="tab-pane fade show active" id="editPage" role="tabpanel">
+        <div class="row gx-4 gy-3">
+            <div class="row">
+                <div class="col-md-12">
+                    <section class="col-lg-12 pt-lg-4 pb-4 mb-3">
+                        <div class="pt-2 px-4 ps-lg-0 pe-xl-5">
+                            <!-- Title-->
+                            <form method="post" asp-page-handler="EditCategoryInfo">
+                                <div class="d-sm-flex flex-wrap justify-content-between align-items-center pb-2">
+                                    <h2 class="h3 py-2 me-2 text-center text-sm-start">Edit Category</h2>
+                                </div>
+
+                                <div class="mb-3 py-2">
+                                    <label asp-for="Input.CategoryEditId" class="col-form-label-lg"></label>
+                                    <select asp-for="Input.CategoryEditId" asp-items="Model.CategorySelectList" class="form-select me-2" id="category-select-list"></select>
+                                    <span asp-validation-for="Input.CategoryEditId" class="text-danger"></span>
+                                </div>
+
+                                <hr class="text-primary"/>
+
+                                <div class="mb-3 py-2">
+                                    <label asp-for="Input.CategoryEditName" class="col-form-label-lg"></label>
+                                    <input asp-for="Input.CategoryEditName" class="form-control me-2" id="editCategoryName"/>
+                                    <span asp-validation-for="Input.CategoryEditName" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3 py-2">
+                                    <label asp-for="Input.CategoryEditDescription" class="col-form-label-lg"></label>
+                                    <textarea asp-for="Input.CategoryEditDescription" class="form-control me-2" rows="6" id="editCategoryDesc"></textarea>
+                                    <span asp-validation-for="Input.CategoryEditDescription" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3 py-2">
+                                    <label asp-for="Input.CategoryEditTag" class="col-form-label-lg"></label>
+                                    <input asp-for="Input.CategoryEditTag" class="form-control me-2" id="editCategoryTag"/>
+                                    <span asp-validation-for="Input.CategoryEditTag" class="text-danger"></span>
+                                </div>
+
+                                <div class="bg-secondary rounded-3 p-4">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" asp-for="Input.CanDelete" type="checkbox" data-master-checkbox-for="#editCategory">
+                                        <label class="form-check-label fw-medium" for="nf-disable-all" asp-for="Input.CanDelete"></label>
+                                        <span asp-validation-for="Input.CanDelete" class="text-danger"></span>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3 py-2">
+                                    <input type="submit" value="Edit" class="btn btn-primary"/>
+                                </div>
+                            </form>
+                        </div>
+                    </section>
+
+                </div>
+            </div>
+
+        </div>
 
     </div>
+
+    <div class="tab-pane fade" id="createPage" role="tabpanel">
+        <div class="row gx-4 gy-3">
+            <div class="row">
+                <div class="col-md-12">
+                    <section class="col-lg-12 pt-lg-4 pb-4 mb-3">
+                        <div class="pt-2 px-4 ps-lg-0 pe-xl-5">
+                            <!-- Title-->
+                            <form method="post">
+                                <div class="d-sm-flex flex-wrap justify-content-between align-items-center pb-2">
+                                    <h2 class="h3 py-2 me-2 text-center text-sm-start">Create a Category</h2>
+                                </div>
+
+
+                                <div class="mb-3 py-2">
+                                    <label asp-for="Input.RazorPageId" class="col-form-label-lg"></label>
+                                    <select asp-for="Input.RazorPageId" asp-items="Model.RazorPageSelectList"
+                                            class="form-select me-2" id="uproduct-category"></select>
+                                    <span asp-validation-for="Input.RazorPageId" class="text-danger"></span>
+                                </div>
+
+                                <div class=" mb-3 py-2">
+                                    <label asp-for="Input.CategoryName" class="col-form-label-lg"></label>
+                                    <input asp-for="Input.CategoryName" class="form-control me-2"/>
+                                    <span asp-validation-for="Input.CategoryName" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3 py-2">
+                                    <label class="form-label" asp-for="Input.CategoryDescription"></label>
+                                    <textarea class="form-control" rows="6" id="unp-product-description"
+                                              asp-for="Input.CategoryDescription"></textarea>
+                                    <span asp-validation-for="Input.CategoryDescription" class="text-danger"></span>
+                                </div>
+
+
+                                <div class="mb-3 py-2">
+                                    <label asp-for="Input.CategoryTag" class="col-form-label-lg"></label>
+                                    <input asp-for="Input.CategoryTag" class="form-control me-2"/>
+                                    <span asp-validation-for="Input.CategoryTag" class="text-danger"></span>
+
+                                </div>
+
+                                <div class="mb-3 py-2">
+                                    <input type="submit" value="Create" class="btn btn-primary"/>
+
+                                </div>
+                            </form>
+                        </div>
+                    </section>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
 </div>
+
+
+@section Scripts{
+    <script>
+        var selectData = [];
+        $('#razorPage-categoryId').change(function () {
+            // get the selected value
+            var selectedValue = $(this).val();
+            var pageId = Number(selectedValue);
+            $.ajax({
+                type: 'GET', // define the type of HTTP verb we want to use (POST for our form)
+                url: '@Url.Page("AddNewProduct", "SelectionChanged")',//'/Identity/Account/Manage/WebPagePhotos?handler=SaveWording', // the url where we want to POST
+
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("XSRF-TOKEN",
+                        $('input:hidden[name="__RequestVerificationToken"]').val());
+                },
+                data: { id: pageId }, // our data object
+                contentType: "application/json; charset=utf-8",
+                traditional: true,
+                async: false,
+                success: function (data) {
+                    selectData = data;
+                    // create the option and append to select list product-category
+                    var $el = $("#category-select-list");
+                    $el.empty(); // remove old options
+                    $.each(data, function (value, key) {
+                        $el.append($("<option></option>")
+                            .attr("value", key.id).text(key.categoryName));
+                    });
+                    // get the first item in the list
+                    var firstItem = data[0];
+                    // set the first item in the list as the selected item
+                    $('#editCategoryName').val(firstItem.categoryName);
+                    $('#editCategoryDesc').val(firstItem.categoryDescription);
+                    $('#editCategoryTag').val(firstItem.categoryTags);
+
+                },
+                error: function (data) {
+                    console.log("couldn't Successfully");
+                }
+
+            });
+        });
+
+        $('#category-select-list').change(function () {
+            
+            var selectedValue = $(this).val();
+
+            var categoryId = Number(selectedValue);
+            var category = selectData.find(x => x.id === categoryId);
+
+            $('#editCategoryName').val(category.categoryName);
+            $('#editCategoryDesc').val(category.categoryDescription);
+            $('#editCategoryTag').val(category.categoryTags);
+
+
+
+        });
+    </script>
+
+}

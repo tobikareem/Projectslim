@@ -22,6 +22,10 @@ body {
     height: 478px;
 }
 
+.img-h345 {
+    min-height: 345px;
+}
+
 .homehairImg {
     width: 255px;
     height: 224px;
@@ -32,7 +36,36 @@ body {
     height: 80px;
 }
 
+
 .homePopularImg {
-    width: 100%;
-    height: 240px;
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: cover;
 }
+
+
+@media screen and (min-width:481px) {
+    .homePopularImg {
+        width: 100%;
+        height: 240px;
+    }
+}
+
+
+/*.nav-pills .nav-link.active {
+    box-shadow: 0 0.5rem 1.125rem -0.5rem #796d56 !important;
+}
+
+.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+    background-color: #ebe9e1 !important;
+    border: 1px solid gray;
+    color: #796d56 !important;
+    background-color: !important;
+}
+
+.nav-pills .nav-link.hover, .nav-pills .show > .nav-link {
+    background-color: #796d56 !important;
+    color: white !important;
+}*/

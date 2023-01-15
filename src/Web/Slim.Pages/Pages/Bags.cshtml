@@ -1,40 +1,50 @@
 ﻿@page
 @using Slim.Pages.Extensions
 @inject Slim.Shared.Interfaces.Serv.ICartService _cartService;
-@model Slim.Pages.Pages.LashesModel
+@model Slim.Pages.Pages.BagsModel
 @{
-    var section1 = Model.PageSections.FirstOrDefault(x => x.PageSectionName == "Section 1")?.Description ?? "Fake it till you make it";
-    var section2 = Model.PageSections.FirstOrDefault(x => x.PageSectionName == "Section 2")?.Description ?? "Let the holder find the beauty in your eyes.";
+    var section1 = @Model.PageSections.FirstOrDefault(x => x.PageSectionName == "Section 1")?.Description ?? "Hurry up! Limited time offer.";
+    var section2 = @Model.PageSections.FirstOrDefault(x => x.PageSectionName == "Section 2")?.Description ?? "$LIM Salon";
+    var section3 = @Model.PageSections.FirstOrDefault(x => x.PageSectionName == "Section 3")?.Description ?? "Across London...";
+    var section4 = @Model.PageSections.FirstOrDefault(x => x.PageSectionName == "Section 4")?.Description ?? "Since 1993, $LIM has committed to the craft of making hair.";
+    var service = @Model.PageSections.FirstOrDefault(x => x.PageSectionName == "Exceptional Service")?.Description ?? string.Empty;
 }
 
-<div class="cateSub mt-5">
-    <nav class="navbar navbar-expand-lg bg-light cateSub-nav container sticky-top justify-content-center flex-lg-row">
-        @foreach (var (key, _) in Model.ProductWithCategories)
-        {
-            var splitKey = key.Split(" ")[0];
-            <ul class="navbar-nav">
-                <li class="nav-item px-5">
-                    <a href="#@splitKey" class="nav-link text-dark fs-5">@key</a>
-                </li>
-            </ul>
-        }
-    </nav>
-</div>
 
-<section class="tns-carousel tns-controls-lg cate-banner ">
-    <div class="tns-carousel-inner" data-carousel-options="{&quot;mode&quot;: &quot;gallery&quot;, &quot;responsive&quot;: {&quot;0&quot;:{&quot;nav&quot;:true, &quot;controls&quot;: false},&quot;992&quot;:{&quot;nav&quot;:false, &quot;controls&quot;: true}}}">
-        <div class="px-lg-5 cate-banner">
-            <div class="d-lg-flex justify-content-between align-items-center ps-lg-4">
-                <img class="d-block order-lg-2 flex-shrink-0 bg-img" src="img/shop/catalog/False-Eyelashes.jpg" alt="Eye Lashes">
-                <div class="position-relative mx-auto py-5 px-4 mb-lg-5 order-lg-1">
-                    <div class="pb-lg-5 mb-lg-5 text-center text-lg-start text-lg-nowrap">
-                        <h3 class="h2 text-dark pb-1 from-bottom">@section1</h3>
-                        <h2 class="text-dark display-2 from-bottom delay-1">@section2</h2>
-                    </div>
-                </div>
+<section class="top-section">
+    <div class="position-relative mx-auto py-3  px-0 mb-lg-5 width-70-rem">
+        <div class="pb-lg-5 mb-lg-5 text-center text-lg-start text-lg-nowrap d-lg-flex justify-content-between align-items-center ps-lg-4">
+            <img src="~/img/shop/catalog/modelbag.jpg" alt="modelwithabag" class="img-thumbnail  d-block order-lg-2 flex-shrink-0" />
+
+            <div class="position-relative me-lg-n5 py-5 px-4 mb-lg-5 order-lg-1" style="max-width: 50rem; z-index: 10; margin-left: 4%;">
+                <h3 class="fs-6 text-dark fw-light pb-1 from-bottom">@section1</h3>
+                <h2 class="text-dark display-1 from-bottom delay-1">@section2</h2>
+                <p class="fs-lg text-dark pb-4 from-bottom delay-2">@section3 </p>
+                
+                <hr class="hair-hr " />
+
+                <p class="fs-lg text-dark pt-4 pb-3 from-bottom fs-5"> @section4</p>
+                
+              
             </div>
         </div>
+        
+        <div class="position-relative">
+            <ul class="nav nav-pills">
+                <li class="nav-item">
+                    <button class="nav-link active linkBtn" aria-current="page" id="selectAllBag" onclick="OnSelectBag('all')">ALL</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link linkBtn" id="selectMenBag" onclick="OnSelectBag('men')">MEN</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link linkBtn" id="selectWomenBag" onclick="OnSelectBag('women')">WOMEN</button>
+                </li>
+            </ul>
+        </div>
     </div>
+    
+ 
 </section>
 
 
@@ -43,8 +53,8 @@
     foreach (var (category, products) in Model.ProductWithCategories)
     {
         var splitKey = category.Split(" ")[0];
-        <section class="container pt-md-3 pb-5 mb-md-3 mt-5 mt-9-lashes " id="@splitKey">
-            <h2 class="display-6 text-center">@category</h2>
+        <section class="container pt-md-3 pb-5 mb-md-3 mt-5 " id="@splitKey">
+            <h2 class="display-6 text-center" id="cateTest">@category</h2>
             <div class="row pt-4 mx-n2">
 
                 @foreach (var product in products)
@@ -55,7 +65,7 @@
 
                     var productPrice = _cartService.GetPriceForProduct(product.StandardPrice, product.SalePrice);
 
-                    <div class="col-lg-3 col-md-4 col-sm-6 px-2 mb-4">
+                    <div class="col-lg-3 col-md-4 col-sm-6 px-2 mb-4 productTags"  name="@product.ProductTags">
                         <div class="card product-card">
                             @if (product.IsOnSale)
                             {
@@ -64,7 +74,7 @@
                             <button class="btn-wishlist btn-sm" type="button" data-bs-toggle="tooltip" data-bs-placement="left" title="Add to wishlist"><i class="bi bi-heart"></i></button>
 
                             <a class="card-img-top d-block overflow-hidden" asp-page="/ProductDetail" asp-route-id="@product.Id">
-                                <img src="@primary.GetImageSrc(imgPrimary?.UploadedImage)" alt="Product">
+                                <img src="@primary.GetImageSrc(imgPrimary?.UploadedImage)" alt="Product" class="img-h345">
                             </a>
 
                             <div class="card-body py-2">
@@ -73,8 +83,10 @@
                                 <div class="d-flex justify-content-between">
                                     @if (product.IsOnSale)
                                     {
-                                        <div class="product-price"><span class="text-accent"><s>$@productPrice.StandardWholePrice.<small>@productPrice.StandardPriceRoundUp</small></s></span>
-                                            <span class="text-accent">$@productPrice.SalesWholePrice<span class="fs-sm">.@productPrice.SalesPriceRoundUp</span></span></div>
+                                        <div class="product-price">
+                                            <span class="text-accent"><s>$@productPrice.StandardWholePrice.<small>@productPrice.StandardPriceRoundUp</small></s></span>
+                                            <span class="text-accent">$@productPrice.SalesWholePrice<span class="fs-sm">.@productPrice.SalesPriceRoundUp</span></span>
+                                        </div>
                                     }
                                     else
                                     {
@@ -86,7 +98,7 @@
                                 </div>
                             </div>
                             <div class="card-body card-body-hidden">
-                                
+
                                 @if (product.IsProductInCart)
                                 {
                                     <button class="btn btn-secondary btn-sm d-block w-100 mb-2" id="added-to-cart-@product.Id" type="button" disabled><i class="bi bi-bag-plus-fill fs-sm me-1"></i>Added to Cart</button>
@@ -117,8 +129,9 @@
 
             GetTotalCartPrice(priceUrl);
             GetTotalCartItem(cartUrl);
+        
         });
 
-        
+
     </script>
 }

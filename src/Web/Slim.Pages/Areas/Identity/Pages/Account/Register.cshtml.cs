@@ -128,24 +128,37 @@ namespace Slim.Pages.Areas.Identity.Pages.Account
             await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
             var result = await _userManager.CreateAsync(user, Input.Password);
 
-            var claims = new List<Claim>
-            {
-                new(ClaimTypes.Name, Input.FirstName),
-                new (ClaimTypes.Surname, Input.LastName),
-                new(ClaimTypes.Role, ResourceRole.Read),
-                new(ResourceRole.UserSignUpDate, DateTime.Now.ToString("yyyy-MM-dd"))
-            };
-
-            if (SlmConstant.AdminEmailList.Select(x => x.ToLowerInvariant()).Contains(Input.Email.ToLowerInvariant()))
-            {
-                claims.Add(new Claim(ClaimTypes.Role, ResourceRole.Admin));
-            }
-
-            var addClaimsResult = await _userManager.AddClaimsAsync(user, claims);
-
-            if (result.Succeeded && addClaimsResult.Succeeded)
+            if (result.Succeeded)
             {
                 _logger.LogInformation("User created a new account with password.");
+
+
+                var claims = new List<Claim>
+                {
+                    new(ClaimTypes.Name, Input.FirstName),
+                    new (ClaimTypes.Surname, Input.LastName),
+                    new(ClaimTypes.Role, ResourceRole.Read),
+                    new(ResourceRole.UserSignUpDate, DateTime.Now.ToString("yyyy-MM-dd"))
+                };
+
+                if (SlmConstant.AdminEmailList.Select(x => x.ToLowerInvariant()).Contains(Input.Email.ToLowerInvariant()))
+                {
+                    claims.Add(new Claim(ClaimTypes.Role, ResourceRole.Admin));
+                }
+
+                var addClaimsResult = await _userManager.AddClaimsAsync(user, claims);
+
+                if (addClaimsResult.Succeeded)
+                {
+                    _logger.LogInformation("User with claims added.");
+                }
+                else
+                {
+                    foreach (var error in addClaimsResult.Errors)
+                    {
+                        _logger.LogInformation("User with claims error out. {errorCode} - {errorDescription}", error.Code, error.Description);
+                    }
+                }
 
                 var defaultSessionId = GetUserDefaultSessionName();
                 if (!string.IsNullOrWhiteSpace(defaultSessionId))

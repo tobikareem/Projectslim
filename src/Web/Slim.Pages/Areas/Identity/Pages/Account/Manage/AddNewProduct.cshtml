@@ -8,6 +8,7 @@
 <div class="row">
 
     <div asp-validation-summary="ModelOnly" asp-validation-class="text-danger"></div>
+    <partial name="_StatusMessage" for="StatusMessage" />
     <!-- Section Add new Product -->
     <section class="col-lg-12 pt-lg-4 pb-4 mb-3">
         <div class="pt-2 px-4 ps-lg-0 pe-xl-5">
@@ -85,7 +86,7 @@
                                 <span class="input-group-text"><i class="bi bi-plus"></i></span>
                                 <input class="form-control" asp-for="InModel.ProductQuantity">
                             </div>
-                            <div class="form-text">How many quaunties are in store?</div>
+                            <div class="form-text">How many quantities are in store?</div>
                             <span asp-validation-for="InModel.ProductQuantity" class="text-danger"></span>
                         </div>
                         <div class="col-sm-6 mb-3">
