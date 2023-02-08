@@ -3,10 +3,10 @@
 @inject Slim.Shared.Interfaces.Serv.ICartService _cartService;
 @model Slim.Pages.Pages.BagsModel
 @{
-    var section1 = @Model.PageSections.FirstOrDefault(x => x.PageSectionName == "Section 1")?.Description ?? "Hurry up! Limited time offer.";
-    var section2 = @Model.PageSections.FirstOrDefault(x => x.PageSectionName == "Section 2")?.Description ?? "$LIM Salon";
-    var section3 = @Model.PageSections.FirstOrDefault(x => x.PageSectionName == "Section 3")?.Description ?? "Across London...";
-    var section4 = @Model.PageSections.FirstOrDefault(x => x.PageSectionName == "Section 4")?.Description ?? "Since 1993, $LIM has committed to the craft of making hair.";
+    var section1 = @Model.PageSections.FirstOrDefault(x => x.PageSectionName == "Section 1")?.Description ?? string.Empty;
+    var section2 = @Model.PageSections.FirstOrDefault(x => x.PageSectionName == "Section 2")?.Description ?? string.Empty;
+    var section3 = @Model.PageSections.FirstOrDefault(x => x.PageSectionName == "Section 3")?.Description ?? string.Empty;
+    var section4 = @Model.PageSections.FirstOrDefault(x => x.PageSectionName == "Section 4")?.Description ?? string.Empty;
     var service = @Model.PageSections.FirstOrDefault(x => x.PageSectionName == "Exceptional Service")?.Description ?? string.Empty;
 }
 

@@ -34,8 +34,10 @@
                 @{
                     var userYear = User.Claims.FirstOrDefault(c => c.Type == ResourceRole.UserSignUpDate)?.Value?.Split("-")[0];
                     var date = string.IsNullOrWhiteSpace(userYear) ? DateTime.Now.Year : Convert.ToInt32(userYear);
+
+                    var name = User.Claims.Where(x => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name").Skip(1).FirstOrDefault()?.Value;
                 }
-                <h3 class="text-light fs-lg mb-0">Slim</h3><span class="d-block text-light fs-ms opacity-60 py-1">Member since @date</span>
+                <h3 class="text-light fs-lg mb-0">@name</h3><span class="d-block text-light fs-ms opacity-60 py-1">Member since @date</span>
             </div>
         </div>
         @* <div class="d-flex">

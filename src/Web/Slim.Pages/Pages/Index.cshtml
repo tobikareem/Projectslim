@@ -27,7 +27,7 @@
                         <h3 class="h2 text-dark fw-light pb-1 from-bottom">@bannerHeading1</h3>
                         <h2 class="text-dark display-5 from-bottom delay-1">@bannerHeading2</h2>
                         <p class="fs-lg text-dark pb-3 from-bottom delay-2">@bannerHeading3</p>
-                        <div class="d-table scale-up delay-4 mx-auto mx-lg-0"><a class="btn linkBtn" asp-page="/Appointment">Our picks'<i class="bi bi-arrow-right-circle-fill ms-2 me-n1"></i></a></div>
+                        <div class="d-table scale-up delay-4 mx-auto mx-lg-0"><a class="btn linkBtn" asp-page="/Appointment">Best Sellers<i class="bi bi-arrow-right-circle-fill ms-2 me-n1"></i></a></div>
                     </div>
                 </div>
             </div>
@@ -157,7 +157,7 @@
             <div class="d-sm-flex justify-content-between align-items-center bg-secondary overflow-hidden rounded-3">
                 <div class="py-4 my-2 my-md-0 py-md-5 px-4 ms-md-3 text-center text-sm-start">
                     <h4 class="fs-lg fw-light mb-2">Want to talk to a fashion expert?</h4>
-                    <h3 class="mb-4">Hurry up to reserve your spot</h3><a class="btn btn-primary btn-shadow btn-sm" asp-page="/Appointment">Click Here</a>
+                    <h3 class="mb-4">Call a fashion expert</h3><a class="btn btn-primary btn-shadow btn-sm" asp-page="/Appointment">Click Here</a>
                 </div>
                 @*<img class="d-block ms-auto" src="img/shop/catalog/banner.jpg" alt="Shop Converse">*@
             </div>
@@ -196,135 +196,143 @@
         <div class="col-md-7 pt-4 pt-md-0">
             <div class="tns-carousel">
                 <div class="tns-carousel-inner" data-carousel-options="{&quot;nav&quot;: false, &quot;controlsContainer&quot;: &quot;#hoodie-day&quot;}">
-                    <!-- Carousel item-->
-                    <div>
-                        <div class="row mx-n2">
-                            @{
-                                var allShoes = Model.DisplayShoes.Where(x => x.IsTrending).OrderByDescending(x => x.ModifiedDate.GetValueOrDefault()).ThenBy(x => x.CreatedDate).Take(6).ToList();
+                    @{
+                        var allShoes = Model.DisplayShoes.Where(x => x.IsTrending).OrderByDescending(x => x.ModifiedDate.GetValueOrDefault()).ThenBy(x => x.CreatedDate).Take(6).ToList();
+                        var first6 = allShoes.Take(6).ToList();
 
-                                for (var i = 0; i < allShoes.Count(); i++)
-                                {
-                                    var item = allShoes[i];
+                        <!-- Carousel item-->
+                        <div>
+                            <div class="row mx-n2">
+                                @{
+                                    for (var i = 0; i < first6.Count; i++)
+                                    {
+                                        var item = allShoes[i];
 
-                                    var primary = string.Empty;
-                                    var imgPrimary = item.Images.FirstOrDefault(x => x.IsPrimaryImage);
+                                        var primary = string.Empty;
+                                        var imgPrimary = item.Images.FirstOrDefault(x => x.IsPrimaryImage);
 
-                                    var productPrice = _cartService.GetPriceForProduct(item.StandardPrice, item.SalePrice);
+                                        var productPrice = _cartService.GetPriceForProduct(item.StandardPrice, item.SalePrice);
 
-                                    <div class="col-lg-4 col-6 px-0 px-sm-2 mb-sm-4  d-none d-lg-block" >
-                                        <div class="card product-card card-static">
-                                            <button class="btn-wishlist btn-sm" type="button" data-bs-toggle="tooltip" data-bs-placement="left" title="Add to wishlist"> <i class="bi bi-heart"></i> </button>
-                                            <a class="card-img-top d-block overflow-hidden" asp-page="/ProductDetail" asp-route-id="@item.Id">
-                                                <img src="@primary.GetImageSrc(imgPrimary?.UploadedImage)" alt="Shoes" class="homehairImg">
-                                            </a>
+                                        <div class="col-lg-4 col-6 px-0 px-sm-2 mb-sm-4 @ManageClassAttr.Add_d_noneAnd_d_lg_block(i)">
+                                            <div class="card product-card card-static">
+                                                <button class="btn-wishlist btn-sm" type="button" data-bs-toggle="tooltip" data-bs-placement="left" title="Add to wishlist"> <i class="bi bi-heart"></i> </button>
+                                                <a class="card-img-top d-block overflow-hidden" asp-page="/ProductDetail" asp-route-id="@item.Id">
+                                                    <img src="@primary.GetImageSrc(imgPrimary?.UploadedImage)" alt="Shoes" class="homehairImg">
+                                                </a>
 
-                                            <div class="card-body py-2">
-                                                <a class="product-meta d-block fs-xs pb-1" asp-page="/ProductDetail" asp-route-id="@item.Id">@item.Category.CategoryName</a>
-                                                <h3 class="product-title fs-sm"><a asp-page="/ProductDetail" asp-route-id="@item.Id">@item.ProductName</a></h3>
-                                                <div class="d-flex justify-content-between">
-                                                    @if (item.IsOnSale)
-                                                    {
-                                                        <div class="product-price"> <span class="text-accent">$@productPrice.SalesWholePrice<span class="fs-sm">.@productPrice.SalesPriceRoundUp</span></span></div>
-                                                    }
-                                                    else
-                                                    {
-                                                        <div class="product-price"><span class="text-accent">$@productPrice.StandardWholePrice.<small>@productPrice.StandardPriceRoundUp</small></span></div>
-                                                    }
-
-                                                    <div class="star-rating">
-                                                        @{
-
-                                                            var average = item.Reviews.Count > 0 ? item.Reviews.Average(r => r.Rating) : 0;
-                                                            var enumerates1 = Enumerable.Range(0, (int)average);
-
-                                                            var enumerable1 = enumerates1.ToList();
-                                                            foreach (var _ in enumerable1)
-                                                            {
-                                                                <i class="star-rating-icon bi bi-star-fill"></i>
-                                                            }
-
-                                                            var remaining1 = 5 - enumerable1.Count;
-                                                            for (var j = 0; j < remaining1; j++)
-                                                            {
-                                                                <i class="star-rating-icon bi bi-star"></i>
-                                                            }
-
+                                                <div class="card-body py-2">
+                                                    <a class="product-meta d-block fs-xs pb-1" asp-page="/ProductDetail" asp-route-id="@item.Id">@item.Category.CategoryName</a>
+                                                    <h3 class="product-title fs-sm"><a asp-page="/ProductDetail" asp-route-id="@item.Id">@item.ProductName</a></h3>
+                                                    <div class="d-flex justify-content-between">
+                                                        @if (item.IsOnSale)
+                                                        {
+                                                            <div class="product-price"> <span class="text-accent">$@productPrice.SalesWholePrice<span class="fs-sm">.@productPrice.SalesPriceRoundUp</span></span></div>
                                                         }
+                                                        else
+                                                        {
+                                                            <div class="product-price"><span class="text-accent">$@productPrice.StandardWholePrice.<small>@productPrice.StandardPriceRoundUp</small></span></div>
+                                                        }
+
+                                                        <div class="star-rating">
+                                                            @{
+
+                                                                var average = item.Reviews.Count > 0 ? item.Reviews.Average(r => r.Rating) : 0;
+                                                                var enumerates1 = Enumerable.Range(0, (int)average);
+
+                                                                var enumerable1 = enumerates1.ToList();
+                                                                foreach (var _ in enumerable1)
+                                                                {
+                                                                    <i class="star-rating-icon bi bi-star-fill"></i>
+                                                                }
+
+                                                                var remaining1 = 5 - enumerable1.Count;
+                                                                for (var j = 0; j < remaining1; j++)
+                                                                {
+                                                                    <i class="star-rating-icon bi bi-star"></i>
+                                                                }
+
+                                                            }
+                                                        </div>
                                                     </div>
                                                 </div>
+
                                             </div>
-
                                         </div>
-                                    </div>
+                                    }
+
                                 }
-                            }
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- Carousel item-->
-                    <div>
-                        <div class="row mx-n2">
-                            @{
-                                var allShoes2 = Model.DisplayShoes.Where(x => !x.IsTrending).OrderByDescending(x => x.ModifiedDate.GetValueOrDefault()).ThenBy(x => x.CreatedDate).Take(6).ToList();
+                        if (allShoes.Count > 6)
+                        {
+                            <!-- Carousel item-->
+                            <div>
+                                <div class="row mx-n2">
 
-                                for (var i = 0; i < allShoes2.Count(); i++)
-                                {
-                                    var item = allShoes2[i];
+                                    @{
+                                        var newShoes = allShoes.Skip(6).ToList();
+                                        for (var i = 0; i < newShoes.Count(); i++)
+                                        {
+                                            var item = allShoes[i];
 
-                                    var primary = string.Empty;
-                                    var imgPrimary = item.Images.FirstOrDefault(x => x.IsPrimaryImage);
+                                            var primary = string.Empty;
+                                            var imgPrimary = item.Images.FirstOrDefault(x => x.IsPrimaryImage);
 
-                                    var productPrice = _cartService.GetPriceForProduct(item.StandardPrice, item.SalePrice);
+                                            var productPrice = _cartService.GetPriceForProduct(item.StandardPrice, item.SalePrice);
 
-                                    <div class="col-lg-4 col-6 px-0 px-sm-2 mb-sm-4  d-none d-lg-block">
-                                        <div class="card product-card card-static">
-                                            <button class="btn-wishlist btn-sm" type="button" data-bs-toggle="tooltip" data-bs-placement="left" title="Add to wishlist"> <i class="bi bi-heart"></i> </button>
-                                            <a class="card-img-top d-block overflow-hidden" asp-page="/ProductDetail" asp-route-id="@item.Id">
-                                                <img src="@primary.GetImageSrc(imgPrimary?.UploadedImage)" alt="Shoes" class="homehairImg">
-                                            </a>
+                                            <div class="col-lg-4 col-6 px-0 px-sm-2 mb-sm-4 @ManageClassAttr.Add_d_noneAnd_d_lg_block(i)">
+                                                <div class="card product-card card-static">
+                                                    <button class="btn-wishlist btn-sm" type="button" data-bs-toggle="tooltip" data-bs-placement="left" title="Add to wishlist"> <i class="bi bi-heart"></i> </button>
+                                                    <a class="card-img-top d-block overflow-hidden" asp-page="/ProductDetail" asp-route-id="@item.Id">
+                                                        <img src="@primary.GetImageSrc(imgPrimary?.UploadedImage)" alt="Shoes" class="homehairImg">
+                                                    </a>
 
-                                            <div class="card-body py-2">
-                                                <a class="product-meta d-block fs-xs pb-1" asp-page="/ProductDetail" asp-route-id="@item.Id">@item.Category.CategoryName</a>
-                                                <h3 class="product-title fs-sm"><a asp-page="/ProductDetail" asp-route-id="@item.Id">@item.ProductName</a></h3>
-                                                <div class="d-flex justify-content-between">
-                                                    @if (item.IsOnSale)
-                                                    {
-                                                        <div class="product-price"> <span class="text-accent">$@productPrice.SalesWholePrice<span class="fs-sm">.@productPrice.SalesPriceRoundUp</span></span></div>
-                                                    }
-                                                    else
-                                                    {
-                                                        <div class="product-price"><span class="text-accent">$@productPrice.StandardWholePrice.<small>@productPrice.StandardPriceRoundUp</small></span></div>
-                                                    }
-
-                                                    <div class="star-rating">
-                                                        @{
-
-                                                            var average = item.Reviews.Count > 0 ? item.Reviews.Average(r => r.Rating) : 0;
-                                                            var enumerates1 = Enumerable.Range(0, (int)average);
-
-                                                            var enumerable1 = enumerates1.ToList();
-                                                            foreach (var _ in enumerable1)
+                                                    <div class="card-body py-2">
+                                                        <a class="product-meta d-block fs-xs pb-1" asp-page="/ProductDetail" asp-route-id="@item.Id">@item.Category.CategoryName</a>
+                                                        <h3 class="product-title fs-sm"><a asp-page="/ProductDetail" asp-route-id="@item.Id">@item.ProductName</a></h3>
+                                                        <div class="d-flex justify-content-between">
+                                                            @if (item.IsOnSale)
                                                             {
-                                                                <i class="star-rating-icon bi bi-star-fill"></i>
+                                                                <div class="product-price"> <span class="text-accent">$@productPrice.SalesWholePrice<span class="fs-sm">.@productPrice.SalesPriceRoundUp</span></span></div>
+                                                            }
+                                                            else
+                                                            {
+                                                                <div class="product-price"><span class="text-accent">$@productPrice.StandardWholePrice.<small>@productPrice.StandardPriceRoundUp</small></span></div>
                                                             }
 
-                                                            var remaining1 = 5 - enumerable1.Count;
-                                                            for (var j = 0; j < remaining1; j++)
-                                                            {
-                                                                <i class="star-rating-icon bi bi-star"></i>
-                                                            }
+                                                            <div class="star-rating">
+                                                                @{
 
-                                                        }
+                                                                    var average = item.Reviews.Count > 0 ? item.Reviews.Average(r => r.Rating) : 0;
+                                                                    var enumerates1 = Enumerable.Range(0, (int)average);
+
+                                                                    var enumerable1 = enumerates1.ToList();
+                                                                    foreach (var _ in enumerable1)
+                                                                    {
+                                                                        <i class="star-rating-icon bi bi-star-fill"></i>
+                                                                    }
+
+                                                                    var remaining1 = 5 - enumerable1.Count;
+                                                                    for (var j = 0; j < remaining1; j++)
+                                                                    {
+                                                                        <i class="star-rating-icon bi bi-star"></i>
+                                                                    }
+
+                                                                }
+                                                            </div>
+                                                        </div>
                                                     </div>
+
                                                 </div>
                                             </div>
+                                        }
 
-                                        </div>
-                                    </div>
-                                }
-                            }
-                        </div>
-                    </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    }
                 </div>
             </div>
         </div>

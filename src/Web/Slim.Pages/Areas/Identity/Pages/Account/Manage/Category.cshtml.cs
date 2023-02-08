@@ -20,7 +20,7 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
 
         public List<SelectListItem> RazorPageSelectList { get; set; } = new();
         public List<SelectListItem> CategorySelectList { get; set; } = new();
-        
+
         public CategoryModel(IBaseStore<Category> categoryRepository, ILogger<CategoryModel> logger, ICacheService cacheService, IBaseStore<RazorPage> razorPagesBaseStore)
         {
             _categoryRepository = categoryRepository;
@@ -29,7 +29,7 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
             _razorPagesBaseStore = razorPagesBaseStore;
 
             _categories = _cacheService.GetOrCreate(CacheKey.ProductCategories, _categoryRepository.GetAll, 60);
-            _razorPages = _cacheService.GetOrCreate(CacheKey.GetRazorPages, _razorPagesBaseStore.GetAll).Where(x => SlmConstant.PagesForDropDown.Contains(x.PageName));
+            _razorPages = _cacheService.GetOrCreate(CacheKey.GetRazorPages, _razorPagesBaseStore.GetAll).Where(x => x.PageName != "Home");
         }
 
         [BindProperty] public InputModel Input { get; set; } = new();
@@ -99,7 +99,7 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
                 category.CategoryName = Input.CategoryEditName;
             }
 
-            if(category.CategoryDescription != Input.CategoryEditDescription)
+            if (category.CategoryDescription != Input.CategoryEditDescription)
             {
                 hasChanges = true;
                 category.CategoryDescription = Input.CategoryEditDescription;
@@ -120,10 +120,11 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
 
         private void Init()
         {
-            var pageId = _razorPages.FirstOrDefault(x => string.Compare(x.PageName, "Bags", StringComparison.OrdinalIgnoreCase) == 0)?.Id ?? 1;
+            // start by showing bag information first
+            var pageIdForBag = _razorPages.FirstOrDefault(x => string.Compare(x.PageName, "Bags", StringComparison.OrdinalIgnoreCase) == 0)?.Id ?? 1;
             RazorPageSelectList = _razorPages.Select(page => new SelectListItem { Text = page.PageName, Value = page.Id.ToString() }).ToList();
 
-            var editCategory = _categories.Where(x => x.RazorPageId == pageId).ToList();
+            var editCategory = _categories.Where(x => x.RazorPageId == pageIdForBag).ToList();
             CategorySelectList =editCategory.Select(category => new SelectListItem { Text = category.CategoryName, Value = category.Id.ToString() }).ToList();
 
             Input = new InputModel

@@ -54,6 +54,17 @@ body {
 }
 
 
+/** height on a descktop **/
+
+@media screen and (min-width: 1024px) {
+  .img-h345 {
+    min-height: 345px;
+    max-height: 345px;
+    width: 100%;
+}
+}
+
+
 /*.nav-pills .nav-link.active {
     box-shadow: 0 0.5rem 1.125rem -0.5rem #796d56 !important;
 }
