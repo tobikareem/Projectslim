@@ -21,14 +21,14 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
         private readonly IBaseStore<Product> _productBaseStore;
         private readonly ILogger<AddNewProductModel> _logger;
         private readonly IBaseStore<Category> _categoryBaseStore;
-
+        private readonly IEnumerable<Category> _categories;
+        private readonly IEnumerable<RazorPage> _razorPages;
 
         public TestCaptions TextCaptions { get; set; }
         public List<SelectListItem> RazorPageSelectList { get; set; }
         public List<SelectListItem> CategorySelectList { get; set; }
 
-        private readonly IEnumerable<Category> _categories;
-        private readonly IEnumerable<RazorPage> _razorPages;
+        public string[] Genders = { "Male", "Female", "All" };
 
         public AddNewProductModel(IBaseStore<RazorPage> razorPagesBaseStore, ICacheService cacheService, IBaseImage imageBaseStore, ILogger<AddNewProductModel> logger, IBaseStore<Product> productBaseStore, IBaseStore<Category> categoryBaseStore)
         {
@@ -62,9 +62,7 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
             };
 
             InModel.Category = _categories.FirstOrDefault(x => x.CategoryName == "General")?.Id ?? 1;
-
         }
-
 
         public IActionResult OnGetEditProduct(int id)
         {
@@ -92,7 +90,11 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
                 IsTrending = product.IsTrending,
                 ProductQuantity = product.ProductQuantity,
                 Category = product.Category.Id,
-                Id = product.Id
+                Id = product.Id,
+                Gender = product.Gender,
+                HasMaxi = product.HasMaxi,
+                HasMidi = product.HasMidi,
+                HasMini = product.HasMini
             };
 
             return Page();
@@ -153,7 +155,11 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
                 IsTrending = InModel.IsTrending,
                 ProductTags = InModel.ProductTags,
                 ProductQuantity = InModel.ProductQuantity,
-                CategoryId = InModel.Category
+                CategoryId = InModel.Category,
+                Gender = InModel.Gender,
+                HasMini = InModel.HasMini,
+                HasMidi = InModel.HasMidi,
+                HasMaxi = InModel.HasMaxi
             };
             return product;
         }
@@ -175,8 +181,12 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
             prd.CategoryId = InModel.Category;
             prd.ModifiedBy = User.Identity?.Name;
             prd.ModifiedDate = DateTime.UtcNow;
+            prd.Gender = InModel.Gender;
+            prd.HasMini = InModel.HasMini;
+            prd.HasMidi = InModel.HasMidi;
+            prd.HasMaxi = InModel.HasMaxi;
 
-            if (InModel.ProductImage != null)
+            if (InModel?.ProductImage != null)
             {
                 // delete existing image
                 var existingImage = prd.Images.FirstOrDefault(c => c.IsPrimaryImage);
@@ -191,7 +201,7 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
             }
 
 
-            if (InModel.ProductImages != null)
+            if (InModel?.ProductImages != null)
             {
                 // delete existing images
                 var existingImages = prd.Images.Where(c => !c.IsPrimaryImage).ToList();
@@ -205,7 +215,7 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
                 prd.Images.AddRange(images);
             }
 
-            if (InModel.ProductImage != null || InModel.ProductImages != null) return prd;
+            if (InModel?.ProductImage != null || InModel?.ProductImages != null) return prd;
 
             // To skip validation
             InModel.ProductImage = new FormFile(null!, 0, 0, null!, null!);
@@ -403,6 +413,15 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
 
             [Display(Name = "Trending")]
             public bool IsTrending { get; set; }
+
+            public string Gender { get; set; } = "All";
+
+            [Display(Name = "Mini")]
+            public bool HasMini { get; set; }
+            [Display(Name = "Midi")]
+            public bool HasMidi { get; set; }
+            [Display(Name = "Maxi")]
+            public bool HasMaxi { get; set; }
 
         }
 

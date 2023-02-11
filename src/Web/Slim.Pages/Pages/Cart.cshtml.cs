@@ -46,7 +46,7 @@ namespace Slim.Pages.Pages
             TotalCartPrice = GetTotalCartPrice();
         }
 
-        public JsonResult OnGetNewProductToCart(int id)
+        public JsonResult OnGetNewProductToCart(int id, string detail)
         {
             ShoppingCartUserId = GetShoppingCartUserId();
 
@@ -60,7 +60,8 @@ namespace Slim.Pages.Pages
                     CreatedDate = DateTime.UtcNow,
                     CreatedBy = User.Identity?.Name ?? ShoppingCartUserId,
                     Product = _productStore.GetEntity(id),
-                    CartUserId = User.Identity?.Name ?? ShoppingCartUserId
+                    CartUserId = User.Identity?.Name ?? ShoppingCartUserId,
+                    ProductDetail = detail
                 };
 
                 _shoppingCartBaseStore.AddEntity(cartItem, CacheKey.GetShoppingCartItem, true);

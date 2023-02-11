@@ -76,6 +76,10 @@ namespace Slim.Data.Context
                 entity.Property(e => e.IsNewProduct).IsRequired().HasDefaultValue(true);
                 entity.Property(e => e.IsTrending).IsRequired().HasDefaultValue(false);
                 entity.Property(e => e.ProductQuantity);
+                entity.Property(e => e.Gender);
+                entity.Property(e => e.HasMini);
+                entity.Property(e => e.HasMidi);
+                entity.Property(e => e.HasMaxi);
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
                 entity.Property(e => e.CreatedBy);
@@ -151,6 +155,7 @@ namespace Slim.Data.Context
                 entity.Property(e => e.Id).IsRequired();
                 entity.Property(e => e.Quantity);
                 entity.Property(e => e.CartUserId);
+                entity.Property(e => e.ProductDetail);
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
