@@ -16,8 +16,6 @@ namespace Slim.Pages.Extensions
         {
 
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'SlimDbContextConnection' not found.");
-            connectionString =
-                "Server=tcp:fortuneweb.database.windows.net,1433;Initial Catalog=SlimWebDB;Persist Security Info=False;User ID=FortuneWeb;Password=@2fortunE;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
             builder.Services.AddDbContext<SlimDbContext>(options =>options.UseSqlServer(connectionString));
             
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
