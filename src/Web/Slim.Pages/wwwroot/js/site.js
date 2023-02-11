@@ -87,10 +87,13 @@ function GetTotalCartPrice(url) {
 }
 
 function OnAddItemToCart(productId, url, totalCartUrl) {
+
+  // get SizeSelection radio button id
+  var detail = $("input[name='SizeSelectionRadioButton']:checked").val();
   $.ajax({
     url: url,
     type: "get",
-    data: { id: productId },
+    data: { id: productId, detail },
     success: function (data) {
       if (data > 0) {
         SetCartIconData(data);

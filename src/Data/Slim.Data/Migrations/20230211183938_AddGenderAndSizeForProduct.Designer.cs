@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Slim.Data.Context;
 
@@ -11,9 +12,10 @@ using Slim.Data.Context;
 namespace Slim.Data.Migrations
 {
     [DbContext(typeof(SlimDbContext))]
-    partial class SlimDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230211183938_AddGenderAndSizeForProduct")]
+    partial class AddGenderAndSizeForProduct
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -339,7 +341,7 @@ namespace Slim.Data.Migrations
                     b.Property<Guid>("ImageId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier")
-                        .HasDefaultValue(new Guid("d00c8683-2189-4865-8793-e9314d8bbd4e"));
+                        .HasDefaultValue(new Guid("289c1a99-5709-4ab2-96f5-ba2937cd51f8"));
 
                     b.Property<bool>("IsPrimaryImage")
                         .ValueGeneratedOnAdd()
@@ -747,10 +749,6 @@ namespace Slim.Data.Migrations
 
                     b.Property<DateTime?>("ModifiedDate")
                         .HasColumnType("datetime");
-
-                    b.Property<string>("ProductDetail")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
