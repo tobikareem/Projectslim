@@ -25,6 +25,10 @@ namespace Slim.Data.Entity
         public bool IsNewProduct { get; set; }
         public bool IsTrending { get; set; }
         public int ProductQuantity { get; set; }
+        public string Gender { get; set; }
+        public bool HasMini { get; set; }
+        public bool HasMidi { get; set; }
+        public bool HasMaxi { get; set; }
         public int? CategoryId { get; set; }
         [NotMapped] public bool IsProductInCart { get; set; }
         public ICollection<Image> Images { get; set; }

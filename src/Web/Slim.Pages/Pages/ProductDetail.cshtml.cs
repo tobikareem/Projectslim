@@ -18,9 +18,13 @@ public class ProductDetailModel : PageModel
     private readonly IBaseStore<Comment> _commentBaseStore;
     private readonly UserManager<IdentityUser> _userManager;
     private readonly IBaseStore<UserPageImage> _userPageImage;
+    private readonly IBaseStore<RazorPage> _razorPagesBaseStore;
+
     private ILogger<ProductDetailModel> _logger;
     private ICacheService _cacheService;
     private readonly ICartService _cartService;
+    public string[] Sizes = { "Mini", "Midi", "Maxi" };
+    public bool IsBagCategory;
 
     public ProductDetailModel(
         IBaseStore<Product> productBaseStore,
@@ -28,7 +32,7 @@ public class ProductDetailModel : PageModel
         ICacheService cacheService, IBaseStore<Review> reviewBaseStore,
         IBaseStore<Comment> commentBaseStore, UserManager<IdentityUser> userManager,
         ICartService cartService,
-        IBaseStore<UserPageImage> userPageImage)
+        IBaseStore<UserPageImage> userPageImage, IBaseStore<RazorPage> razorPagesBaseStore)
     {
         _productBaseStore = productBaseStore;
         _logger = logger;
@@ -38,6 +42,7 @@ public class ProductDetailModel : PageModel
         _userManager = userManager;
         _cartService = cartService;
         _userPageImage = userPageImage;
+        _razorPagesBaseStore = razorPagesBaseStore;
 
         Product = new Product();
     }
@@ -45,6 +50,7 @@ public class ProductDetailModel : PageModel
     [BindProperty] public Product Product { get; set; }
     [BindProperty] public ReviewModel Review { get; set; } = new();
     [BindProperty] public string UserComment { get; set; } = string.Empty;
+    [BindProperty] public string SizeSelectionRadioButton { get; set;}
     [TempData] public string TempComment { get; set; } = string.Empty;
     [TempData] public string TempReview { get; set; } = string.Empty;
     [TempData] public string StatusMessage { get; set; } = string.Empty;
@@ -67,6 +73,17 @@ public class ProductDetailModel : PageModel
             Review.FullName = $"{User.Claims.Where(x => x.Type == ClaimTypes.Name).Skip(1).FirstOrDefault()?.Value} {User.FindFirstValue(ClaimTypes.Surname)}";
             Review.Email = user.Email;
         }
+
+        var cartItem = _cartService.GetCartItemsForUser(User.Identity?.Name, GetCartUserId()).FirstOrDefault(x => x.ProductId == id);
+
+        if (cartItem != null)
+        {
+            SizeSelectionRadioButton = Sizes.FirstOrDefault(x => x == cartItem.ProductDetail) ?? string.Empty;
+        }
+
+        var razorPages = _cacheService.GetOrCreate(CacheKey.GetRazorPages, _razorPagesBaseStore.GetAll);
+
+        IsBagCategory = razorPages.First(x => x.PageName == "Bags").Id == Product.RazorPageId;
 
 
         if (TempData["TempReview"] == null && TempData["TempComment"] == null)
