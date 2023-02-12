@@ -2,7 +2,7 @@
 @using System.Globalization
 @using Slim.Pages.Extensions
 @model Slim.Pages.Pages.CartModel
-@inject Slim.Shared.Interfaces.Serv.ICartService _cartService;
+@inject Slim.Shared.Interfaces.Serv.ICartService CartService;
 @{
 }
 
@@ -45,7 +45,7 @@
 
                     var primary = string.Empty;
                     var imgPrimary = product.Images.FirstOrDefault(x => x.IsPrimaryImage);
-                    var productPrice = _cartService.GetPriceForProduct(product.StandardPrice, product.SalePrice);
+                    var productPrice = CartService.GetPriceForProduct(product.StandardPrice, product.SalePrice);
 
                     <div class="d-sm-flex justify-content-between align-items-center my-2 pb-3 border-bottom">
                         <div class="d-block d-sm-flex align-items-center text-center text-sm-start">
@@ -55,6 +55,16 @@
                             <div class="pt-2">
                                 <h3 class="product-title fs-base mb-2"><a asp-page="/ProductDetail" asp-route-id="@product.Id">@product.ProductName</a></h3>
                                 <div class="fs-sm"><span class="text-muted me-2">Category:</span>@product.Category.CategoryName</div>
+
+                                @if (CartService.GetProductType(product.RazorPageId) == "bags")
+                                {
+                                    var it = item;
+
+                                    <div class="fs-sm">
+                                        <select asp-items="@Model.BagSizesListItems" asp-for="@Model.CartItems[it].BagSize" class="form-select"
+                                        id="selected_bagSize" onchange="OnBagSizeItemChanged('@Model.CartItems[it].Id')"></select>
+                                    </div>
+                                }
                                 @if (product.IsOnSale)
                                 {
                                     <div class="fs-lg text-accent pt-2">$@productPrice.SalesWholePrice.<small>@productPrice.SalesPriceRoundUp</small></div>
@@ -63,6 +73,7 @@
                                 {
                                     <div class="fs-lg text-accent pt-2">$@productPrice.StandardWholePrice.<small>@productPrice.StandardPriceRoundUp</small></div>
                                 }
+
                             </div>
                         </div>
                         <div class="pt-2 pt-sm-0 ps-sm-3 mx-auto mx-sm-0 text-center text-sm-start" style="max-width: 9rem;">
@@ -82,24 +93,6 @@
                     </div>
                 }
             </form>
-
-            <!-- Item-->
-            @*  <div class="d-sm-flex justify-content-between align-items-center my-2 pb-3 border-bottom">
-            <div class="d-block d-sm-flex align-items-center text-center text-sm-start">
-            <a class="d-inline-block flex-shrink-0 mx-auto me-sm-4" href="shop-single-v1.html"><img src="img/shop/cart/01.jpg" width="160" alt="Product"></a>
-            <div class="pt-2">
-            <h3 class="product-title fs-base mb-2"><a href="shop-single-v1.html">Women Colorblock Sneakers</a></h3>
-            <div class="fs-sm"><span class="text-muted me-2">Size:</span>8.5</div>
-            <div class="fs-sm"><span class="text-muted me-2">Color:</span>White &amp; Blue</div>
-            <div class="fs-lg text-accent pt-2">$154.<small>00</small></div>
-            </div>
-            </div>
-            <div class="pt-2 pt-sm-0 ps-sm-3 mx-auto mx-sm-0 text-center text-sm-start" style="max-width: 9rem;">
-            <label class="form-label" for="quantity1">Quantity</label>
-            <input class="form-control" type="number" id="quantity1" min="1" value="1">
-            <button class="btn btn-link px-0 text-danger" type="button"><i class="bi bi-trash3 me-2"></i><span class="fs-sm">Remove</span></button>
-            </div>
-            </div>*@
 
         </section>
         <!-- Sidebar-->
@@ -196,52 +189,27 @@
 
 @section Scripts{
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
             var priceUrl = '@Url.Page("Cart", "TotalCartPrice")';
             var cartUrl = '@Url.Page("Cart", "TotalCartCount")';
 
             GetTotalCartPrice(priceUrl);
             GetTotalCartItem(cartUrl);
 
-            //$('#quantitySelect').change(function () {
-            //    // get the selected value
-            //    var quantity = $(this).val();
-            //    var selectedId = $('#cartItemId').val();
-
-            //    $.ajax({
-            //        type: 'GET', // define the type of HTTP verb we want to use (POST for our form)
-            //        url: '@Url.Page(null, "UpdateShoppingCart")',
-
-            //        beforeSend: function (xhr) {
-            //            xhr.setRequestHeader("XSRF-TOKEN",
-            //                $('input:hidden[name="__RequestVerificationToken"]').val());
-            //        },
-            //        data: { cartItemId: selectedId, quantity }, // our data object
-            //        contentType: "application/json; charset=utf-8",
-            //        traditional: true,
-            //        async: false,
-            //        success:
-            //            function (data) {
-            //                if (data > 0) {
-            //                    SetCartIconData(data);
-            //                }
-
-            //                var cartUrl = '@Url.Page("Cart", "TotalCartCount")';
-            //                GetTotalCartItem(cartUrl);
-            //            },
-            //        error: function (data) {
-            //            console.log(data);
-            //        }
-
-
-            //    });
-
-            //});
-        })
+        });
 
         function OnSelectItemChanged(id, selectedCartId) {
             var quantity = Number(id.selectedIndex) + 1;
+            callAjax({ cartItemId: selectedCartId, quantity, bagSize: '', changeType: 'quantity' });
+        }
 
+        function OnBagSizeItemChanged(selectedCartId) {
+            // get select bag size from dropdown id selected_bagSize
+            var bagSize = $('#selected_bagSize option:selected').text();
+            callAjax({ cartItemId: selectedCartId, quantity: 0, bagSize, changeType: 'bagSize' });
+        }
+
+        function callAjax(data) {
             $.ajax({
                 type: 'GET', // define the type of HTTP verb we want to use (POST for our form)
                 url: '@Url.Page(null, "UpdateShoppingCart")',
@@ -250,7 +218,7 @@
                     xhr.setRequestHeader("XSRF-TOKEN",
                         $('input:hidden[name="__RequestVerificationToken"]').val());
                 },
-                data: { cartItemId: selectedCartId, quantity }, // our data object
+                data: data, // our data object
                 contentType: "application/json; charset=utf-8",
                 traditional: true,
                 async: false,

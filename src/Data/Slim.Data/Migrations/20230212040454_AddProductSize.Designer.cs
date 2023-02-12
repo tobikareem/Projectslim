@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Slim.Data.Context;
 
@@ -11,9 +12,10 @@ using Slim.Data.Context;
 namespace Slim.Data.Migrations
 {
     [DbContext(typeof(SlimDbContext))]
-    partial class SlimDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230212040454_AddProductSize")]
+    partial class AddProductSize
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -339,7 +341,7 @@ namespace Slim.Data.Migrations
                     b.Property<Guid>("ImageId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier")
-                        .HasDefaultValue(new Guid("6a88b505-f7ee-4cb3-9116-76387c3abfd7"));
+                        .HasDefaultValue(new Guid("eeaedaed-8dcf-4fe3-b566-f252016ad001"));
 
                     b.Property<bool>("IsPrimaryImage")
                         .ValueGeneratedOnAdd()
@@ -746,6 +748,10 @@ namespace Slim.Data.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValueSql("((1))");
 
+                    b.Property<string>("JewelrySize")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ModifiedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -756,6 +762,9 @@ namespace Slim.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ShoeSize")
                         .HasColumnType("int");
 
                     b.HasKey("Id");

@@ -15,15 +15,18 @@ namespace Slim.Pages.Pages
         private readonly ILogger<CartModel> _logger;
         private readonly ICacheService _cacheService;
         private readonly ICartService _cartService;
+        private readonly IBaseStore<RazorPage> _razorPagesBaseStore;
 
+        public List<SelectListItem> BagSizesListItems { get; set; }
         public List<SelectListItem> QuantitySelectListItem { get; set; }
 
-        public CartModel(IBaseCart<ShoppingCart> shoppingCart, IBaseStore<Product> product, ILogger<CartModel> logger, ICacheService cacheService, ICartService cartService)
+        public CartModel(IBaseCart<ShoppingCart> shoppingCart, IBaseStore<Product> product, ILogger<CartModel> logger, ICacheService cacheService, ICartService cartService, IBaseStore<RazorPage> razorPagesBaseStore)
         {
             _shoppingCartBaseStore = shoppingCart;
             _productStore = product;
             _cacheService = cacheService;
             _cartService = cartService;
+            _razorPagesBaseStore = razorPagesBaseStore;
 
             ShoppingCartUserId = string.Empty;
             _logger=logger;
@@ -33,10 +36,18 @@ namespace Slim.Pages.Pages
                 Value = x.ToString(),
                 Text = x.ToString()
             }).ToList();
+
+            BagSizesListItems = SlmConstant.BagSizes.Select(size => new SelectListItem
+            {
+                Value = size,
+                Text = size
+            }).ToList();
+
         }
 
         private string ShoppingCartUserId { get; set; }
         [BindProperty] public List<ShoppingCart> CartItems { get; set; } = new();
+        [BindProperty] public string SelectedBagSize { get; set; } = string.Empty;
 
         public decimal TotalCartPrice { get; set; }
 
@@ -44,9 +55,12 @@ namespace Slim.Pages.Pages
         {
             CartItems =  _cartService.GetCartItemsForUser(User.Identity?.Name ?? string.Empty, GetShoppingCartUserId());
             TotalCartPrice = GetTotalCartPrice();
+
+            var razorPages = _cacheService.GetOrCreate(CacheKey.GetRazorPages, _razorPagesBaseStore.GetAll);
+            // var isBagCategory = razorPages.First(x => x.PageName == "Bags").Id == Product.RazorPageId;
         }
 
-        public JsonResult OnGetNewProductToCart(int id, string detail)
+        public JsonResult OnGetAddNewProductToCart(int id, string bagSize)
         {
             ShoppingCartUserId = GetShoppingCartUserId();
 
@@ -60,9 +74,13 @@ namespace Slim.Pages.Pages
                     CreatedDate = DateTime.UtcNow,
                     CreatedBy = User.Identity?.Name ?? ShoppingCartUserId,
                     Product = _productStore.GetEntity(id),
-                    CartUserId = User.Identity?.Name ?? ShoppingCartUserId,
-                    ProductDetail = detail
+                    CartUserId = User.Identity?.Name ?? ShoppingCartUserId
                 };
+
+                if (!string.IsNullOrWhiteSpace(bagSize))
+                {
+                    cartItem.BagSize = bagSize;
+                }
 
                 _shoppingCartBaseStore.AddEntity(cartItem, CacheKey.GetShoppingCartItem, true);
 
@@ -84,8 +102,9 @@ namespace Slim.Pages.Pages
             TotalCartPrice = GetTotalCartPrice();
             return new JsonResult(TotalCartPrice);
         }
+        
 
-        public JsonResult OnGetUpdateShoppingCart(string cartItemId, int quantity)
+        public JsonResult OnGetUpdateShoppingCart(string cartItemId, int quantity, string bagSize, string changeType)
         {
             ShoppingCartUserId = GetShoppingCartUserId();
             var itemsFromCache = _cartService.GetCartItemsForUser(User.Identity?.Name ?? string.Empty, ShoppingCartUserId);
@@ -99,9 +118,20 @@ namespace Slim.Pages.Pages
                 return new JsonResult(TotalCartPrice);
             }
 
-            changedItemFromCache.Quantity = quantity;
+           
             changedItemFromCache.ModifiedDate = DateTime.UtcNow;
             changedItemFromCache.ModifiedBy = ShoppingCartUserId;
+
+            switch (changeType)
+            {
+                case "quantity":
+                    changedItemFromCache.Quantity = quantity;
+                    break;
+                case "bagSize":
+                    changedItemFromCache.BagSize = bagSize;
+                    break;
+            }
+
             _shoppingCartBaseStore.UpdateEntity(changedItemFromCache, CacheKey.GetShoppingCartItem, true);
 
             CartItems  = _cartService.GetCartItemsForUser(User.Identity?.Name ?? string.Empty, ShoppingCartUserId);

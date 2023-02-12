@@ -49,16 +49,20 @@
             };
             }
         }
-        public static List<string> EssentialBillingAddressModel
-        {
-            get
+        public static List<string> EssentialBillingAddressModel =>
+            new()
             {
-                return new List<string>{
                 nameof(AddressModel.BillingAddress1),
                 nameof(AddressModel.BillingAddress2),
                 nameof(AddressModel.BillingZipCode)
             };
-            }
-        }
+
+        public static string[] BagSizes => new[] {
+            "Mini",
+            "Midi",
+            "Maxi"
+        };
+
+        public static string[] Genders => new[] { "Male", "Female", "All" };
     }
 }

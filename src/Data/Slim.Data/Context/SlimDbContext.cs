@@ -155,7 +155,7 @@ namespace Slim.Data.Context
                 entity.Property(e => e.Id).IsRequired();
                 entity.Property(e => e.Quantity);
                 entity.Property(e => e.CartUserId);
-                entity.Property(e => e.ProductDetail);
+                entity.Property(e => e.BagSize);
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
