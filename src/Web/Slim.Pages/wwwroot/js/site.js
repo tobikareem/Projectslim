@@ -86,32 +86,55 @@ function GetTotalCartPrice(url) {
   });
 }
 
-function OnAddItemToCart(productId, url, totalCartUrl) {
+function OnAddItemToCart(productId, url, totalCartUrl, productType) {
 
   // get SizeSelection radio button id
-  var detail = $("input[name='SizeSelectionRadioButton']:checked").val();
+    var bagSize = $("input[name='SizeSelectionRadioButton']:checked").val();
+    if (bagSize == undefined && productType === 'bags') {
+       // show the error modal
+        $('#errorModal').modal('show');
+        return;
+    } else {
+        // hide the error modal
+        $('#errorModal').modal('hide');
+    }
+
+       // hide the add to cart button and display a added to cart button
+       $("#add-to-cart-" + productId).prop("disabled", true);
+
+       // change the class of the button to btn btn-secondary
+       $("#add-to-cart-" + productId).removeClass("btn-primary");
+       $("#add-to-cart-" + productId).addClass("btn-secondary");
+ 
+       // add html to the button to display added to cart <i class="bi bi-bag-plus-fill fs-sm me-1"></i>
+       $("#add-to-cart-" + productId).html(
+         '<i class="bi bi-bag-plus-fill fs-sm me-1"></i> Added to cart'
+       );
+
   $.ajax({
     url: url,
     type: "get",
-    data: { id: productId, detail },
+      data: { id: productId, bagSize },
     success: function (data) {
       if (data > 0) {
         SetCartIconData(data);
       }
-      // hide the add to cart button and display a added to cart button
-      $("#add-to-cart-" + productId).prop("disabled", true);
-
-      // change the class of the button to btn btn-secondary
-      $("#add-to-cart-" + productId).removeClass("btn-primary");
-      $("#add-to-cart-" + productId).addClass("btn-secondary");
-
-      // add html to the button to display added to cart <i class="bi bi-bag-plus-fill fs-sm me-1"></i>
-      $("#add-to-cart-" + productId).html(
-        '<i class="bi bi-bag-plus-fill fs-sm me-1"></i> Added to cart'
-      );
 
       GetTotalCartItem(totalCartUrl);
     },
+    error: function (data) {
+         // hide the add to cart button and display a added to cart button
+         $("#add-to-cart-" + productId).prop("disabled", false);
+
+         // change the class of the button to btn btn-secondary
+         $("#add-to-cart-" + productId).removeClass("btn-secondary");
+         $("#add-to-cart-" + productId).addClass("btn-primary");
+   
+         // add html to the button to display added to cart <i class="bi bi-bag-plus-fill fs-sm me-1"></i>
+         $("#add-to-cart-" + productId).html(
+           '<i class="bi bi-cart fs-lg me-2"></i> Add to cart'
+         );
+    }
   });
 }
 

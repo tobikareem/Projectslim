@@ -36,4 +36,11 @@ public interface ICartService
     /// <param name="defaultSessionUser"></param>
     /// <returns></returns>
     List<Product> GetProductsWithInCartCheck(IEnumerable<Product> products, string loggedInUser, string defaultSessionUser);
+
+    /// <summary>
+    /// Get the type of product that it is
+    /// </summary>
+    /// <param name="razorPageId"></param>
+    /// <returns></returns>
+    string GetProductType(int razorPageId);
 }

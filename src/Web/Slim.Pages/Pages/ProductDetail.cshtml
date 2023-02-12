@@ -1,7 +1,7 @@
 @page "{id:int}"
 @using Slim.Pages.Extensions
 @model Slim.Pages.Pages.ProductDetailModel
-@inject Slim.Shared.Interfaces.Serv.ICartService _cartService;
+@inject Slim.Shared.Interfaces.Serv.ICartService CartService;
 
 @{
     ViewData["Title"] = "ProductDetail";
@@ -31,6 +31,22 @@
 }
 <partial name="_StatusMessage" for="StatusMessage" />
 
+<!-- Error modal-->
+<div class="modal fade" id="errorModal" tabindex="-1" role="dialog" aria-labelledby="errorModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <p class="fs-5"> Please, select a size. </p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="dismissModal()">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="page-wrapper">
     <div class="page-title-overlap bg-accent pt-4">
         <div class="container d-lg-flex justify-content-between py-2 py-lg-3">
@@ -52,7 +68,6 @@
             </div>
         </div>
     </div>
-
 
     <!-- Shadow box-->
     <section class="container mb-3 pb-3">
@@ -112,7 +127,7 @@
                     <hr class="d-lg-none">
                     <div class="bg-white h-100 p-4 ms-auto border-start">
                         @{
-                            var price = _cartService.GetPriceForProduct(Model.Product.StandardPrice, Model.Product.SalePrice);
+                            var price = CartService.GetPriceForProduct(Model.Product.StandardPrice, Model.Product.SalePrice);
                         }
                         <div class="px-lg-2">
                             <div class="accordion accordion-flush mb-3" id="licenses">
@@ -150,7 +165,7 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
                             @if (Model.IsBagCategory)
                             {
                                 <div class="bg-secondary py-2 mb-3">
@@ -161,7 +176,15 @@
                                         {
                                             <div class="col mb-3">
                                                 <label class="form-label">@s</label>
-                                                <input class="form-check-input" type="radio" value="@s" asp-for="SizeSelectionRadioButton">
+                                                @if (@Model.Product.IsProductInCart)
+                                                {
+                                                    <input class="form-check-input" type="radio" value="@s" asp-for="SizeSelectionRadioButton" disabled>
+                                                }
+                                                else
+                                                {
+                                                    <input class="form-check-input" type="radio" value="@s" asp-for="SizeSelectionRadioButton">
+                                                }
+
                                             </div>
                                         }
                                     </div>
@@ -171,7 +194,7 @@
                             <hr>
                             @if (!Model.Product.IsProductInCart)
                             {
-                                <button class="btn btn-primary btn-shadow d-block w-100 mt-4"  id="add-to-cart-@Model.Product.Id" type="submit" onclick="OnAddItemToCart(@Model.Product.Id, '@Url.Page("Cart", "NewProductToCart")', '@Url.Page("Cart", "TotalCartCount")')"><i class="bi bi-cart fs-lg me-2"></i>Add to Cart</button>
+                                <button class="btn btn-primary btn-shadow d-block w-100 mt-4" id="add-to-cart-@Model.Product.Id" type="submit" onclick="OnAddItemToCart(@Model.Product.Id, '@Url.Page("Cart", "AddNewProductToCart")', '@Url.Page("Cart", "TotalCartCount")'), @CartService.GetProductType(@Model.Product.RazorPageId)"><i class="bi bi-cart fs-lg me-2"></i>Add to Cart</button>
                             }
                             else
                             {
@@ -355,10 +378,10 @@
                                             {
                                                 <img class="rounded-circle" src="~/img/home/banners/upload.png" width="50" alt="@review.FullName">
                                             }
-                                            
+
                                             <div class="ps-3">
-                                                <h6 class="fs-sm mb-0">@review.FullName</h6><span class="fs-ms text-muted">@review.CreatedDate.ToShortDateString()</span> 
-                                                
+                                                <h6 class="fs-sm mb-0">@review.FullName</h6><span class="fs-ms text-muted">@review.CreatedDate.ToShortDateString()</span>
+
                                             </div>
                                         </div>
                                         <div>
@@ -409,7 +432,7 @@
                     <div class="col-md-5 mt-2 pt-4 mt-md-0 pt-md-0">
                         <div class="bg-secondary py-grid-gutter px-grid-gutter rounded-3">
                             <h3 class="h4 pb-2">Write a review</h3>
-                            <partial name="Shared/_StatusMessage" for="StatusMessage"/>
+                            <partial name="Shared/_StatusMessage" for="StatusMessage" />
                             <form class="needs-validation" method="post" asp-page-handler="SubmitUserReview" id="reviewForm">
                                 <div class="mb-3">
                                     <label class="form-label" asp-for="Review.FullName"></label>
@@ -477,7 +500,7 @@
                                             <h6 class="fs-md mb-0">@productComment.FullName</h6>
                                         </div>
                                         <p class="fs-md mb-1">@productComment.UserComment</p><span class="fs-ms text-muted"><i class="bi bi-time align-middle me-2"></i>@productComment.CreatedDate.ToShortDateString()</span>
-                                       
+
                                     </div>
                                 </div>
                             }
@@ -524,5 +547,9 @@
             GetTotalCartPrice(priceUrl);
             GetTotalCartItem(cartUrl);
         });
+
+        function dismissModal() {
+            $('#errorModal').modal('hide');
+        }
     </script>
 }

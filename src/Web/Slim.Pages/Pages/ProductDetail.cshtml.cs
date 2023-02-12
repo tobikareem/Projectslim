@@ -23,7 +23,7 @@ public class ProductDetailModel : PageModel
     private ILogger<ProductDetailModel> _logger;
     private ICacheService _cacheService;
     private readonly ICartService _cartService;
-    public string[] Sizes = { "Mini", "Midi", "Maxi" };
+    public string[] Sizes = SlmConstant.BagSizes;
     public bool IsBagCategory;
 
     public ProductDetailModel(
@@ -50,7 +50,7 @@ public class ProductDetailModel : PageModel
     [BindProperty] public Product Product { get; set; }
     [BindProperty] public ReviewModel Review { get; set; } = new();
     [BindProperty] public string UserComment { get; set; } = string.Empty;
-    [BindProperty] public string SizeSelectionRadioButton { get; set;}
+    [BindProperty] public string SizeSelectionRadioButton { get; set;} = string.Empty;
     [TempData] public string TempComment { get; set; } = string.Empty;
     [TempData] public string TempReview { get; set; } = string.Empty;
     [TempData] public string StatusMessage { get; set; } = string.Empty;
@@ -78,7 +78,7 @@ public class ProductDetailModel : PageModel
 
         if (cartItem != null)
         {
-            SizeSelectionRadioButton = Sizes.FirstOrDefault(x => x == cartItem.ProductDetail) ?? string.Empty;
+            SizeSelectionRadioButton = Sizes.FirstOrDefault(x => x == cartItem.BagSize) ?? string.Empty;
         }
 
         var razorPages = _cacheService.GetOrCreate(CacheKey.GetRazorPages, _razorPagesBaseStore.GetAll);
