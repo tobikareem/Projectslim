@@ -28,7 +28,7 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
         public List<SelectListItem> RazorPageSelectList { get; set; }
         public List<SelectListItem> CategorySelectList { get; set; }
 
-        public string[] Genders = { "Male", "Female", "All" };
+        public string[] Genders = SlmConstant.Genders;
 
         public AddNewProductModel(IBaseStore<RazorPage> razorPagesBaseStore, ICacheService cacheService, IBaseImage imageBaseStore, ILogger<AddNewProductModel> logger, IBaseStore<Product> productBaseStore, IBaseStore<Category> categoryBaseStore)
         {

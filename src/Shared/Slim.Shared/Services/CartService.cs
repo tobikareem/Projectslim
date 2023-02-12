@@ -10,11 +10,13 @@ namespace Slim.Shared.Services
     {
         private readonly ICacheService _cacheService;
         private readonly IBaseCart<ShoppingCart> _shoppingCartBaseStore;
+        private readonly IBaseStore<RazorPage> _razorPagesBaseStore;
 
-        public CartService(IBaseCart<ShoppingCart> shoppingCartBaseStore, ICacheService cacheService)
+        public CartService(IBaseCart<ShoppingCart> shoppingCartBaseStore, ICacheService cacheService, IBaseStore<RazorPage> razorPagesBaseStore)
         {
             _shoppingCartBaseStore = shoppingCartBaseStore;
             _cacheService = cacheService;
+            _razorPagesBaseStore = razorPagesBaseStore;
         }
 
         public List<ShoppingCart> GetCartItemsForUser(string loggedInUser, string defaultSessionUser)
@@ -73,6 +75,12 @@ namespace Slim.Shared.Services
             }).ToList();
 
             return productsWithInCartCheck;
+        }
+
+        public string GetProductType(int razorPageId)
+        {
+            var razorPages = _cacheService.GetOrCreate(CacheKey.GetRazorPages, _razorPagesBaseStore.GetAll);
+            return razorPages.First(x => x.Id == razorPageId).PageName.ToLowerInvariant();
         }
     }
 }
