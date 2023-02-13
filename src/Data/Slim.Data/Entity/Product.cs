@@ -12,6 +12,7 @@ namespace Slim.Data.Entity
             ProductImages = new HashSet<ProductImage>();
             Comments = new HashSet<Comment>();
             Reviews = new HashSet<Review>();
+            ProductDetails = new HashSet<ProductDetail>();
         }
 
         public int Id { get; set; }
@@ -25,16 +26,13 @@ namespace Slim.Data.Entity
         public bool IsNewProduct { get; set; }
         public bool IsTrending { get; set; }
         public int ProductQuantity { get; set; }
-        public string Gender { get; set; }
-        public bool HasMini { get; set; }
-        public bool HasMidi { get; set; }
-        public bool HasMaxi { get; set; }
         public int? CategoryId { get; set; }
         [NotMapped] public bool IsProductInCart { get; set; }
         public ICollection<Image> Images { get; set; }
         public ICollection<ProductImage> ProductImages { get; set; }
         public ICollection<Comment> Comments { get; set; }
         public ICollection<Review> Reviews { get; set; }
+        public ICollection<ProductDetail> ProductDetails { get; set; }
         public virtual RazorPage RazorPage { get; set; }
         public virtual Category Category { get; set; }
 

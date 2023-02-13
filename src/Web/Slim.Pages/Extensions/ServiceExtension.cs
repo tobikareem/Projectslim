@@ -48,6 +48,7 @@ public static class ServiceExtension
         builder.Services.AddScoped<IPageSection, PageSectionRepo>();
         builder.Services.AddScoped<IBaseImage, ImageUploadRepo>();
         builder.Services.AddScoped<IBaseStore<Product>, ProductRepository>();
+        builder.Services.AddScoped<IBaseStore<ProductDetail>, ProductDetailRepository>();
         builder.Services.AddScoped<IBaseStore<Category>, CategoryRepository>();
         builder.Services.AddScoped<IBaseStore<Review>, ReviewRepository>();
         builder.Services.AddScoped<IBaseStore<Comment>, CommentRepository>();

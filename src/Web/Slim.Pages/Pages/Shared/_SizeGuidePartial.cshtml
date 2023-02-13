@@ -1,0 +1,116 @@
+﻿@using Slim.Core.Model
+
+
+<ul class="nav nav-tabs nav-justified" role="tablist">
+    <li class="nav-item">
+        <a class="nav-link px-0 active" href="#editPage" data-bs-toggle="tab" role="tab">
+            <div class="d-none d-lg-block"><i class="bi bi-person opacity-60 me-2"></i>Men</div>
+            <div class="d-lg-none text-center">
+                <i class="ci-user opacity-60 d-block fs-xl mb-2"></i><span class="fs-ms">Men Shoe Guide</span>
+            </div>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link px-0" href="#createPage" data-bs-toggle="tab" role="tab">
+            <div class="d-none d-lg-block"><i class="bi bi-person-circle opacity-60 me-2"></i>Women</div>
+            <div class="d-lg-none text-center">
+                <i class="bi bi-image-alt opacity-60 d-block fs-xl mb-2"></i><span class="fs-ms">
+                    Women Shoe Guide
+                </span>
+            </div>
+        </a>
+    </li>
+</ul>
+
+
+<div class="tab-content">
+
+    <!-- Profile-->
+    <div class="tab-pane fade show active" id="editPage" role="tabpanel">
+        <div class="row gx-4 gy-3">
+            <div class="row">
+                <div class="col-md-12">
+                    <section class="col-lg-12 pt-lg-4 pb-4 mb-3">
+                        <div class="pt-2 px-4 ps-lg-0 pe-xl-5">
+                            <table class="table">
+
+                                <thead>
+                                    <tr>
+                                        <th scope="col">NG</th>
+                                        <th scope="col">EU</th>
+                                        <th scope="col">UK</th>
+                                        <th scope="col">US</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+
+
+                                    @for (var i = 0; i < ShoeSize.MensNgSize.Length; i++)
+                                    {
+                                        <tr>
+                                            <th scope="row">@ShoeSize.MensNgSize[i]</th>
+                                            <td>@ShoeSize.MensEuSize[i]</td>
+                                            <td>@ShoeSize.MensUkSize[i]</td>
+                                            <td>@ShoeSize.MensUsSize[i]</td>
+                                        </tr>
+                                    }
+
+
+                                </tbody>
+
+                            </table>
+                        </div>
+                    </section>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="tab-pane fade" id="createPage" role="tabpanel">
+        <div class="row gx-4 gy-3">
+            <div class="row">
+                <div class="col-md-12">
+                    <section class="col-lg-12 pt-lg-4 pb-4 mb-3">
+                        <div class="pt-2 px-4 ps-lg-0 pe-xl-5">
+                            <table class="table">
+
+                                <thead>
+                                <tr>
+                                    <th scope="col">NG</th>
+                                    <th scope="col">EU</th>
+                                    <th scope="col">UK</th>
+                                    <th scope="col">US</th>
+                                </tr>
+                                </thead>
+
+                                <tbody>
+
+
+                                @for (var i = 0; i < ShoeSize.WomensNgSize.Length; i++)
+                                {
+                                    <tr>
+                                        <th scope="row">@ShoeSize.WomensNgSize[i]</th>
+                                        <td>@ShoeSize.WomensEuSize[i]</td>
+                                        <td>@ShoeSize.WomensUkSize[i]</td>
+                                        <td>@ShoeSize.WomensUsSize[i]</td>
+                                    </tr>
+                                }
+
+
+                                </tbody>
+
+                            </table>
+                        </div>
+                    </section>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
