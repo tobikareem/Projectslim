@@ -223,3 +223,12 @@ function OnSelectBag(selection) {
     });
   }
 }
+
+function dismissModal(id) {
+
+    // hide the error modal
+
+    $(`#${id}`).modal('hide');
+
+  // $('#errorModal').modal('hide');
+}

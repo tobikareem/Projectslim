@@ -23,7 +23,7 @@ public class ProductDetailModel : PageModel
     private ILogger<ProductDetailModel> _logger;
     private ICacheService _cacheService;
     private readonly ICartService _cartService;
-    public string[] Sizes = SlmConstant.BagSizes;
+    public string[] BagSizes = SlmConstant.BagSizes;
     public bool IsBagCategory;
 
     public ProductDetailModel(
@@ -75,10 +75,27 @@ public class ProductDetailModel : PageModel
         }
 
         var cartItem = _cartService.GetCartItemsForUser(User.Identity?.Name, GetCartUserId()).FirstOrDefault(x => x.ProductId == id);
+        
+
+        if (!Product.ProductDetails.Any(x => x.HasMini))
+        {
+            BagSizes = BagSizes.Where(x => x != "Mini").ToArray();
+        }
+
+        if (!Product.ProductDetails.Any(x => x.HasMidi))
+        {
+            BagSizes = BagSizes.Where(x => x != "Midi").ToArray();
+        }
+
+        if (!Product.ProductDetails.Any(x => x.HasMaxi))
+        {
+            BagSizes = BagSizes.Where(x => x != "Maxi").ToArray();
+        }
+
 
         if (cartItem != null)
         {
-            SizeSelectionRadioButton = Sizes.FirstOrDefault(x => x == cartItem.BagSize) ?? string.Empty;
+            SizeSelectionRadioButton = BagSizes.FirstOrDefault(x => x == cartItem.BagSize) ?? string.Empty;
         }
 
         var razorPages = _cacheService.GetOrCreate(CacheKey.GetRazorPages, _razorPagesBaseStore.GetAll);
