@@ -8,6 +8,7 @@ using Slim.Shared.Interfaces.Serv;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.Net.Http.Headers;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Globalization;
 using NuGet.Packaging;
 // ReSharper disable ConditionIsAlwaysTrueOrFalse
 
@@ -19,18 +20,25 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
         private readonly ICacheService _cacheService;
         private readonly IBaseImage _imageBaseStore;
         private readonly IBaseStore<Product> _productBaseStore;
+        private readonly IBaseStore<ProductDetail> _productDetailBaseStore;
         private readonly ILogger<AddNewProductModel> _logger;
         private readonly IBaseStore<Category> _categoryBaseStore;
         private readonly IEnumerable<Category> _categories;
         private readonly IEnumerable<RazorPage> _razorPages;
+        private readonly ICartService _cartService;
 
         public TestCaptions TextCaptions { get; set; }
         public List<SelectListItem> RazorPageSelectList { get; set; }
         public List<SelectListItem> CategorySelectList { get; set; }
+        public List<SelectListItem> AllMenShoeSizesItems { get; set; }
+        public List<SelectListItem> AllWomenShoeSizesItems { get; set; }
 
         public string[] Genders = SlmConstant.Genders;
+        public double[] MenShoeSizes = ShoeSize.MensNgSize;
+        public double[] WomenShoeSizes = ShoeSize.WomensNgSize;
+        [BindProperty] public IEnumerable<string> SelectedShoeSizes { get; set; }
 
-        public AddNewProductModel(IBaseStore<RazorPage> razorPagesBaseStore, ICacheService cacheService, IBaseImage imageBaseStore, ILogger<AddNewProductModel> logger, IBaseStore<Product> productBaseStore, IBaseStore<Category> categoryBaseStore)
+        public AddNewProductModel(IBaseStore<RazorPage> razorPagesBaseStore, ICacheService cacheService, IBaseImage imageBaseStore, ILogger<AddNewProductModel> logger, IBaseStore<Product> productBaseStore, IBaseStore<Category> categoryBaseStore, ICartService cartService, IBaseStore<ProductDetail> productDetailBaseStore)
         {
             _razorPagesBaseStore = razorPagesBaseStore;
             _cacheService = cacheService;
@@ -38,9 +46,9 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
             _imageBaseStore = imageBaseStore;
             _productBaseStore = productBaseStore;
             _categoryBaseStore = categoryBaseStore;
-            RazorPageSelectList = new List<SelectListItem>();
+            _cartService = cartService;
+            _productDetailBaseStore = productDetailBaseStore;
 
-            TextCaptions = new TestCaptions();
             _razorPages = _cacheService.GetOrCreate(CacheKey.GetRazorPages, _razorPagesBaseStore.GetAll).Where(x => x.PageName != "Home").ToList();
             _categories = _cacheService.GetOrCreate(CacheKey.ProductCategories, _categoryBaseStore.GetAll);
 
@@ -48,6 +56,11 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
 
             RazorPageSelectList = _razorPages.Select(page => new SelectListItem { Text = page.PageName, Value = page.Id.ToString() }).ToList();
             CategorySelectList = _categories.Where(x => x.RazorPageId == pageId).Select(category => new SelectListItem { Text = category.CategoryName, Value = category.Id.ToString() }).ToList();
+            AllMenShoeSizesItems = MenShoeSizes.Select(x => new SelectListItem { Text = x.ToString(CultureInfo.CurrentCulture), Value = x.ToString(CultureInfo.CurrentCulture) }).ToList();
+            AllWomenShoeSizesItems = WomenShoeSizes.Select(x => new SelectListItem { Text = x.ToString(CultureInfo.CurrentCulture), Value = x.ToString(CultureInfo.CurrentCulture) }).ToList();
+
+            SelectedShoeSizes = Enumerable.Empty<string>();
+            TextCaptions = new TestCaptions();
         }
 
         [BindProperty(SupportsGet = true)] public InputModel InModel { get; set; } = new();
@@ -90,12 +103,23 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
                 IsTrending = product.IsTrending,
                 ProductQuantity = product.ProductQuantity,
                 Category = product.Category.Id,
-                Id = product.Id,
-                Gender = product.Gender,
-                HasMaxi = product.HasMaxi,
-                HasMidi = product.HasMidi,
-                HasMini = product.HasMini
+                Id = product.Id
             };
+
+            if (!product.ProductDetails.Any())
+            {
+                return Page();
+            }
+
+            InModel.Gender = string.IsNullOrWhiteSpace(product.ProductDetails.First().Gender)
+                ? "All"
+                : product.ProductDetails.First().Gender;
+            InModel.HasMaxi = product.ProductDetails.Any(x => x.HasMaxi);
+            InModel.HasMidi = product.ProductDetails.Any(x => x.HasMidi);
+            InModel.HasMini = product.ProductDetails.Any(x => x.HasMini);
+            SelectedShoeSizes = product.ProductDetails.First().ShoeSize.Split(',');
+
+
 
             return Page();
         }
@@ -104,6 +128,15 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
         {
             var product = _productBaseStore.GetEntity(id);
             _productBaseStore.DeleteEntity(product, CacheKey.GetProducts, true);
+
+            if (!product.ProductDetails.Any())
+            {
+                return RedirectToPage("./AllProducts");
+            }
+
+            var details = product.ProductDetails.First();
+            _productDetailBaseStore.DeleteEntity(details, CacheKey.GetProductDetails, true);
+
             return RedirectToPage("./AllProducts");
         }
 
@@ -117,11 +150,32 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
         {
             var isEdit = InModel.Id > 0;
 
-            var product = isEdit ? UpdateExistingProduct() : CreateNewProduct();
+            var product = isEdit ? UpdateExistingProductTemplate() : CreateNewProductTemplate();
+
+            if (_cartService.GetProductType(product.RazorPageId) == "bags" && !InModel.HasMini && !InModel.HasMidi && !InModel.HasMaxi)
+            {
+                StatusMessage = "Error. Bag must have a Mini, Midi or Maxi size.";
+                return Page();
+            }
+
+
+            var isDetailExist = product.ProductDetails.Any();
+            var productDetail = CreateProductDetailTemplate(product, isDetailExist);
 
             if (isEdit)
             {
                 _productBaseStore.UpdateEntity(product, CacheKey.GetProducts, true);
+
+                if (isDetailExist)
+                {
+                    _productDetailBaseStore.UpdateEntity(productDetail, CacheKey.GetProductDetails, true);
+                }
+                else
+                {
+                    productDetail.Product = product;
+                    _productDetailBaseStore.AddEntity(productDetail, CacheKey.GetProductDetails, true);
+                }
+
                 return RedirectToPage("./AllProducts");
             }
 
@@ -132,12 +186,15 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
             }
 
             _productBaseStore.AddEntity(product, CacheKey.GetProducts, true);
+            
+            productDetail.Product = product;
+            _productDetailBaseStore.AddEntity(productDetail, CacheKey.GetProductDetails, true);
 
             return RedirectToPage("./AllProducts");
         }
 
 
-        private Product CreateNewProduct()
+        private Product CreateNewProductTemplate()
         {
             var product = new Product
             {
@@ -155,16 +212,56 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
                 IsTrending = InModel.IsTrending,
                 ProductTags = InModel.ProductTags,
                 ProductQuantity = InModel.ProductQuantity,
-                CategoryId = InModel.Category,
-                Gender = InModel.Gender,
-                HasMini = InModel.HasMini,
-                HasMidi = InModel.HasMidi,
-                HasMaxi = InModel.HasMaxi
+                CategoryId = InModel.Category
             };
             return product;
         }
 
-        private Product UpdateExistingProduct()
+        private ProductDetail CreateProductDetailTemplate(Product product, bool isDetailExist)
+        {
+            ProductDetail detail;
+
+            if (isDetailExist)
+            {
+                detail = product.ProductDetails.First();
+                detail.Gender = InModel.Gender;
+
+                if (_cartService.GetProductType(product.RazorPageId) == "bags")
+                {
+                    detail.HasMini = InModel.HasMini;
+                    detail.HasMidi = InModel.HasMidi;
+                    detail.HasMaxi = InModel.HasMaxi;
+                }
+
+                if (_cartService.GetProductType(product.RazorPageId) == "shoes")
+                {
+                    detail.ShoeSize = string.Join(',', SelectedShoeSizes);
+                }
+
+                detail.ModifiedBy = User.Identity?.Name;
+                detail.ModifiedDate = DateTime.UtcNow;
+
+                return detail;
+            }
+
+            detail = new ProductDetail
+            {
+                Gender = InModel.Gender,
+
+                HasMini = InModel.HasMini,
+                HasMidi = InModel.HasMidi,
+                HasMaxi = InModel.HasMaxi,
+                ShoeSize = string.Join(',', SelectedShoeSizes),
+
+                CreatedDate = DateTime.UtcNow,
+                CreatedBy = User.Identity?.Name,
+            };
+
+            return detail;
+
+        }
+
+        private Product UpdateExistingProductTemplate()
         {
             var prd = _productBaseStore.GetEntity(InModel.Id);
 
@@ -181,10 +278,6 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
             prd.CategoryId = InModel.Category;
             prd.ModifiedBy = User.Identity?.Name;
             prd.ModifiedDate = DateTime.UtcNow;
-            prd.Gender = InModel.Gender;
-            prd.HasMini = InModel.HasMini;
-            prd.HasMidi = InModel.HasMidi;
-            prd.HasMaxi = InModel.HasMaxi;
 
             if (InModel?.ProductImage != null)
             {
@@ -196,7 +289,7 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
                     _imageBaseStore.DeleteEntity(existingImage);
                 }
 
-                var img = UploadProductImage();
+                var img = ProcessProductImage();
                 prd.Images.Add(img);
             }
 
@@ -211,7 +304,7 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
                     _imageBaseStore.DeleteImages(existingImages, CacheKey.UploadImage, true);
                 }
 
-                var images = UploadProductImages();
+                var images = ProcessAdditionalProductImages();
                 prd.Images.AddRange(images);
             }
 
@@ -224,7 +317,7 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
             return prd;
         }
 
-        private Image UploadProductImage()
+        private Image ProcessProductImage()
         {
             var image = new Image();
             try
@@ -279,7 +372,7 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
             return image;
         }
 
-        private List<Image> UploadProductImages()
+        private List<Image> ProcessAdditionalProductImages()
         {
             var images = new List<Image>();
 
@@ -347,10 +440,10 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
             var images = new List<Image>();
             try
             {
-                var image = UploadProductImage();
+                var image = ProcessProductImage();
                 images.Add(image);
 
-                var additionalImages = UploadProductImages();
+                var additionalImages = ProcessAdditionalProductImages();
                 images.AddRange(additionalImages);
 
             }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Slim.Data.Context;
 
@@ -11,9 +12,10 @@ using Slim.Data.Context;
 namespace Slim.Data.Migrations
 {
     [DbContext(typeof(SlimDbContext))]
-    partial class SlimDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230213060102_AddProductDetailTable")]
+    partial class AddProductDetailTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -339,7 +341,7 @@ namespace Slim.Data.Migrations
                     b.Property<Guid>("ImageId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier")
-                        .HasDefaultValue(new Guid("8ba5af9a-dfec-4c76-8526-35910d4b7120"));
+                        .HasDefaultValue(new Guid("47da4518-e911-48e7-aa92-deba6a0c29d0"));
 
                     b.Property<bool>("IsPrimaryImage")
                         .ValueGeneratedOnAdd()
@@ -469,6 +471,19 @@ namespace Slim.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValueSql("((1))");
+
+                    b.Property<string>("Gender")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("HasMaxi")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HasMidi")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HasMini")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsNewProduct")
                         .ValueGeneratedOnAdd()

@@ -41,7 +41,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="dismissModal()">Close</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="dismissModal('errorModal')">Close</button>
             </div>
         </div>
     </div>
@@ -172,7 +172,7 @@
                                     <div class="row" id="isProductHasMiniMidiMaxi">
                                         <label class="form-label py-2"> Size Availability </label>
 
-                                        @foreach (var s in Model.Sizes)
+                                        @foreach (var s in Model.BagSizes)
                                         {
                                             <div class="col mb-3">
                                                 <label class="form-label">@s</label>
@@ -548,8 +548,5 @@
             GetTotalCartItem(cartUrl);
         });
 
-        function dismissModal() {
-            $('#errorModal').modal('hide');
-        }
     </script>
 }

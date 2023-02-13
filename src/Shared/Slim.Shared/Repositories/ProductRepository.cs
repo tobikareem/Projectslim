@@ -93,6 +93,7 @@ namespace Slim.Shared.Repositories
             try
             {
                 return _context.Products.Include(x => x.Images)
+                    .Include(a => a.ProductDetails)
                     .Include(x => x.Category)
                     .Include(y => y.Comments)
                     .Include(d => d.Reviews).ToList();

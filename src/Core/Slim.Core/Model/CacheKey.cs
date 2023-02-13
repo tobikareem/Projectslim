@@ -15,6 +15,7 @@ namespace Slim.Core.Model
         GetShoppingCartItem,
         UserProfileImage,
         GetWebPages,
-        GetHomePageImages
+        GetHomePageImages,
+        GetProductDetails
     }
 }
