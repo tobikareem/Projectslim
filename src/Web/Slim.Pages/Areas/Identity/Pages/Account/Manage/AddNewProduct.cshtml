@@ -233,6 +233,32 @@
             var selectedName = selectedValue.find("option:selected").text().toLowerCase();
             filterToShow(selectedName);
 
+            var productId = $('#hiddenProductId').val();
+            if (productId > 0) {
+                // call the ajax method to get the ring size
+
+                $.ajax({
+                    type: 'GET', // define the type of HTTP verb we want to use (POST for our form)
+                    url: '@Url.Page(null, "ReturnRingSizes")', // the url where we want to POST
+
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("XSRF-TOKEN",
+                            $('input:hidden[name="__RequestVerificationToken"]').val());
+                    },
+                    data: { productId }, // our data object
+                    contentType: "application/json; charset=utf-8",
+                    traditional: true,
+                    async: false,
+                    success: function (data) {
+                        editJewelryRingSize(data, productId);
+                    },
+                    error: function (data) {
+
+                        console.log("couldn't Successfully");
+                    }
+                });
+            }
+
         });
 
 
@@ -285,7 +311,7 @@
                 return;
             }
 
-            if(selectedSubCategory.toLowerCase() !== "ring") {
+            if (selectedSubCategory.toLowerCase() !== "ring") {
                 $('#productHasGender').hide();
                 $('#productIsARing').hide();
                 return;
@@ -295,14 +321,35 @@
             $('#productHasGender').hide();
 
             var productId = $('#hiddenProductId').val();
-            debugger;
-            if(productId > 0) {
+            if (productId > 0) {
                 // call the ajax method to get the ring size
 
-                
+                $.ajax({
+                    type: 'GET', // define the type of HTTP verb we want to use (POST for our form)
+                    url: '@Url.Page(null, "ReturnRingSizes")', // the url where we want to POST
+
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("XSRF-TOKEN",
+                            $('input:hidden[name="__RequestVerificationToken"]').val());
+                    },
+                    data: { productId }, // our data object
+                    contentType: "application/json; charset=utf-8",
+                    traditional: true,
+                    async: false,
+                    success: function (data) {
+                        editJewelryRingSize(data, productId);
+                    },
+                    error: function (data) {
+
+                        console.log("couldn't Successfully");
+                    }
+                });
+
+            } else {
+                filterToShow(selectedName);
             }
 
-            filterToShow(selectedName);
+
 
         });
 
@@ -319,7 +366,7 @@
                     showShoes();
                     break;
                 case "jewelries":
-                    showRingSize();
+                    showRingSize(false);
 
                     break;
                 default:
@@ -346,8 +393,9 @@
             });
         }
 
-        function showRingSize() {
+        function showRingSize(isEdit) {
             $('#productIsARing').show();
+            $('#productHasGender').hide();
 
             // clear the div id ringSizeButton
             document.getElementById('ringSizeButton').innerHTML = '';
@@ -371,21 +419,68 @@
                         selectedSizesArray.push(size.innerHTML);
                     });
 
-                    // set the value of id InModel.SelectedRingSizes
-                    $('#InModel.SelectedRingSizes').val(selectedSizesArray);
-
                     // call the function to update selectedsize
 
-                    updateSelectedRingSize(selectedSizesArray.toString(), 20);
-
-                    console.log('selected sizes: ', selectedSizesArray);
+                    updateSelectedRingSize(selectedSizesArray.toString(), 0);
 
                 };
                 document.getElementById('ringSizeButton').appendChild(button);
             });
         }
 
-        function updateSelectedRingSize(selectedSizesArray, pageId) {
+        function editJewelryRingSize(data, productId) {
+            if (data != null) {
+                var $el = $("#ringSizeButton");
+                $el.empty(); // remove old options
+                var ringSizes = [6, 7, 8, 9, 10, 11, 12];
+
+                // create a selectable button for each size and append to div id ringSizeButton and add a selected onclick event to each button
+                // if the size is in the data then add the selected class to the button
+
+                $.each(ringSizes, function (index, value) {
+                    var button = document.createElement("button");
+                    button.type = "button";
+                    button.innerText = value;
+                    button.onclick = function () {
+                        var selected = $(this).hasClass("selected");
+                        if (selected) {
+                            $(this).removeClass("selected");
+                        } else {
+                            $(this).addClass("selected");
+                        }
+
+                        this.classList.toggle("btn-dark");
+                        this.classList.toggle("btn-outline-dark");
+
+                        // get all the selected sizes
+                        var selectedSizes = document.querySelectorAll('.btn-dark');
+                        var selectedSizesArray = [];
+                        selectedSizes.forEach(function (size) {
+                            selectedSizesArray.push(size.innerHTML);
+                        });
+
+                        // call the function to update selectedsize
+
+                        updateSelectedRingSize(selectedSizesArray.toString(), productId);
+                    };
+                    if (data.includes(value)) {
+                        button.className = "btn btn-sm btn-dark me-2 col selected";
+                    } else {
+                        button.className = "btn btn-sm btn-outline-dark me-2 col";
+                    }
+
+                    $el.append(button);
+                });
+
+            }
+            else {
+                var $el = $("#ringSizeButton");
+                $el.empty(); // remove old options
+            }
+
+        }
+
+        function updateSelectedRingSize(selectedSizesArray, productId) {
             $.ajax({
                 type: 'GET', // define the type of HTTP verb we want to use (POST for our form)
                 url: '@Url.Page(null, "AddRingSizes")', //'/Identity/Account/Manage/WebPagePhotos?handler=SaveWording', // the url where we want to POST
@@ -394,7 +489,7 @@
                     xhr.setRequestHeader("XSRF-TOKEN",
                         $('input:hidden[name="__RequestVerificationToken"]').val());
                 },
-                data: { ringSizes: selectedSizesArray, pageId }, // our data object
+                data: { ringSizes: selectedSizesArray, productId }, // our data object
                 contentType: "application/json; charset=utf-8",
                 traditional: true,
                 async: false,
