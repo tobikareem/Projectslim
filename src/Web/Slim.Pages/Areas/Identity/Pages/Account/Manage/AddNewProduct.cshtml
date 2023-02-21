@@ -46,7 +46,7 @@
                 </div>
 
                 <div id="refreshPage">
-                    <input asp-for="InModel.Id" type="hidden" />
+                    <input asp-for="InModel.Id" type="hidden" id="hiddenProductId" />
 
                     <div class="mb-3 pb-2">
                         <label class="form-label" asp-for="InModel.ProductName"></label>
@@ -138,13 +138,13 @@
                         </div>
                     </div>
 
-                    <div class="row">
+                    <div class="row" id="productHasGender">
                         <label class="form-label py-2 bg-secondary"> Gender Availability </label>
                         @foreach (var gender in Model.Genders)
                         {
                             <div class="col mb-3">
                                 <label class="form-label" asp-for="InModel.Gender">@gender</label>
-                                <input class="form-check-input" type="radio" asp-for="InModel.Gender"  value="@gender">
+                                <input class="form-check-input" type="radio" asp-for="InModel.Gender" value="@gender">
                             </div>
                         }
                     </div>
@@ -181,15 +181,13 @@
                             <button class="btn btn-sm btn-dark" onclick="onSizeGuideClick()" type="button"> Size Guide </button>
                         </div>
                     </div>
-                    
+
                     <div class="row" id="productIsARing">
                         <label class="form-label py-2 bg-secondary"> Ring Size </label>
                         <div class="form-text">Select all available sizes of ring.</div>
 
                         <div class="row" id="ringSizeButton"></div>
-                        
-                        <input type="hidden" asp-for="InModel.SelectedRingSizes"/>
-                        
+
                     </div>
 
                     <div class="mb-3 py-2">
@@ -235,8 +233,6 @@
             var selectedName = selectedValue.find("option:selected").text().toLowerCase();
             filterToShow(selectedName);
 
-            $('#womenShoeDropDown').hide();
-
         });
 
 
@@ -276,8 +272,43 @@
             });
         });
 
+        $('#product-category').change(function () {
+            // get the selected name
+            var selectedCategory = $('#add-product-category').find("option:selected").text().toLowerCase();
+
+            // get select details from the form for '#product-category'
+            // get the text of the selected option
+            var selectedSubCategory = $(this).find("option:selected").text().toLocaleLowerCase();
+
+            if (selectedCategory.toLowerCase() !== "jewelries") {
+                $('#productIsARing').hide();
+                return;
+            }
+
+            if(selectedSubCategory.toLowerCase() !== "ring") {
+                $('#productHasGender').hide();
+                $('#productIsARing').hide();
+                return;
+            }
+
+            $('#productIsARing').show();
+            $('#productHasGender').hide();
+
+            var productId = $('#hiddenProductId').val();
+            debugger;
+            if(productId > 0) {
+                // call the ajax method to get the ring size
+
+                
+            }
+
+            filterToShow(selectedName);
+
+        });
+
         function filterToShow(selectedName) {
             $('#productIsAShoe').hide();
+            $('#womenShoeDropDown').hide();
             $('#productHasMiniMidiMaxi').hide();
             $('#productIsARing').hide();
             switch (selectedName) {
@@ -285,68 +316,73 @@
                     $('#productHasMiniMidiMaxi').show();
                     break;
                 case "shoes":
-                    $('#productIsAShoe').show();
-
-                    $('input[name="InModel.Gender"]').change(function () {
-
-                        var selectedValue = $(this).val().toLowerCase();
-
-                        $('#womenShoeDropDown').hide();
-                        $('#menShoeDropDown').hide();
-
-                        if (selectedValue === "male" || selectedValue === "all") {
-                            $('#menShoeDropDown').show();
-                        } else {
-                            $('#womenShoeDropDown').show();
-                        }
-
-                    });
+                    showShoes();
                     break;
                 case "jewelries":
-                    $('#productIsARing').show();
-
-                    // clear the div id ringSizeButton
-                    document.getElementById('ringSizeButton').innerHTML = '';
-
-                    var ringSizes = [6,7,8,9,10,11,12];
-
-                    // create a selectable button for each size and append to div id ringSizeButton and add a selected onclick event to each button
-                    ringSizes.forEach(function (size) {
-                        var button = document.createElement('button');
-                        button.type = 'button';
-                        button.className = 'btn btn-sm btn-outline-dark me-2 col';
-                        button.innerHTML = size;
-                        button.onclick = function () {
-                            this.classList.toggle('btn-dark');
-                            this.classList.toggle('btn-outline-dark');
-
-                            // get all the selected sizes
-                            var selectedSizes = document.querySelectorAll('.btn-dark');
-                            var selectedSizesArray = [];
-                            selectedSizes.forEach(function (size) {
-                                if(size.innerHTML === 'Size Guide'){
-                                    continue;
-                                }
-                                selectedSizesArray.push(size.innerHTML);
-                            });
-
-                            // set the value of id InModel.SelectedRingSizes
-                            $('#InModel.SelectedRingSizes').val(selectedSizesArray);
-
-                            // call the function to update selectedsize
-
-                            updateSelectedRingSize(selectedSizesArray.toString(), 20);
-
-                            console.log('selected sizes: ', selectedSizesArray);
-
-                        };
-                        document.getElementById('ringSizeButton').appendChild(button);
-                    });
+                    showRingSize();
 
                     break;
                 default:
                     break;
             }
+        }
+
+        function showShoes() {
+            $('#productIsAShoe').show();
+
+            $('input[name="InModel.Gender"]').change(function () {
+
+                var selectedValue = $(this).val().toLowerCase();
+
+                $('#womenShoeDropDown').hide();
+                $('#menShoeDropDown').hide();
+
+                if (selectedValue === "male" || selectedValue === "all") {
+                    $('#menShoeDropDown').show();
+                } else {
+                    $('#womenShoeDropDown').show();
+                }
+
+            });
+        }
+
+        function showRingSize() {
+            $('#productIsARing').show();
+
+            // clear the div id ringSizeButton
+            document.getElementById('ringSizeButton').innerHTML = '';
+
+            var ringSizes = [6, 7, 8, 9, 10, 11, 12];
+
+            // create a selectable button for each size and append to div id ringSizeButton and add a selected onclick event to each button
+            ringSizes.forEach(function (size) {
+                var button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'btn btn-sm btn-outline-dark me-2 col';
+                button.innerHTML = size;
+                button.onclick = function () {
+                    this.classList.toggle('btn-dark');
+                    this.classList.toggle('btn-outline-dark');
+
+                    // get all the selected sizes
+                    var selectedSizes = document.querySelectorAll('.btn-dark');
+                    var selectedSizesArray = [];
+                    selectedSizes.forEach(function (size) {
+                        selectedSizesArray.push(size.innerHTML);
+                    });
+
+                    // set the value of id InModel.SelectedRingSizes
+                    $('#InModel.SelectedRingSizes').val(selectedSizesArray);
+
+                    // call the function to update selectedsize
+
+                    updateSelectedRingSize(selectedSizesArray.toString(), 20);
+
+                    console.log('selected sizes: ', selectedSizesArray);
+
+                };
+                document.getElementById('ringSizeButton').appendChild(button);
+            });
         }
 
         function updateSelectedRingSize(selectedSizesArray, pageId) {
@@ -363,7 +399,7 @@
                 traditional: true,
                 async: false,
                 success: function (data) {
-                    
+
                 },
                 error: function (data) {
 
@@ -373,9 +409,7 @@
         }
 
         function onSizeGuideClick() {
-
             $('#sizeGuideModal').modal('show');
-
         }
 
     </script>
