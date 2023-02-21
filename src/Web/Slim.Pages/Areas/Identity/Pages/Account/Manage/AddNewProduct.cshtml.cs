@@ -146,8 +146,40 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
             return new JsonResult(categories);
         }
 
+        public JsonResult OnGetAddRingSizes(string ringSizes, int pageId)
+        {
+            var productIdDetails = _productDetailBaseStore.GetAll().FirstOrDefault(x => x.ProductId == 0);
+
+            switch (productIdDetails)
+            {
+                case null when !string.IsNullOrWhiteSpace(ringSizes):
+                    TempData["ringSize"] = ringSizes;
+                    return new JsonResult(null);
+                case null:
+                    return new JsonResult(null);
+            }
+
+            // Get the product detail for jewelry size
+            productIdDetails.JewelrySize = ringSizes;
+            _productDetailBaseStore.UpdateEntity(productIdDetails, CacheKey.GetProductDetails, true);
+            return new JsonResult(productIdDetails);
+
+        }
+
         public IActionResult OnPostAddNewProduct()
         {
+
+            var shoeSize = Convert.ToString(TempData["ringSize"]);
+            if (!string.IsNullOrWhiteSpace(shoeSize))
+            {
+                InModel.SelectedRingSizes = shoeSize;
+            }
+
+            if (InModel?.SelectedRingSizes == null)
+            {
+                return Page();
+            }
+
             var isEdit = InModel.Id > 0;
 
             var product = isEdit ? UpdateExistingProductTemplate() : CreateNewProductTemplate();
@@ -186,7 +218,7 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
             }
 
             _productBaseStore.AddEntity(product, CacheKey.GetProducts, true);
-            
+
             productDetail.Product = product;
             _productDetailBaseStore.AddEntity(productDetail, CacheKey.GetProductDetails, true);
 
@@ -515,6 +547,7 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
             public bool HasMidi { get; set; }
             [Display(Name = "Maxi")]
             public bool HasMaxi { get; set; }
+            public string SelectedRingSizes { get; set; }
 
         }
 
