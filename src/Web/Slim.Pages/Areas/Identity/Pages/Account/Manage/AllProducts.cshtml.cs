@@ -27,7 +27,7 @@ public class AllProductsModel : PageModel
         RazorPageSelectList = new List<SelectListItem>();
         ProductAndPrimaryImage = new Dictionary<int, string>();
 
-        var razorPages = _cacheService.GetOrCreate(CacheKey.GetRazorPages, _razorPagesBaseStore.GetAll).Where(x => SlmConstant.PagesForDropDown.Contains(x.PageName));
+        var razorPages = _cacheService.GetOrCreate(CacheKey.GetRazorPages, _razorPagesBaseStore.GetAll).Where(x  => x.PageName != "Home");
         RazorPageSelectList = razorPages.Select(page => new SelectListItem { Text = page.PageName, Value = page.Id.ToString() }).ToList();
     }
     [BindProperty(SupportsGet = true)] public InputModel InModel { get; set; } = new();

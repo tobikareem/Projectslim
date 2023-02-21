@@ -173,6 +173,14 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
             InModel.HasMini = product.ProductDetails.Any(x => x.HasMini);
             SelectedShoeSizes = product.ProductDetails.First().ShoeSize.Split(',');
 
+            var categories = _cacheService.GetOrCreate(CacheKey.ProductCategories, _categoryBaseStore.GetAll).Where(x => x.RazorPageId == product.RazorPageId);
+            CategorySelectList = categories.Select(category => new SelectListItem { Text = category.CategoryName, Value = category.Id.ToString() }).ToList();
+
+            if (_cartService.GetProductType(product.RazorPageId) == "jewelries")
+            {
+                TempData["ringSize"] = product.ProductDetails.First().JewelrySize;
+            }
+
             return Page();
         }
 
@@ -198,9 +206,25 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
             return new JsonResult(categories);
         }
 
-        public JsonResult OnGetAddRingSizes(string ringSizes, int pageId)
+        public JsonResult OnGetReturnRingSizes(int productId)
         {
-            var productIdDetails = _productDetailBaseStore.GetAll().FirstOrDefault(x => x.ProductId == 0);
+            var product = _productBaseStore.GetEntity(productId);
+
+            if (product?.Id == 0 || !product.ProductDetails.Any())
+            {
+                return new JsonResult(null);
+            }
+
+            var ringSizes = product.ProductDetails.First().JewelrySize;
+
+            var allSizes = ringSizes.Split(',').Where(x => int.TryParse(x, out _)).Select(int.Parse);
+
+            return new JsonResult(allSizes);
+        }
+
+        public JsonResult OnGetAddRingSizes(string ringSizes, int productId)
+        {
+            var productIdDetails = _productDetailBaseStore.GetAll().FirstOrDefault(x => x.ProductId == productId);
 
             switch (productIdDetails)
             {
@@ -259,11 +283,6 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
                 if (_cartService.GetProductType(product.RazorPageId) == "shoes")
                 {
                     detail.ShoeSize = string.Join(',', SelectedShoeSizes);
-                }
-
-                if (_cartService.GetProductType(product.RazorPageId) == "jewelries")
-                {
-                    detail.JewelrySize = InModel.SelectedRingSizes;
                 }
 
                 detail.ModifiedBy = User.Identity?.Name;
