@@ -77,95 +77,6 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
             InModel.Category = _categories.FirstOrDefault(x => x.CategoryName == "General")?.Id ?? 1;
         }
 
-        public IActionResult OnGetEditProduct(int id)
-        {
-            var product = _productBaseStore.GetEntity(id);
-
-            TextCaptions = new TestCaptions
-            {
-                IsEditing = true,
-                TitleCaption = $"Edit: {product.ProductName}",
-                BtnCaption = "Update Product",
-                ProfileImageEditText = "Uploading a new image will replace the current image",
-                ProfileImagesEditText = "Uploading one or more images will remove all current Images"
-            };
-
-            InModel = new InputModel
-            {
-                RazorPageId = product.RazorPageId.ToString(),
-                ProductName = product.ProductName,
-                ProductDescription = product.ProductDescription,
-                SalePrice = product.SalePrice,
-                StandardPrice = product.StandardPrice,
-                ProductTags = product.ProductTags,
-                IsOnSale = product.IsOnSale,
-                IsNewProduct = product.IsNewProduct,
-                IsTrending = product.IsTrending,
-                ProductQuantity = product.ProductQuantity,
-                Category = product.Category.Id,
-                Id = product.Id
-            };
-
-            if (!product.ProductDetails.Any())
-            {
-                return Page();
-            }
-
-            InModel.Gender = string.IsNullOrWhiteSpace(product.ProductDetails.First().Gender)
-                ? "All"
-                : product.ProductDetails.First().Gender;
-            InModel.HasMaxi = product.ProductDetails.Any(x => x.HasMaxi);
-            InModel.HasMidi = product.ProductDetails.Any(x => x.HasMidi);
-            InModel.HasMini = product.ProductDetails.Any(x => x.HasMini);
-            SelectedShoeSizes = product.ProductDetails.First().ShoeSize.Split(',');
-
-
-
-            return Page();
-        }
-
-        public IActionResult OnGetDeleteProduct(int id)
-        {
-            var product = _productBaseStore.GetEntity(id);
-            _productBaseStore.DeleteEntity(product, CacheKey.GetProducts, true);
-
-            if (!product.ProductDetails.Any())
-            {
-                return RedirectToPage("./AllProducts");
-            }
-
-            var details = product.ProductDetails.First();
-            _productDetailBaseStore.DeleteEntity(details, CacheKey.GetProductDetails, true);
-
-            return RedirectToPage("./AllProducts");
-        }
-
-        public JsonResult OnGetSelectionChanged(int id)
-        {
-            var categories = _cacheService.GetOrCreate(CacheKey.ProductCategories, _categoryBaseStore.GetAll).Where(x => x.RazorPageId == id);
-            return new JsonResult(categories);
-        }
-
-        public JsonResult OnGetAddRingSizes(string ringSizes, int pageId)
-        {
-            var productIdDetails = _productDetailBaseStore.GetAll().FirstOrDefault(x => x.ProductId == 0);
-
-            switch (productIdDetails)
-            {
-                case null when !string.IsNullOrWhiteSpace(ringSizes):
-                    TempData["ringSize"] = ringSizes;
-                    return new JsonResult(null);
-                case null:
-                    return new JsonResult(null);
-            }
-
-            // Get the product detail for jewelry size
-            productIdDetails.JewelrySize = ringSizes;
-            _productDetailBaseStore.UpdateEntity(productIdDetails, CacheKey.GetProductDetails, true);
-            return new JsonResult(productIdDetails);
-
-        }
-
         public IActionResult OnPostAddNewProduct()
         {
 
@@ -173,11 +84,6 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
             if (!string.IsNullOrWhiteSpace(shoeSize))
             {
                 InModel.SelectedRingSizes = shoeSize;
-            }
-
-            if (InModel?.SelectedRingSizes == null)
-            {
-                return Page();
             }
 
             var isEdit = InModel.Id > 0;
@@ -225,6 +131,91 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
             return RedirectToPage("./AllProducts");
         }
 
+        public IActionResult OnGetEditProduct(int id)
+        {
+            var product = _productBaseStore.GetEntity(id);
+
+            TextCaptions = new TestCaptions
+            {
+                IsEditing = true,
+                TitleCaption = $"Edit: {product.ProductName}",
+                BtnCaption = "Update Product",
+                ProfileImageEditText = "Uploading a new image will replace the current image",
+                ProfileImagesEditText = "Uploading one or more images will remove all current Images"
+            };
+
+            InModel = new InputModel
+            {
+                RazorPageId = product.RazorPageId.ToString(),
+                ProductName = product.ProductName,
+                ProductDescription = product.ProductDescription,
+                SalePrice = product.SalePrice,
+                StandardPrice = product.StandardPrice,
+                ProductTags = product.ProductTags,
+                IsOnSale = product.IsOnSale,
+                IsNewProduct = product.IsNewProduct,
+                IsTrending = product.IsTrending,
+                ProductQuantity = product.ProductQuantity,
+                Category = product.Category.Id,
+                Id = product.Id
+            };
+
+            if (!product.ProductDetails.Any())
+            {
+                return Page();
+            }
+
+            InModel.Gender = string.IsNullOrWhiteSpace(product.ProductDetails.First().Gender)
+                ? "All"
+                : product.ProductDetails.First().Gender;
+            InModel.HasMaxi = product.ProductDetails.Any(x => x.HasMaxi);
+            InModel.HasMidi = product.ProductDetails.Any(x => x.HasMidi);
+            InModel.HasMini = product.ProductDetails.Any(x => x.HasMini);
+            SelectedShoeSizes = product.ProductDetails.First().ShoeSize.Split(',');
+
+            return Page();
+        }
+
+        public IActionResult OnGetDeleteProduct(int id)
+        {
+            var product = _productBaseStore.GetEntity(id);
+            _productBaseStore.DeleteEntity(product, CacheKey.GetProducts, true);
+
+            if (!product.ProductDetails.Any())
+            {
+                return RedirectToPage("./AllProducts");
+            }
+
+            var details = product.ProductDetails.First();
+            _productDetailBaseStore.DeleteEntity(details, CacheKey.GetProductDetails, true);
+
+            return RedirectToPage("./AllProducts");
+        }
+
+        public JsonResult OnGetSelectionChanged(int id)
+        {
+            var categories = _cacheService.GetOrCreate(CacheKey.ProductCategories, _categoryBaseStore.GetAll).Where(x => x.RazorPageId == id);
+            return new JsonResult(categories);
+        }
+
+        public JsonResult OnGetAddRingSizes(string ringSizes, int pageId)
+        {
+            var productIdDetails = _productDetailBaseStore.GetAll().FirstOrDefault(x => x.ProductId == 0);
+
+            switch (productIdDetails)
+            {
+                case null when !string.IsNullOrWhiteSpace(ringSizes):
+                    TempData["ringSize"] = ringSizes;
+                    return new JsonResult(null);
+                case null:
+                    return new JsonResult(null);
+            }
+
+            // Get the product detail for jewelry size
+            productIdDetails.JewelrySize = ringSizes;
+            _productDetailBaseStore.UpdateEntity(productIdDetails, CacheKey.GetProductDetails, true);
+            return new JsonResult(productIdDetails);
+        }
 
         private Product CreateNewProductTemplate()
         {
@@ -270,6 +261,11 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
                     detail.ShoeSize = string.Join(',', SelectedShoeSizes);
                 }
 
+                if (_cartService.GetProductType(product.RazorPageId) == "jewelries")
+                {
+                    detail.JewelrySize = InModel.SelectedRingSizes;
+                }
+
                 detail.ModifiedBy = User.Identity?.Name;
                 detail.ModifiedDate = DateTime.UtcNow;
 
@@ -284,6 +280,7 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
                 HasMidi = InModel.HasMidi,
                 HasMaxi = InModel.HasMaxi,
                 ShoeSize = string.Join(',', SelectedShoeSizes),
+                JewelrySize = InModel.SelectedRingSizes,
 
                 CreatedDate = DateTime.UtcNow,
                 CreatedBy = User.Identity?.Name,
@@ -547,7 +544,7 @@ namespace Slim.Pages.Areas.Identity.Pages.Account.Manage
             public bool HasMidi { get; set; }
             [Display(Name = "Maxi")]
             public bool HasMaxi { get; set; }
-            public string SelectedRingSizes { get; set; }
+            public string? SelectedRingSizes { get; set; }
 
         }
 
